@@ -129,6 +129,9 @@ namespace TQC.IdealFinish.PFSWrapper
                 }
             }
 
+            /// <summary>
+            /// Get all Synchronous Data
+            /// </summary>
             public double[] Data
             {
                 get
@@ -201,6 +204,23 @@ namespace TQC.IdealFinish.PFSWrapper
                 return DateTime.FromOADate(m_pfsWrapper.get_varProfileAttribute(TQC_ProfileAttributeType.TQC_DOWNLOAD_DATE_TIME));
             }
         }
+
+        public float SampleRate
+        {
+            get
+            {
+                return m_pfsWrapper.get_varProfileAttribute(TQC_ProfileAttributeType.TQC_SAMPLE_RATE);
+            }
+        }
+
+        public float NumberOfReadings
+        {
+            get
+            {
+                return m_pfsWrapper.get_varProfileAttribute(TQC_ProfileAttributeType.TQC_NUMBER_OF_READINGS);
+            }
+        }
+
         public TempUnits TempUnits
         {
             get
@@ -213,6 +233,46 @@ namespace TQC.IdealFinish.PFSWrapper
                         return PFSWrapper.TempUnits.Farenheight;
                 }
                 return PFSWrapper.TempUnits.Centigrade;
+            }
+        }
+        public PFSAsyncData AsynchnousData
+        {
+            get
+            {
+                var data = m_pfsWrapper.AllProbeDataEx(0);
+
+                PFSAsyncData result = new PFSAsyncData();
+
+                object[,] dataRead = data as object[,];
+                AsynchSamples sample = null ;
+                for (int rowId = 1; rowId <=(Readings + 1); ++rowId)
+                {
+                    for (int channelId = 1; channelId <=(Probes + 1); ++channelId)
+                    {
+                        if (rowId == 1)
+                        {
+                            if (channelId > 1)
+                            {
+                                result.ProbeNames.Add(dataRead[rowId, channelId] as string);
+                            }
+                        }
+                        else
+                        {
+                            double value = (double) dataRead[rowId, channelId];
+                            if (channelId == 1)
+                            {
+                                sample = new AsynchSamples();
+                                result.Samples.Add(sample);
+                                sample.TimeOfSample = DateTime.FromOADate(value);
+                            }
+                            else
+                            {
+                                sample.Readings.Add(value.ToReading());
+                            }
+                        }
+                    }
+                }
+                return result ;
             }
         }
         
