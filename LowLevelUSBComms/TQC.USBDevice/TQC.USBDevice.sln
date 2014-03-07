@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TQC.USBDevice", "TQC.USBDevice\TQC.USBDevice.csproj", "{BB4FAFDC-9176-4050-99AE-89597FB62F27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTestProject1", "IntegrationTestProject1\IntegrationTestProject1.csproj", "{9CC0B5CA-298A-495E-8CE0-83ABBD6DA20F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BB4FAFDC-9176-4050-99AE-89597FB62F27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB4FAFDC-9176-4050-99AE-89597FB62F27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB4FAFDC-9176-4050-99AE-89597FB62F27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB4FAFDC-9176-4050-99AE-89597FB62F27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CC0B5CA-298A-495E-8CE0-83ABBD6DA20F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CC0B5CA-298A-495E-8CE0-83ABBD6DA20F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CC0B5CA-298A-495E-8CE0-83ABBD6DA20F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC0B5CA-298A-495E-8CE0-83ABBD6DA20F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
