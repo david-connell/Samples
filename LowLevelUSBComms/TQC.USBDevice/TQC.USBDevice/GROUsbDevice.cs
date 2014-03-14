@@ -4,122 +4,228 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TQC.USBDevice
+namespace TQC.USBDevice.GradientOven
 {
-    public class CarierPosition
+    public enum PowerState : byte
     {
-        public byte Location { get; set; }
-        public float Speed { get; set; }
+        ON = 1,
+        OFF = 0,
     }
+
+    public enum ClampState : byte
+    {
+        Open = 1,
+        Closed = 0,
+    }
+
+    public enum LiftState : byte
+    {
+        Up = 1,
+        Down = 0,
+    }
+
+    public class CarrierPosition
+    {
+        public CarrierPosition(byte positionInMilliMeters)
+        {
+            PositionInMilliMeters = positionInMilliMeters;
+        }
+        public byte PositionInMilliMeters { get; private set; }
+    }
+
+
+    public class Percentage
+    {
+        public Percentage(byte percentage)
+        {
+            if (percentage > 100)
+            {
+                throw new ArgumentOutOfRangeException("percentage", "Max range is 0->100");
+            }
+            Value = percentage;
+        }
+        public byte Value { get; private set; }
+    }
+
+    public class Speed
+    {
+        public Speed(byte speed)
+        {
+            SpeedMillimetersPerSecond = speed;
+        }
+        public byte SpeedMillimetersPerSecond { get; private set; }
+    }
+
     public class GROUsbDevice : TQCUsbLogger
-    {        
-        public byte FanSpeed
+    {
+        public Percentage FanSpeed
         {
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)0 ))  ;
-                return response[0];
+                return new Percentage(response[0]);
             }
             set
             {
                 List<byte> request = new List<byte>();
 
                 request.AddRange(BitConverter.GetBytes((short)0));
-                request.Add(value) ;
+                request.Add(value.Value) ;
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
-        public byte Cooling
+
+        public Percentage Cooling
         {
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)1));
-                return response[0];
+                return new Percentage(response[0]);
             }
             set
             {
                 List<byte> request = new List<byte>();
 
                 request.AddRange(BitConverter.GetBytes((short)1));
-                request.Add(value);
+                request.Add(value.Value);
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
-        public bool Power
+        /// <summary>
+        /// Turns off or on the power supply
+        /// </summary>
+        public PowerState Power
         {
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)2));
-                return response[0] == 1;
+                return (PowerState)response[0];
             }
             set
             {
                 List<byte> request = new List<byte>();
 
                 request.AddRange(BitConverter.GetBytes((short)2));
-                request.Add(value ? (byte)1 : (byte)0);
+                request.Add((byte)value );
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
 
-        public bool Clamp
+        /// <summary>
+        /// Sets/Gets the position of the lift
+        /// </summary>
+        public LiftState Lift
+        {
+            get
+            {
+                var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)7));
+                return (LiftState)response[0];
+            }
+            set
+            {
+                List<byte> request = new List<byte>();
+
+                request.AddRange(BitConverter.GetBytes((short)7));
+                request.Add((byte)value);
+                Request(Commands.GROSetCommand, request.ToArray());
+            }
+        }
+
+        /// <summary>
+        /// The clamp
+        /// </summary>
+        public ClampState Clamp
         {
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)4));
-                return response[0] == 1;
+                return (ClampState) response[0];
             }
             set
             {
                 List<byte> request = new List<byte>();
 
                 request.AddRange(BitConverter.GetBytes((short)4));
-                request.Add(value ? (byte)1 : (byte)0);
+                request.Add((byte)value );
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
 
-        public CarierPosition CarierPosition
+        /// <summary>
+        /// The position of the carrier in millimeters
+        /// </summary>
+        public CarrierPosition CarrierPosition
         {
             get
             {
                 List<byte> request = new List<byte>();
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)5));
-                return new CarierPosition { Location = response[0], Speed = BitConverter.ToSingle(response, 1) };                
+                return new CarrierPosition(response[0]);
             }
             set
             {
                 List<byte> request = new List<byte>();
 
                 request.AddRange(BitConverter.GetBytes((short)5));
-                request.Add(value.Location);
-                request.AddRange(BitConverter.GetBytes(value.Speed));
-
+                request.Add(value.PositionInMilliMeters);                
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
 
-        public byte GetFanSetting(short fanId)
+
+        /// <summary>
+        /// The speed of the carrier in millimeters/sec
+        /// </summary>
+        public Speed CarrierSpeed
         {
-            if (fanId < 0 || fanId > 100)
+            get
             {
-                throw new Exception("Invalid fan Id");
+                List<byte> request = new List<byte>();
+                var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)6));
+                return new Speed(response[0]);
             }
-            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)100 + fanId));            
-            return response[0];
+            set
+            {
+                List<byte> request = new List<byte>();
+
+                request.AddRange(BitConverter.GetBytes((short)6));
+                request.Add(value.SpeedMillimetersPerSecond);
+                Request(Commands.GROSetCommand, request.ToArray());
+            }
         }
 
-        public void SetFanSetting(short fanId, byte fanSetting)
+
+        /// <summary>
+        /// Gets the Fan setting
+        /// </summary>
+        /// <param name="fanId">The Fan That's specified, (0->32)</param>
+        /// <returns>% setting of the fan</returns>
+        public Percentage GetFanSetting(short fanId)
         {
-            if (fanId < 0 || fanId > 100)
+            if (fanId < 0 || fanId > 32)
             {
-                throw new Exception("Invalid fan Id");
+                throw new ArgumentOutOfRangeException("fanId", "Valid fans 0->32");
+            }
+            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)100 + fanId));            
+            return new Percentage(response[0]);
+        }
+
+        /// <summary>
+        /// Sets the Fan setting
+        /// </summary>
+        /// <param name="fanId">The Fan That's specified, (0->32)</param>
+        /// <returns>% setting of the fan</returns>
+        public void SetFanSetting(short fanId, Percentage fanSetting)
+        {
+            if (fanId < 0 || fanId > 32)
+            {
+                throw new ArgumentOutOfRangeException("fanId", "Valid fans 0->32");
             }
 
             List<byte> request = new List<byte>();
 
             request.AddRange(BitConverter.GetBytes((short)100+fanId));
-            request.Add(fanSetting);
+            request.Add(fanSetting.Value);
 
             Request(Commands.GROSetCommand, request.ToArray());
             return ;
@@ -129,9 +235,9 @@ namespace TQC.USBDevice
 
         public float GetTempSetting(short slotId)
         {
-            if (slotId < 0 || slotId > 100)
+            if (slotId < 0 || slotId > 32)
             {
-                throw new Exception("Invalid slot Id");
+                throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
             }
             byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)200 + slotId));
             return BitConverter.ToUInt16(response, 0)/ 10.0f ;
@@ -139,9 +245,9 @@ namespace TQC.USBDevice
 
         public void SetTempSetting(short fanId, float  temperatureSettingInDegreesC)
         {
-            if (fanId < 0 || fanId > 100)
+            if (fanId < 0 || fanId > 32)
             {
-                throw new Exception("Invalid fan Id");
+                throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
             }
             if ((temperatureSettingInDegreesC < 0.0f) || (temperatureSettingInDegreesC > 500.0f) )
             {
