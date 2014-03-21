@@ -39,9 +39,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IdealFinishApplication.cs" />
     <Compile Include="IGOCInterProcessServer.cs" />
     <Compile Include="GOCIServerImplenetation.cs" />
     <Compile Include="IIdealFinishAnalysis.cs" />
+    <Compile Include="Installer\InstallerInformation.cs" />
     <Compile Include="Model\Channel.cs" />
     <Compile Include="Model\DataRunDetail.cs" />
     <Compile Include="Model\SamplePoint.cs" />

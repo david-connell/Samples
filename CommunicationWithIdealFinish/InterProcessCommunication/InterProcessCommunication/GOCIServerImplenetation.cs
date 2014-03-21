@@ -37,12 +37,18 @@ namespace TQC.GOC.InterProcessCommunication
         private TextWriter m_Writer;
         private bool m_IsRunning;
         private EventWaitHandle m_TerminateHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-        bool m_HasConnected;
+        private bool m_HasConnected;
 
         public event ConnectHandler Connect;
         public event ConnectHandler Disconnect;
         public event ExceptionHandler ExceptionThrown;
 
+        public GOCServerImplementation()
+        {
+            IdealFinishApplication.StartUp();
+            
+
+        }
         public void CreateServer(TextWriter writer)
         {
             m_IsRunning = true;
