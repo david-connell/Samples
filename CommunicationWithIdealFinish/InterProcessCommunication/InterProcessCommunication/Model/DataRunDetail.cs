@@ -46,8 +46,19 @@ namespace TQC.GOC.InterProcessCommunication.Model
 
         private List<SamplePoint> m_Samples = new List<SamplePoint>();
 
+        public int NumberOfChannels
+        {
+            get
+            {
+                return Channels.Count;
+            }
+        }
         internal void AddSample(SamplePoint point)
         {
+            if (point.Samples.Length != NumberOfChannels)
+            {
+                throw new ArgumentException("Incorrect number of channel passed for given data run", "point");
+            }
             m_Samples.Add(point);
         }
         internal IList<SamplePoint> Samples

@@ -10,15 +10,16 @@ using TQC.GOC.InterProcessCommunication.Model;
 
 namespace TQC.GOC.InterProcessCommunication
 {
-    internal class NamedPipeReader
+    internal class NamedPipeServerData
     {
-        public NamedPipeServerStream PipeServer { get; set; }
         public byte[] Buffer { get; set; }
         public bool CanDoNextCommand { get; set; }
         public bool PipeBroken { get; set; }
+        private NamedPipeServerStream m_PipeServer;
 
-        public NamedPipeReader()
+        public NamedPipeServerData(NamedPipeServerStream pipeServer)
         {
+            m_PipeServer = pipeServer;
             Buffer = new byte[255];
         }
 
@@ -29,6 +30,15 @@ namespace TQC.GOC.InterProcessCommunication
                 return Buffer.Length;
             }
         }
+
+        public NamedPipeServerStream PipeServer
+        {
+            get
+            {
+                return m_PipeServer;
+            }
+        }
+
     }
 
     public class GOCServerImplementation : IIdealFinishAnalysis, IGOCInterProcessServer
@@ -38,6 +48,7 @@ namespace TQC.GOC.InterProcessCommunication
         private bool m_IsRunning;
         private EventWaitHandle m_TerminateHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
         private bool m_HasConnected;
+        private bool m_IsTerminating;
 
         public event ConnectHandler Connect;
         public event ConnectHandler Disconnect;
@@ -95,29 +106,52 @@ namespace TQC.GOC.InterProcessCommunication
 
         private void ProcessClientThread(object o)
         {
-            NamedPipeServerStream pipeStream = (NamedPipeServerStream)o;
+            NamedPipeServerData namedPipeServerData = (NamedPipeServerData)o;
             try
             {
-                while (m_IsRunning)
-                {
-                    NamedPipeReader pipeReader = new NamedPipeReader { PipeServer = pipeStream };
 
-                    pipeStream.BeginRead(pipeReader.Buffer, 0, pipeReader.Length, ClientMessage, pipeReader);
-                    while (m_IsRunning && !pipeReader.CanDoNextCommand)
+
+                SendCommandToGetFolder(namedPipeServerData);
+
+                while (m_IsRunning && !namedPipeServerData.PipeBroken && !m_IsTerminating)
+                {
+
+                    while (m_IsRunning)
                     {
+                        SendPing(namedPipeServerData);
                         if (m_TerminateHandle.WaitOne(10))
                         {
+                            m_IsTerminating = true;
                             break;
                         }
-                        if (pipeReader.PipeBroken)
+                        if (namedPipeServerData.PipeBroken)
                         {
                             break;
                         }
+
+                        ////pipeStream.BeginRead(pipeReader.Buffer, 0, pipeReader.Length, ClientMessage, pipeReader);
+                        //while (m_IsRunning && !namedPipeServerData.CanDoNextCommand)
+                        //{
+                        //    if (m_TerminateHandle.WaitOne(10))
+                        //    {
+                        //        m_IsTerminating = true;
+                        //        break;
+                        //    }
+                        //    if (namedPipeServerData.PipeBroken)
+                        //    {
+                        //        break;
+                        //    }
+                        //}
                     }
                 }
             }
-            catch (ObjectDisposedException)
+            //catch (ObjectDisposedException odex)
+            //{
+            //    int i;
+            //}
+            catch (IOException ioex)
             {
+                namedPipeServerData.PipeBroken = true;
             }
             catch (Exception ex)
             {
@@ -127,8 +161,8 @@ namespace TQC.GOC.InterProcessCommunication
             {
                 try
                 {
-                    pipeStream.Close();
-                    pipeStream.Dispose();
+                    namedPipeServerData.PipeServer.Close();
+                    namedPipeServerData.PipeServer.Dispose();
                 }
                 catch (Exception ex)
                 {
@@ -136,14 +170,74 @@ namespace TQC.GOC.InterProcessCommunication
                 }
 
             }
+            namedPipeServerData.PipeBroken = true;
             OnDisconnect(EventArgs.Empty);            
         }
+
+        
+        private void SendCommandToGetFolder(NamedPipeServerData pipeReader)
+        {
+            string message = "@1";
+            byte[] buf = Encoding.ASCII.GetBytes(message);
+            pipeReader.PipeServer.Write(buf, 0, buf.Length);
+            pipeReader.PipeServer.BeginRead(pipeReader.Buffer, 0, pipeReader.Length, ClientMessageGetFolder, pipeReader);
+
+            while (m_IsRunning && !pipeReader.CanDoNextCommand)
+            {
+                if (m_TerminateHandle.WaitOne(10))
+                {
+                    m_IsTerminating = true;
+                    break;
+                }
+                if (pipeReader.PipeBroken)
+                {
+                    break;
+                }
+            }                        
+        }
+
+        private void SendPing(NamedPipeServerData pipeReader)
+        {
+            string message = "@2";
+            byte[] buf = Encoding.ASCII.GetBytes(message);
+            pipeReader.PipeServer.Write(buf, 0, buf.Length);           
+        }
+
+        private void ClientMessageGetFolder(IAsyncResult ar)
+        {
+            if (ar != null)
+            {
+                NamedPipeServerData reader = ar.AsyncState as NamedPipeServerData;
+                if (reader != null)
+                {
+                    try
+                    {
+                        reader.PipeServer.EndRead(ar);
+                        string message = System.Text.ASCIIEncoding.ASCII.GetString(reader.Buffer).Trim(new char[] { '\0', ' ' });
+                        lock (m_Server)
+                        {
+                            IdealAnalysisFolder = message;
+                        }
+                        reader.CanDoNextCommand = true;
+                    }
+                    catch (IOException ex)
+                    {
+                        reader.PipeBroken = true;                        
+                    }
+                    catch (Exception ex)
+                    {
+                        OnException(ex);
+                    }
+                }
+            }
+        }
+
 
         private void ClientMessage(IAsyncResult ar)
         {
             if (ar != null)
             {
-                NamedPipeReader reader = ar.AsyncState as NamedPipeReader;
+                NamedPipeServerData reader = ar.AsyncState as NamedPipeServerData;
                 if (reader != null)
                 {
                     try
@@ -169,6 +263,7 @@ namespace TQC.GOC.InterProcessCommunication
                 }
             }            
         }
+
         protected void ProcessNextClient()
         {
             m_HasConnected = false;
@@ -178,9 +273,10 @@ namespace TQC.GOC.InterProcessCommunication
             {
                 m_Writer.WriteLine("[Server] Pipe created {0}", pipeServer.GetHashCode());
 
+                var data = new NamedPipeServerData(pipeServer);
                 try
                 {
-                    pipeServer.BeginWaitForConnection(new AsyncCallback(WaitForConnectionCallBack), pipeServer);
+                    pipeServer.BeginWaitForConnection(new AsyncCallback(WaitForConnectionCallBack), data);
                 }
                 catch (IOException ex)
                 {
@@ -197,7 +293,7 @@ namespace TQC.GOC.InterProcessCommunication
                     {
                         return;
                     }
-                    if (m_HasConnected)
+                    if (data.PipeBroken)
                     {
                         return;
                     }
@@ -213,17 +309,17 @@ namespace TQC.GOC.InterProcessCommunication
         private void WaitForConnectionCallBack(IAsyncResult iar)
         {
             try
-            {                
-                NamedPipeServerStream pipeServer = (NamedPipeServerStream)iar.AsyncState;
+            {
+                NamedPipeServerData data = (NamedPipeServerData)iar.AsyncState;
              
                 
-                pipeServer.EndWaitForConnection(iar);
+                data.PipeServer.EndWaitForConnection(iar);
                                 
                 OnConnect(EventArgs.Empty);
                 m_HasConnected = true;  //Make sure that we can wait for a new connection...
 
                 Thread t = new Thread(ProcessClientThread);
-                t.Start(pipeServer);
+                t.Start(data);
 
             }
             catch (Exception ex)
@@ -242,12 +338,18 @@ namespace TQC.GOC.InterProcessCommunication
 
         private string IdealAnalysisFolder { get; set; }
         private DataRunDetail DataRunDetails { get; set; }
-        bool CollectingData { get; set; }
+        private bool CollectingData { get; set; }
+
         public string Folder
         {
             get 
             {
-                return IdealAnalysisFolder;
+                string result;
+                lock (m_Server)
+                {
+                    result = IdealAnalysisFolder;
+                }
+                return result;
             }
         }
 

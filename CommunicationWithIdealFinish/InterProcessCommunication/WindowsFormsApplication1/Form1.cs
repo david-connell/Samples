@@ -20,10 +20,12 @@ namespace WindowsFormsApplication1
         {
             InitializeComponent();
 
-            m_Server.CreateServer(m_TextWriter);
+            
             m_Server.Connect += m_Server_Connect;
             m_Server.Disconnect += m_Server_Disconnect;
             m_Server.ExceptionThrown += m_Server_ExceptionThrown;
+            //Hook this up afterwards to make sure that we don't miss anything...
+            m_Server.CreateServer(m_TextWriter);
         }
 
         void m_Server_ExceptionThrown(object sender, ExceptionEventArgs e)
