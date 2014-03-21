@@ -4,9 +4,21 @@ namespace TQC.GOC.InterProcessCommunication
 {
     interface IGOCInterProcessServer : IDisposable
     {
+        /// <summary>
+        /// Event called on Connecting to Ideal Finish
+        /// </summary>
         event ConnectHandler Connect;
+        /// <summary>
+        /// Event called on disconnecting from Ideal Finish
+        /// </summary>
         event ConnectHandler Disconnect;
+
         event ExceptionHandler ExceptionThrown;
+
+        /// <summary>
+        /// The server is created at this point. It's Thread safe and is non-blocking
+        /// </summary>
+        /// <param name="writer"></param>
         void CreateServer(TextWriter writer);
     }
 

@@ -9,7 +9,7 @@ namespace TQC.GOC.InterProcessCommunication
 {
     public interface IIdealFinishAnalysis
     {
-        string Folder { get; }
+        string DataFolder { get; }
         bool DataRunStart(DataRunDetail details);
         bool DataRunStop();
         bool Data(SamplePoint sample);

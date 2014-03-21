@@ -47,7 +47,7 @@ namespace TQC.GOC.InterProcessCommunication
         private TextWriter m_Writer;
         private bool m_IsRunning;
         private EventWaitHandle m_TerminateHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-        private bool m_HasConnected;
+
         private bool m_IsTerminating;
 
         public event ConnectHandler Connect;
@@ -58,8 +58,15 @@ namespace TQC.GOC.InterProcessCommunication
         {
             
         }
+
         public void CreateServer(TextWriter writer)
         {
+            if (m_IsRunning)
+            {
+                Exception ex = new Exception("Cannot create more than one InterProcessServer");
+                OnException(ex);
+                throw ex;
+            }
             m_IsRunning = true;
             m_Writer = writer;
             m_Server = new Thread(ServerLoop);
@@ -109,17 +116,13 @@ namespace TQC.GOC.InterProcessCommunication
             NamedPipeServerData namedPipeServerData = (NamedPipeServerData)o;
             try
             {
-
-
                 SendCommandToGetFolder(namedPipeServerData);
-
                 while (m_IsRunning && !namedPipeServerData.PipeBroken && !m_IsTerminating)
                 {
-
                     while (m_IsRunning)
                     {
                         SendPing(namedPipeServerData);
-                        if (m_TerminateHandle.WaitOne(10))
+                        if (m_TerminateHandle.WaitOne(1000))
                         {
                             m_IsTerminating = true;
                             break;
@@ -145,10 +148,6 @@ namespace TQC.GOC.InterProcessCommunication
                     }
                 }
             }
-            //catch (ObjectDisposedException odex)
-            //{
-            //    int i;
-            //}
             catch (IOException ioex)
             {
                 namedPipeServerData.PipeBroken = true;
@@ -253,8 +252,7 @@ namespace TQC.GOC.InterProcessCommunication
                     }
                     catch (IOException ex)
                     {
-                        reader.PipeBroken = true;
-                        //Pipe broken somehow!
+                        reader.PipeBroken = true;                        
                     }
                     catch (Exception ex)
                     {
@@ -266,7 +264,7 @@ namespace TQC.GOC.InterProcessCommunication
 
         protected void ProcessNextClient()
         {
-            m_HasConnected = false;
+            
             using (NamedPipeServerStream pipeServer = 
                 new NamedPipeServerStream("TQC.GradientOven", PipeDirection.InOut,
                     1, PipeTransmissionMode.Message, PipeOptions.Asynchronous))
@@ -310,14 +308,9 @@ namespace TQC.GOC.InterProcessCommunication
         {
             try
             {
-                NamedPipeServerData data = (NamedPipeServerData)iar.AsyncState;
-             
-                
-                data.PipeServer.EndWaitForConnection(iar);
-                                
-                OnConnect(EventArgs.Empty);
-                m_HasConnected = true;  //Make sure that we can wait for a new connection...
-
+                NamedPipeServerData data = (NamedPipeServerData)iar.AsyncState;                            
+                data.PipeServer.EndWaitForConnection(iar);                                
+                OnConnect(EventArgs.Empty);                
                 Thread t = new Thread(ProcessClientThread);
                 t.Start(data);
 
@@ -340,7 +333,7 @@ namespace TQC.GOC.InterProcessCommunication
         private DataRunDetail DataRunDetails { get; set; }
         private bool CollectingData { get; set; }
 
-        public string Folder
+        public string DataFolder
         {
             get 
             {
