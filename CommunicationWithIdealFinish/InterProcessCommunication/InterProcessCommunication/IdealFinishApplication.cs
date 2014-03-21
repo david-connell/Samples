@@ -19,7 +19,6 @@ namespace TQC.GOC.InterProcessCommunication
             {
                 RunFirstInstalledProgram(new Guid("{C97015C6-5C71-47DA-B8EB-418115005B5D}"), programName);
             }
-
         }
 
         private static bool IsProgramRunning(string programName)

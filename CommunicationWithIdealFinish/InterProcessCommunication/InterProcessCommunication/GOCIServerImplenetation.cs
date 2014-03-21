@@ -29,8 +29,8 @@ namespace TQC.GOC.InterProcessCommunication
                 return Buffer.Length;
             }
         }
-
     }
+
     public class GOCServerImplementation : IIdealFinishAnalysis, IGOCInterProcessServer
     {        
         private Thread m_Server;
@@ -45,9 +45,7 @@ namespace TQC.GOC.InterProcessCommunication
 
         public GOCServerImplementation()
         {
-            IdealFinishApplication.StartUp();
             
-
         }
         public void CreateServer(TextWriter writer)
         {
@@ -55,6 +53,14 @@ namespace TQC.GOC.InterProcessCommunication
             m_Writer = writer;
             m_Server = new Thread(ServerLoop);
             m_Server.Start();
+            try
+            {
+                IdealFinishApplication.StartUp();
+            }
+            catch (Exception ex)
+            {
+                OnException(ex);
+            }
         }
 
         protected virtual void OnConnect(EventArgs e)
