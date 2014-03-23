@@ -6,9 +6,11 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TQC.GOC.InterProcessCommunication;
+using TQC.GOC.InterProcessCommunication.Model;
 
 namespace WindowsFormsApplication1
 {
@@ -47,6 +49,9 @@ namespace WindowsFormsApplication1
                 return;
             }
             m_Connected.Text = "CONNECTED";
+            Thread.Sleep(100);
+            m_Version.Text = m_Server.IdealFinishAnalysisVersion.ToString();
+            m_Path.Text = m_Server.DataFolder;
         }
 
         void m_Server_Disconnect(object sender, EventArgs e)
@@ -58,6 +63,9 @@ namespace WindowsFormsApplication1
             }
 
             m_Connected.Text = "DISCONNECTED";
+            m_Version.Text = "";
+            m_Path.Text = "";
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -69,10 +77,35 @@ namespace WindowsFormsApplication1
         {
             m_Server.Dispose();
         }
-
-        private void m_SendData_Click(object sender, EventArgs e)
+        DataRunDetail m_DataRunDetail;
+        int m_PointId;
+        private void Start(object sender, EventArgs e)
         {
+            
+            m_PointId = 0;
+            
+            m_DataRunDetail = new DataRunDetail(
+                    "0001-111",
+                    new List<Channel>() { new Channel("Channel1", ChannelType.Temperature) },
+                    DateTime.Now,
+                    1,
+                    Environment.UserName
+                    );
+            m_Server.DataRunStart(m_DataRunDetail);
+            
+        }
 
+        private void SendSample(object sender, EventArgs e)
+        {
+            double dataPoint = ++m_PointId;            
+            DateTime sampleTime = m_DataRunDetail.StartOfRun.AddSeconds(m_PointId * m_DataRunDetail.SampleRate);
+            m_Server.Data(
+                new SamplePoint(sampleTime, new double[1] {dataPoint} ));
+        }
+
+        private void Stop(object sender, EventArgs e)
+        {
+            m_Server.DataRunStop();
         }
     }
 

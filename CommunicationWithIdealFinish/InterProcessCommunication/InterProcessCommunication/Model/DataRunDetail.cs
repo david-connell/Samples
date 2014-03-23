@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 
 namespace TQC.GOC.InterProcessCommunication.Model
 {
@@ -27,24 +28,38 @@ namespace TQC.GOC.InterProcessCommunication.Model
 
     public class DataRunDetail
     {
-        public DataRunDetail(DateTime start, DateTimeOffset sample, IList<Channel> channels, string operatorName, TempUnits tempUnits, ThicknessUnits thickness)
+        public DateTime StartOfRun { get; private set; }
+        public string OperatorName { get; private set; }
+        public double SampleRate { get; private set; }
+        public IList<Channel> Channels { get; private set; }
+        public TempUnits DefaultTemperatureUnits { get; private set; }
+        public ThicknessUnits DefaultThicknessUnits { get; private set; }
+        public string SerialNumber { get; private set; }
+        private List<SamplePoint> m_Samples = new List<SamplePoint>();
+        private int m_BatchId;
+
+        public DataRunDetail(string serialNumber, IList<Channel> channels, DateTime start, double sample, string operatorName, TempUnits tempUnits = TempUnits.DegreesC, ThicknessUnits thickness = ThicknessUnits.AUTO_THICKNESS)
         {
+            if (String.IsNullOrEmpty(serialNumber))
+                throw new ArgumentNullException("serialNumber");
+
             StartOfRun = start;
             SampleRate = sample;
             Channels = channels;
             OperatorName = operatorName;
             DefaultTemperatureUnits = tempUnits;
             DefaultThicknessUnits = thickness;
+            SerialNumber = serialNumber;
+            m_BatchId = GetNextBatchID();
 
         }
-        public DateTime StartOfRun { get; private set; }
-        public string OperatorName { get; private set; }
-        public DateTimeOffset SampleRate { get; private set; }
-        public IList<Channel> Channels { get; private set; }
-        public TempUnits DefaultTemperatureUnits { get; private set; }
-        public ThicknessUnits DefaultThicknessUnits { get; private set; }
 
-        private List<SamplePoint> m_Samples = new List<SamplePoint>();
+        private int GetNextBatchID()
+        {
+            int val = (int)Registry.LocalMachine.GetValue(@"SOFTWARE\TQC\GOC\BatchId", 1);
+            Registry.LocalMachine.SetValue(@"SOFTWARE\TQC\GOC\BatchId", val + 1);
+            return val;
+        }
 
         public int NumberOfChannels
         {
@@ -53,6 +68,14 @@ namespace TQC.GOC.InterProcessCommunication.Model
                 return Channels.Count;
             }
         }
+        public int BatchId
+        {
+            get
+            {                
+                return m_BatchId;
+            }
+        }
+
         internal void AddSample(SamplePoint point)
         {
             if (point.Samples.Length != NumberOfChannels)

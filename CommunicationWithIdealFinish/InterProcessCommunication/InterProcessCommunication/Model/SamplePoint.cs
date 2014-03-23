@@ -8,6 +8,11 @@ namespace TQC.GOC.InterProcessCommunication.Model
 {
     public class SamplePoint
     {
+        public SamplePoint(DateTime sampleTime, double[] samples)
+        {
+            SampleTime = sampleTime;
+            Samples = samples;
+        }
         public DateTime SampleTime { get; private set; }
         public double[] Samples { get; private set; }
     }

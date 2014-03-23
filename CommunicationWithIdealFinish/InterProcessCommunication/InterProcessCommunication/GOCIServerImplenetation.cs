@@ -41,6 +41,84 @@ namespace TQC.GOC.InterProcessCommunication
 
     }
 
+    internal interface IDataToBeSent
+    {
+        void Send(NamedPipeServerData namedPipeServerData);
+    }
+
+    internal class StartOfRunData : IDataToBeSent
+    {
+        DataRunDetail m_RunDetail;
+        public StartOfRunData(DataRunDetail runDetail)
+        {
+            m_RunDetail = runDetail;
+        }
+
+        DataRunDetail DataRunDetail { get { return m_RunDetail; } }
+
+        public void Send(NamedPipeServerData namedPipeServerData)
+        {
+            StringBuilder message = new StringBuilder("@4*");
+            byte[] buf = Encoding.ASCII.GetBytes(message.ToString());
+            List<byte> request = new List<byte>(buf);
+            request.AddRange(BitConverter.GetBytes(m_RunDetail.BatchId));
+            request.AddRange(BitConverter.GetBytes(m_RunDetail.NumberOfChannels));
+            request.AddRange(BitConverter.GetBytes(m_RunDetail.SampleRate));
+            request.AddRange(BitConverter.GetBytes(m_RunDetail.StartOfRun.ToOADate()));
+
+            request.AddRange(BitConverter.GetBytes((byte)m_RunDetail.DefaultTemperatureUnits));
+            request.AddRange(BitConverter.GetBytes((byte)m_RunDetail.DefaultThicknessUnits));
+
+            request.AddRange(Encoding.ASCII.GetBytes(m_RunDetail.SerialNumber));
+            request.AddRange(Encoding.ASCII.GetBytes(m_RunDetail.OperatorName));
+
+
+            namedPipeServerData.PipeServer.Write(request.ToArray(), 0, request.Count);           
+
+        }
+    }
+
+    internal class SampleData : IDataToBeSent
+    {
+        SamplePoint m_SamplePoint;
+        public SampleData(SamplePoint runDetail)
+        {
+            m_SamplePoint = runDetail;
+        }
+
+        SamplePoint SamplePoint { get { return m_SamplePoint; } }
+
+        public void Send(NamedPipeServerData namedPipeServerData)
+        {
+            StringBuilder message = new StringBuilder("@5*");
+            message.AppendFormat("{0}*", m_SamplePoint.SampleTime);
+            foreach (var item in m_SamplePoint.Samples)
+            {
+                message.AppendFormat("{0}*", item);
+            }
+            byte[] buf = Encoding.ASCII.GetBytes(message.ToString());
+
+            namedPipeServerData.PipeServer.Write(buf, 0, buf.Length);           
+            
+        }
+    }
+
+    internal class StopOfRunData : IDataToBeSent
+    {
+
+        public StopOfRunData()
+        {
+            
+        }
+
+        public void Send(NamedPipeServerData namedPipeServerData)
+        {
+            string message = "@6";
+            byte[] buf = Encoding.ASCII.GetBytes(message);
+            namedPipeServerData.PipeServer.Write(buf, 0, buf.Length);                       
+        }
+    }
+
     public class GOCServerImplementation : IIdealFinishAnalysis, IGOCInterProcessServer
     {        
         private Thread m_Server;
@@ -53,6 +131,7 @@ namespace TQC.GOC.InterProcessCommunication
         public event ConnectHandler Connect;
         public event ConnectHandler Disconnect;
         public event ExceptionHandler ExceptionThrown;
+        Queue<IDataToBeSent> m_QueueOfData = new Queue<IDataToBeSent>();
 
         public GOCServerImplementation()
         {
@@ -114,6 +193,18 @@ namespace TQC.GOC.InterProcessCommunication
         private void ProcessClientThread(object o)
         {
             NamedPipeServerData namedPipeServerData = (NamedPipeServerData)o;
+            lock (m_QueueOfData)
+            {
+                Clear();
+                if (CollectingData)
+                {
+                    Push(new StartOfRunData(DataRunDetails));
+                    foreach (var sample in DataRunDetails.Samples)
+                    {
+                        Push(new SampleData(sample));
+                    }
+                }
+            }
             try
             {
                 SendCommandToGetFolder(namedPipeServerData);
@@ -121,7 +212,15 @@ namespace TQC.GOC.InterProcessCommunication
                 {
                     while (m_IsRunning)
                     {
-                        SendPing(namedPipeServerData);
+                        var dataToSend = Pop();
+                        if (dataToSend != null)
+                        {
+                            dataToSend.Send(namedPipeServerData);
+                        }
+                        else
+                        {
+                            SendPing(namedPipeServerData);
+                        }
                         if (m_TerminateHandle.WaitOne(1000))
                         {
                             m_IsTerminating = true;
@@ -215,7 +314,9 @@ namespace TQC.GOC.InterProcessCommunication
                         string message = System.Text.ASCIIEncoding.ASCII.GetString(reader.Buffer).Trim(new char[] { '\0', ' ' });
                         lock (m_Server)
                         {
-                            IdealAnalysisFolder = message;
+                            var results = message.Split('*');
+                            IdealAnalysisFolder = results[1];
+                            m_IdealAnalysisVersion = new Version(results[0]);
                         }
                         reader.CanDoNextCommand = true;
                     }
@@ -329,10 +430,18 @@ namespace TQC.GOC.InterProcessCommunication
             m_TerminateHandle.WaitOne();
         }
 
+        private Version m_IdealAnalysisVersion;
         private string IdealAnalysisFolder { get; set; }
         private DataRunDetail DataRunDetails { get; set; }
         private bool CollectingData { get; set; }
 
+        public Version IdealFinishAnalysisVersion
+        {
+            get
+            {
+                return m_IdealAnalysisVersion;
+            }
+        }
         public string DataFolder
         {
             get 
@@ -348,13 +457,19 @@ namespace TQC.GOC.InterProcessCommunication
 
         public bool DataRunStart(DataRunDetail details)
         {
-            DataRunDetails = details;
-            CollectingData = true;
+            if (CollectingData == false)
+            {
+                Clear();
+                Push(new StartOfRunData(details));
+                DataRunDetails = details;
+                CollectingData = true;
+            }
             return CollectingData;
         }
 
         public bool DataRunStop()
         {
+            Push(new StopOfRunData());
             CollectingData = false;
             return CollectingData;
         }
@@ -363,10 +478,42 @@ namespace TQC.GOC.InterProcessCommunication
         {
             if (CollectingData)
             {
+                Push(new SampleData(sample));
+                if (sample.Samples.Length != DataRunDetails.NumberOfChannels)
+                {
+                    throw new ArgumentException("sample", "sample data mismatch on Channel definition");
+                }
                 DataRunDetails.AddSample(sample);
             }
             return CollectingData;
         }
+
+        void Push(IDataToBeSent data)
+        {
+            lock (m_QueueOfData)
+            {
+                m_QueueOfData.Enqueue(data);
+            }
+        }
+        IDataToBeSent Pop()
+        {
+            lock (m_QueueOfData)
+            {
+                if (m_QueueOfData.Count == 0)
+                {
+                    return null;
+                }
+                return m_QueueOfData.Dequeue();
+            }            
+        }
+
+        void Clear()
+        {
+            lock (m_QueueOfData)
+            {
+                m_QueueOfData.Clear();
+            }            
+        }        
     }
 
 }
