@@ -29,6 +29,7 @@ namespace TQC.USBDevice
             USB_PRODUCT2 = 0x15CD0011,
             USB_CURVEX_3 = 0x2047FFFE,
             USB_CURVEX_3a = 0x20470827,
+            GRADIENT_OVEN = 0x04037B60,
 
         }
         private TQC.IF.USBLogger.USBGeneric m_Logger;
