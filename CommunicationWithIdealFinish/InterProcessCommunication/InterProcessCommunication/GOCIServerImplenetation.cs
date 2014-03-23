@@ -311,7 +311,7 @@ namespace TQC.GOC.InterProcessCommunication
                     try
                     {
                         reader.PipeServer.EndRead(ar);
-                        string message = System.Text.ASCIIEncoding.ASCII.GetString(reader.Buffer).Trim(new char[] { '\0', ' ' });
+                        string message = System.Text.UnicodeEncoding.Unicode.GetString(reader.Buffer).Trim(new char[] { '\0', ' ' });
                         lock (m_Server)
                         {
                             var results = message.Split('*');
