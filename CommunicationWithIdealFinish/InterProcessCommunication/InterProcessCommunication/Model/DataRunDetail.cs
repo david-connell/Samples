@@ -56,8 +56,8 @@ namespace TQC.GOC.InterProcessCommunication.Model
 
         private int GetNextBatchID()
         {
-            int val = (int)Registry.LocalMachine.GetValue(@"SOFTWARE\TQC\GOC\BatchId", 1);
-            Registry.LocalMachine.SetValue(@"SOFTWARE\TQC\GOC\BatchId", val + 1);
+            int val = (int)Registry.CurrentUser.GetValue(@"SOFTWARE\TQC\GOC\BatchId", 1);
+            Registry.CurrentUser.SetValue(@"SOFTWARE\TQC\GOC\BatchId", val + 1);
             return val;
         }
 

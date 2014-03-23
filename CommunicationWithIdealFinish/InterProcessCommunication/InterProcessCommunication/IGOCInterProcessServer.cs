@@ -20,6 +20,11 @@ namespace TQC.GOC.InterProcessCommunication
         /// </summary>
         /// <param name="writer"></param>
         void CreateServer(TextWriter writer);
+
+        /// <summary>
+        /// Last time ping was sent
+        /// </summary>
+        DateTime LastPing { get; }
     }
 
     public class ExceptionEventArgs : EventArgs

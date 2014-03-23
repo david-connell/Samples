@@ -107,6 +107,11 @@ namespace WindowsFormsApplication1
         {
             m_Server.DataRunStop();
         }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            label4.Text = (DateTime.Now - m_Server.LastPing).TotalSeconds.ToString();
+        }
     }
 
     public class ConsoleTextWriter : TextWriter

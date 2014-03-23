@@ -15,7 +15,7 @@ namespace TQC.GOC.InterProcessCommunication
         public byte[] Buffer { get; set; }
         public bool CanDoNextCommand { get; set; }
         public bool PipeBroken { get; set; }
-        private NamedPipeServerStream m_PipeServer;
+        private NamedPipeServerStream m_PipeServer;        
 
         public NamedPipeServerData(NamedPipeServerStream pipeServer)
         {
@@ -124,6 +124,7 @@ namespace TQC.GOC.InterProcessCommunication
         private Thread m_Server;
         private TextWriter m_Writer;
         private bool m_IsRunning;
+        private DateTime m_PingLastSend;
         private EventWaitHandle m_TerminateHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
 
         private bool m_IsTerminating;
@@ -178,6 +179,15 @@ namespace TQC.GOC.InterProcessCommunication
                 ExceptionThrown(this, new ExceptionEventArgs(e));
         }
 
+        public DateTime LastPing
+        {
+            get
+            {
+                lock (m_QueueOfData)
+                    return m_PingLastSend;
+            }
+        }
+
         private void ServerLoop()
         {
             while (m_IsRunning)
@@ -215,11 +225,16 @@ namespace TQC.GOC.InterProcessCommunication
                         var dataToSend = Pop();
                         if (dataToSend != null)
                         {
+                            m_Writer.WriteLine("Send {0}", namedPipeServerData);
                             dataToSend.Send(namedPipeServerData);
                         }
                         else
                         {
                             SendPing(namedPipeServerData);
+                            lock (m_QueueOfData)
+                            {
+                                m_PingLastSend = DateTime.Now;
+                            }
                         }
                         if (m_TerminateHandle.WaitOne(1000))
                         {
@@ -231,19 +246,6 @@ namespace TQC.GOC.InterProcessCommunication
                             break;
                         }
 
-                        ////pipeStream.BeginRead(pipeReader.Buffer, 0, pipeReader.Length, ClientMessage, pipeReader);
-                        //while (m_IsRunning && !namedPipeServerData.CanDoNextCommand)
-                        //{
-                        //    if (m_TerminateHandle.WaitOne(10))
-                        //    {
-                        //        m_IsTerminating = true;
-                        //        break;
-                        //    }
-                        //    if (namedPipeServerData.PipeBroken)
-                        //    {
-                        //        break;
-                        //    }
-                        //}
                     }
                 }
             }
@@ -277,9 +279,10 @@ namespace TQC.GOC.InterProcessCommunication
         {
             string message = "@1";
             byte[] buf = Encoding.ASCII.GetBytes(message);
+            m_Writer.WriteLine("SendCommandToGetFolder");
             pipeReader.PipeServer.Write(buf, 0, buf.Length);
             pipeReader.PipeServer.BeginRead(pipeReader.Buffer, 0, pipeReader.Length, ClientMessageGetFolder, pipeReader);
-
+            
             while (m_IsRunning && !pipeReader.CanDoNextCommand)
             {
                 if (m_TerminateHandle.WaitOne(10))
@@ -297,8 +300,9 @@ namespace TQC.GOC.InterProcessCommunication
         private void SendPing(NamedPipeServerData pipeReader)
         {
             string message = "@2";
-            byte[] buf = Encoding.ASCII.GetBytes(message);
+            byte[] buf = Encoding.ASCII.GetBytes(message);            
             pipeReader.PipeServer.Write(buf, 0, buf.Length);           
+
         }
 
         private void ClientMessageGetFolder(IAsyncResult ar)
@@ -332,36 +336,7 @@ namespace TQC.GOC.InterProcessCommunication
             }
         }
 
-
-        private void ClientMessage(IAsyncResult ar)
-        {
-            if (ar != null)
-            {
-                NamedPipeServerData reader = ar.AsyncState as NamedPipeServerData;
-                if (reader != null)
-                {
-                    try
-                    {
-                        reader.PipeServer.EndRead(ar);
-                        string message = System.Text.ASCIIEncoding.ASCII.GetString(reader.Buffer).Trim(new char[] { '\0', ' ' });
-                        message = message.Replace(Environment.NewLine, " ").TrimEnd() + "BOB";
-                        var buf = Encoding.ASCII.GetBytes(message);
-
-                        reader.PipeServer.Write(buf, 0, buf.Length);
-                        reader.CanDoNextCommand = true;
-
-                    }
-                    catch (IOException ex)
-                    {
-                        reader.PipeBroken = true;                        
-                    }
-                    catch (Exception ex)
-                    {
-                        OnException(ex);
-                    }
-                }
-            }            
-        }
+        
 
         protected void ProcessNextClient()
         {
