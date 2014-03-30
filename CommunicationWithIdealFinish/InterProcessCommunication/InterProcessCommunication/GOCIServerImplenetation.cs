@@ -66,15 +66,24 @@ namespace TQC.GOC.InterProcessCommunication
             request.AddRange(BitConverter.GetBytes(m_RunDetail.SampleRate));
             request.AddRange(BitConverter.GetBytes(m_RunDetail.StartOfRun.ToOADate()));
 
-            request.AddRange(BitConverter.GetBytes((byte)m_RunDetail.DefaultTemperatureUnits));
-            request.AddRange(BitConverter.GetBytes((byte)m_RunDetail.DefaultThicknessUnits));
+            request.Add((byte)m_RunDetail.DefaultTemperatureUnits);
+            request.Add((byte)m_RunDetail.DefaultThicknessUnits);
 
             request.AddRange(Encoding.ASCII.GetBytes(m_RunDetail.SerialNumber));
+            request.Add((byte)0);
             request.AddRange(Encoding.ASCII.GetBytes(m_RunDetail.OperatorName));
-
-
+            foreach (var channel in m_RunDetail.Channels)
+            {
+                request.Add((byte)channel.ChannelType);
+                request.AddRange(Encoding.ASCII.GetBytes(channel.ChannelName));
+                request.Add((byte)0);
+            }
             namedPipeServerData.PipeServer.Write(request.ToArray(), 0, request.Count);           
 
+        }
+        public override string ToString()
+        {
+            return string.Format("Start '{0}'", m_RunDetail.BatchId);
         }
     }
 
@@ -91,16 +100,23 @@ namespace TQC.GOC.InterProcessCommunication
         public void Send(NamedPipeServerData namedPipeServerData)
         {
             StringBuilder message = new StringBuilder("@5*");
-            message.AppendFormat("{0}*", m_SamplePoint.SampleTime);
+            List<byte> request = new List<byte>();
+            request.AddRange(Encoding.ASCII.GetBytes(message.ToString() ) );
+            request.AddRange(BitConverter.GetBytes(m_SamplePoint.SampleTime.ToOADate()));                       
             foreach (var item in m_SamplePoint.Samples)
             {
-                message.AppendFormat("{0}*", item);
+                request.AddRange(BitConverter.GetBytes(item));                
             }
-            byte[] buf = Encoding.ASCII.GetBytes(message.ToString());
+            byte[] buf = request.ToArray();
 
             namedPipeServerData.PipeServer.Write(buf, 0, buf.Length);           
             
         }
+        public override string ToString()
+        {
+            return string.Format("Sample '{0}'", m_SamplePoint.Samples[0]);
+        }
+
     }
 
     internal class StopOfRunData : IDataToBeSent
@@ -116,6 +132,10 @@ namespace TQC.GOC.InterProcessCommunication
             string message = "@6";
             byte[] buf = Encoding.ASCII.GetBytes(message);
             namedPipeServerData.PipeServer.Write(buf, 0, buf.Length);                       
+        }
+        public override string ToString()
+        {
+            return "DataRunFinish";
         }
     }
 
@@ -225,7 +245,7 @@ namespace TQC.GOC.InterProcessCommunication
                         var dataToSend = Pop();
                         if (dataToSend != null)
                         {
-                            m_Writer.WriteLine("Send {0}", namedPipeServerData);
+                            m_Writer.WriteLine("Send {0}", dataToSend);
                             dataToSend.Send(namedPipeServerData);
                         }
                         else
@@ -236,7 +256,7 @@ namespace TQC.GOC.InterProcessCommunication
                                 m_PingLastSend = DateTime.Now;
                             }
                         }
-                        if (m_TerminateHandle.WaitOne(1000))
+                        if (m_TerminateHandle.WaitOne(100))
                         {
                             m_IsTerminating = true;
                             break;

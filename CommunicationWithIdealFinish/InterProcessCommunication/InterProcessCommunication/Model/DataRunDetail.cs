@@ -43,7 +43,7 @@ namespace TQC.GOC.InterProcessCommunication.Model
             if (String.IsNullOrEmpty(serialNumber))
                 throw new ArgumentNullException("serialNumber");
 
-            StartOfRun = start;
+            StartOfRun = new DateTime(start.Year, start.Month, start.Day, start.Hour, start.Minute, 0);
             SampleRate = sample;
             Channels = channels;
             OperatorName = operatorName;
