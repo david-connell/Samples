@@ -86,7 +86,16 @@ namespace WindowsFormsApplication1
             
             m_DataRunDetail = new DataRunDetail(
                     "0001-111",
-                    new List<Channel>() { new Channel("Channel1", ChannelType.Temperature) },
+                    new List<Channel>() 
+                    { 
+                        new Channel("ChannelA", ChannelType.Temperature),
+                        new Channel("ChannelB", ChannelType.Temperature),
+                        new Channel("ChannelC", ChannelType.Temperature),
+                        new Channel("ChannelD", ChannelType.Temperature),
+                        new Channel("ChannelE", ChannelType.Temperature),
+                        new Channel("ChannelF", ChannelType.Temperature),
+
+                    },
                     DateTime.Now,
                     1,
                     Environment.UserName
@@ -97,10 +106,16 @@ namespace WindowsFormsApplication1
 
         private void SendSample(object sender, EventArgs e)
         {
-            double dataPoint = ++m_PointId;            
+            ++m_PointId;
+            double dataPoint = m_PointId;
             DateTime sampleTime = m_DataRunDetail.StartOfRun.AddSeconds(m_PointId * m_DataRunDetail.SampleRate);
+            List<double> vals = new List<double>();
+            for (int channelId = 0; channelId < m_DataRunDetail.NumberOfChannels; channelId++)
+            {
+                vals.Add(dataPoint + channelId * 2);
+            }
             m_Server.Data(
-                new SamplePoint(sampleTime, new double[1] {dataPoint} ));
+                new SamplePoint(sampleTime, vals.ToArray()));
         }
 
         private void Stop(object sender, EventArgs e)
@@ -110,7 +125,7 @@ namespace WindowsFormsApplication1
 
         private void timer2_Tick(object sender, EventArgs e)
         {
-            label4.Text = (DateTime.Now - m_Server.LastPing).TotalSeconds.ToString();
+            label4.Text = (DateTime.Now - m_Server.LastPing).ToString();
         }
     }
 
