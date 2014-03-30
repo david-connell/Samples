@@ -42,6 +42,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.label5 = new System.Windows.Forms.Label();
+            this.m_DataRate = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // m_SendData
@@ -161,11 +163,31 @@
             this.timer2.Interval = 1000;
             this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(15, 57);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(54, 13);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "Data rate:";
+            // 
+            // m_DataRate
+            // 
+            this.m_DataRate.AutoSize = true;
+            this.m_DataRate.Location = new System.Drawing.Point(123, 57);
+            this.m_DataRate.Name = "m_DataRate";
+            this.m_DataRate.Size = new System.Drawing.Size(35, 13);
+            this.m_DataRate.TabIndex = 13;
+            this.m_DataRate.Text = "label6";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(411, 341);
+            this.Controls.Add(this.m_DataRate);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.m_Version);
@@ -200,6 +222,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label m_DataRate;
     }
 }
 

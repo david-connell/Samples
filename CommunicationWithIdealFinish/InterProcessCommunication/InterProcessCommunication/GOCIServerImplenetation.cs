@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using TQC.GOC.InterProcessCommunication.Model;
 
 namespace TQC.GOC.InterProcessCommunication
-{
+{    
     internal class NamedPipeServerData
     {
         public byte[] Buffer { get; set; }
@@ -152,6 +152,7 @@ namespace TQC.GOC.InterProcessCommunication
         public event ConnectHandler Connect;
         public event ConnectHandler Disconnect;
         public event ExceptionHandler ExceptionThrown;
+        public event GOCServerStatusHandler GOCServerStatus;
         Queue<IDataToBeSent> m_QueueOfData = new Queue<IDataToBeSent>();
 
         public GOCServerImplementation()
@@ -197,6 +198,12 @@ namespace TQC.GOC.InterProcessCommunication
         {
             if (ExceptionThrown != null)
                 ExceptionThrown(this, new ExceptionEventArgs(e));
+        }
+
+        protected virtual void OnGOCServerStatus(GOCServerStatus status)
+        {
+            if (GOCServerStatus != null)
+                GOCServerStatus(this, new GOCServerStatusEventArgs(status));
         }
 
         public DateTime LastPing
@@ -247,10 +254,12 @@ namespace TQC.GOC.InterProcessCommunication
                         {
                             m_Writer.WriteLine("Send {0}", dataToSend);
                             dataToSend.Send(namedPipeServerData);
+                            OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.SendingDataSamples);
                         }
                         else
                         {
                             SendPing(namedPipeServerData);
+                            OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.PingIng);
                             lock (m_QueueOfData)
                             {
                                 m_PingLastSend = DateTime.Now;
@@ -314,7 +323,11 @@ namespace TQC.GOC.InterProcessCommunication
                 {
                     break;
                 }
-            }                        
+            }
+            if (m_IsRunning)
+            {
+                OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.DataFolderRecieved);
+            }
         }
 
         private void SendPing(NamedPipeServerData pipeReader)

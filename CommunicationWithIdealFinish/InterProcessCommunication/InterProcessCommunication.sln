@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TQC.GRO.InterProcessCommunication", "InterProcessCommunication\TQC.GRO.InterProcessCommunication.csproj", "{17B5CD1F-9AF0-4484-B4B4-176205BE3414}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PFSWrapper", "..\..\ReadPFSSample\ReadPFS\PFSWrapper.csproj", "{242C4822-7E31-4A84-AE87-60D1EFD78B9F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication1", "WindowsFormsApplication1\WindowsFormsApplication1.csproj", "{23FD177F-9232-4483-B9EA-B0A1ADDDC93E}"
 EndProject
 Global
@@ -17,10 +15,6 @@ Global
 		{17B5CD1F-9AF0-4484-B4B4-176205BE3414}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17B5CD1F-9AF0-4484-B4B4-176205BE3414}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17B5CD1F-9AF0-4484-B4B4-176205BE3414}.Release|Any CPU.Build.0 = Release|Any CPU
-		{242C4822-7E31-4A84-AE87-60D1EFD78B9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{242C4822-7E31-4A84-AE87-60D1EFD78B9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{242C4822-7E31-4A84-AE87-60D1EFD78B9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{242C4822-7E31-4A84-AE87-60D1EFD78B9F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{23FD177F-9232-4483-B9EA-B0A1ADDDC93E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{23FD177F-9232-4483-B9EA-B0A1ADDDC93E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23FD177F-9232-4483-B9EA-B0A1ADDDC93E}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -26,8 +26,57 @@ namespace WindowsFormsApplication1
             m_Server.Connect += m_Server_Connect;
             m_Server.Disconnect += m_Server_Disconnect;
             m_Server.ExceptionThrown += m_Server_ExceptionThrown;
+            m_Server.GOCServerStatus += m_Server_GOCServerStatus;
+
             //Hook this up afterwards to make sure that we don't miss anything...
             m_Server.CreateServer(m_TextWriter);
+        }
+
+        void m_Server_GOCServerStatus(object sender, GOCServerStatusEventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                BeginInvoke((MethodInvoker)(() => m_Server_GOCServerStatus(sender, e)));
+                return;
+            }
+            switch (e.Status)
+            {
+                case GOCServerStatus.DataFolderRecieved:
+                    {
+                        m_Version.Text = m_Server.IdealFinishAnalysisVersion.ToString();
+                        m_Path.Text = m_Server.DataFolder;
+                    }
+                    break;
+                case GOCServerStatus.PingIng:
+                    //Ignore
+                    break;
+                case GOCServerStatus.SendingDataHeader:
+                case GOCServerStatus.SendingDataSamples:
+                case GOCServerStatus.SendEndOfData:
+                    TransmittedData(1);
+                    break;
+
+
+            }
+        }
+
+        DateTime m_CurrentPoint = DateTime.Now;
+        int m_PacketsPerSecond = 0;
+
+        private void TransmittedData(int packets)
+        {
+            DateTime currentTime = DateTime.Now;
+            if ((currentTime - m_CurrentPoint).TotalSeconds > 1)
+            {
+                m_CurrentPoint = currentTime;
+                m_PacketsPerSecond = packets;
+            }
+            else
+            {
+                m_PacketsPerSecond += packets;
+            }
+            m_DataRate.Text = m_PacketsPerSecond.ToString();
+
         }
 
         void m_Server_ExceptionThrown(object sender, ExceptionEventArgs e)
@@ -49,9 +98,6 @@ namespace WindowsFormsApplication1
                 return;
             }
             m_Connected.Text = "CONNECTED";
-            Thread.Sleep(100);
-            m_Version.Text = m_Server.IdealFinishAnalysisVersion.ToString();
-            m_Path.Text = m_Server.DataFolder;
         }
 
         void m_Server_Disconnect(object sender, EventArgs e)
@@ -71,6 +117,7 @@ namespace WindowsFormsApplication1
         private void timer1_Tick(object sender, EventArgs e)
         {
             m_Debug.Text = m_TextWriter.ToString();
+            TransmittedData(0);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)

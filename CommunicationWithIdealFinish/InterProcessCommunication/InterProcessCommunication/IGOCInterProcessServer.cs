@@ -15,6 +15,8 @@ namespace TQC.GOC.InterProcessCommunication
 
         event ExceptionHandler ExceptionThrown;
 
+        event GOCServerStatusHandler GOCServerStatus;
+
         /// <summary>
         /// The server is created at this point. It's Thread safe and is non-blocking
         /// </summary>
@@ -27,6 +29,26 @@ namespace TQC.GOC.InterProcessCommunication
         DateTime LastPing { get; }
     }
 
+
+
+    public enum GOCServerStatus
+    {        
+        DataFolderRecieved,
+        SendingDataHeader,
+        SendingDataSamples,
+        SendEndOfData,
+        PingIng,
+
+    }
+
+    public class GOCServerStatusEventArgs : EventArgs
+    {
+        public GOCServerStatus Status { get; private set; }
+        public GOCServerStatusEventArgs(GOCServerStatus status)
+        {
+            Status = status;
+        }
+    }
     public class ExceptionEventArgs : EventArgs
     {
         public Exception Exception { get; internal set; }
@@ -37,4 +59,5 @@ namespace TQC.GOC.InterProcessCommunication
     }
     public delegate void ConnectHandler(object sender, EventArgs e);
     public delegate void ExceptionHandler(object sender, ExceptionEventArgs e);
+    public delegate void GOCServerStatusHandler(object sender, GOCServerStatusEventArgs e);
 }
