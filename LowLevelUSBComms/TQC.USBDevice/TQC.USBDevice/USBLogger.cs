@@ -43,6 +43,15 @@ namespace TQC.USBDevice
             Dispose(false);
         }
 
+        public int GradientOvenComPort
+        {
+            get
+            {
+                int comPort;
+                m_Logger.GradientOvenComPort(out comPort);                
+                return comPort;
+            }
+        }
 
         public bool Open(USBProductId id)
         {
