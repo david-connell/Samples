@@ -194,7 +194,14 @@ namespace WindowsFormsApplication1
             List<double> vals = new List<double>();
             for (int channelId = 0; channelId < m_DataRunDetail.NumberOfChannels; channelId++)
             {
-                vals.Add(dataPoint + channelId * 2);
+                if (channelId == 0)
+                {
+                    vals.Add((dataPoint % 100)/ 10);
+                }
+                else
+                {
+                    vals.Add(Math.Sin((dataPoint+channelId) / 20.0 ) * channelId );
+                }
             }
             m_Server.Data(
                 new SamplePoint(sampleTime, vals.ToArray()));
@@ -208,6 +215,16 @@ namespace WindowsFormsApplication1
         private void timer2_Tick(object sender, EventArgs e)
         {
             label4.Text = (DateTime.Now - m_Server.LastPing).ToString();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            SendSampleTimer.Enabled = !SendSampleTimer.Enabled;
+        }
+
+        private void SendSampleTimer_Tick(object sender, EventArgs e)
+        {
+            SendSample(sender, e);
         }
     }
 

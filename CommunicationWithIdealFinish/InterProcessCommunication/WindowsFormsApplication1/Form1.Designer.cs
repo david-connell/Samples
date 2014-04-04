@@ -46,6 +46,8 @@
             this.m_DataRate = new System.Windows.Forms.Label();
             this.m_NumberOfProtocolErrors = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
+            this.button3 = new System.Windows.Forms.Button();
+            this.SendSampleTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // m_SendData
@@ -79,7 +81,7 @@
             // 
             // m_Connected
             // 
-            this.m_Connected.Location = new System.Drawing.Point(12, 178);
+            this.m_Connected.Location = new System.Drawing.Point(12, 181);
             this.m_Connected.Name = "m_Connected";
             this.m_Connected.Size = new System.Drawing.Size(104, 23);
             this.m_Connected.TabIndex = 3;
@@ -108,7 +110,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 125);
+            this.label1.Location = new System.Drawing.Point(15, 133);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(29, 13);
             this.label1.TabIndex = 6;
@@ -117,7 +119,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 151);
+            this.label2.Location = new System.Drawing.Point(15, 159);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(45, 13);
             this.label2.TabIndex = 7;
@@ -126,7 +128,7 @@
             // m_Path
             // 
             this.m_Path.AutoSize = true;
-            this.m_Path.Location = new System.Drawing.Point(70, 125);
+            this.m_Path.Location = new System.Drawing.Point(70, 133);
             this.m_Path.Name = "m_Path";
             this.m_Path.Size = new System.Drawing.Size(35, 13);
             this.m_Path.TabIndex = 8;
@@ -135,7 +137,7 @@
             // m_Version
             // 
             this.m_Version.AutoSize = true;
-            this.m_Version.Location = new System.Drawing.Point(70, 151);
+            this.m_Version.Location = new System.Drawing.Point(70, 159);
             this.m_Version.Name = "m_Version";
             this.m_Version.Size = new System.Drawing.Size(35, 13);
             this.m_Version.TabIndex = 9;
@@ -144,7 +146,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 93);
+            this.label3.Location = new System.Drawing.Point(15, 101);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(98, 13);
             this.label3.TabIndex = 10;
@@ -153,7 +155,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(120, 93);
+            this.label4.Location = new System.Drawing.Point(120, 101);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(35, 13);
             this.label4.TabIndex = 11;
@@ -168,7 +170,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(15, 57);
+            this.label5.Location = new System.Drawing.Point(15, 65);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(54, 13);
             this.label5.TabIndex = 12;
@@ -177,7 +179,7 @@
             // m_DataRate
             // 
             this.m_DataRate.AutoSize = true;
-            this.m_DataRate.Location = new System.Drawing.Point(123, 57);
+            this.m_DataRate.Location = new System.Drawing.Point(123, 65);
             this.m_DataRate.Name = "m_DataRate";
             this.m_DataRate.Size = new System.Drawing.Size(35, 13);
             this.m_DataRate.TabIndex = 13;
@@ -186,7 +188,7 @@
             // m_NumberOfProtocolErrors
             // 
             this.m_NumberOfProtocolErrors.AutoSize = true;
-            this.m_NumberOfProtocolErrors.Location = new System.Drawing.Point(363, 57);
+            this.m_NumberOfProtocolErrors.Location = new System.Drawing.Point(363, 65);
             this.m_NumberOfProtocolErrors.Name = "m_NumberOfProtocolErrors";
             this.m_NumberOfProtocolErrors.Size = new System.Drawing.Size(13, 13);
             this.m_NumberOfProtocolErrors.TabIndex = 15;
@@ -195,17 +197,33 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(226, 57);
+            this.label7.Location = new System.Drawing.Point(226, 65);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(131, 13);
             this.label7.TabIndex = 14;
             this.label7.Text = "Number of Protocol Errors:";
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(106, 39);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(104, 23);
+            this.button3.TabIndex = 16;
+            this.button3.Text = "Send Samples";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // SendSampleTimer
+            // 
+            this.SendSampleTimer.Interval = 200;
+            this.SendSampleTimer.Tick += new System.EventHandler(this.SendSampleTimer_Tick);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(411, 341);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.m_NumberOfProtocolErrors);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.m_DataRate);
@@ -248,6 +266,8 @@
         private System.Windows.Forms.Label m_DataRate;
         private System.Windows.Forms.Label m_NumberOfProtocolErrors;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Timer SendSampleTimer;
     }
 }
 
