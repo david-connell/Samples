@@ -17,6 +17,12 @@ namespace TQC.GOC.InterProcessCommunication
         private bool m_IsRunning;
         private DateTime m_PingLastSend;
         private EventWaitHandle m_TerminateHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+        private Version m_IdealAnalysisVersion;
+        private Version m_ProtocolVersion;
+        private string IdealAnalysisFolder { get; set; }
+        private DataRunDetail DataRunDetails { get; set; }
+        private bool CollectingData { get; set; }
+
 
         private bool m_IsTerminating;
 
@@ -28,7 +34,7 @@ namespace TQC.GOC.InterProcessCommunication
 
         public GOCServerImplementation()
         {
-            
+            m_ProtocolVersion = new Version(1, 0);  //Default version
         }
 
         public void CreateServer(TextWriter writer)
@@ -124,12 +130,12 @@ namespace TQC.GOC.InterProcessCommunication
                         if (dataToSend != null)
                         {
                             m_Writer.WriteLine("Send {0}", dataToSend);
-                            dataToSend.Send(namedPipeServerData);
+                            dataToSend.Send(namedPipeServerData, m_ProtocolVersion);
                             OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.SendingDataSamples);
                         }
                         else
                         {
-                            SendPing(namedPipeServerData);
+                            (new Ping()).Send(namedPipeServerData, m_ProtocolVersion);
                             OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.PingIng);
                             lock (m_QueueOfData)
                             {
@@ -201,14 +207,6 @@ namespace TQC.GOC.InterProcessCommunication
             }
         }
 
-        private void SendPing(NamedPipeServerData pipeReader)
-        {
-            string message = "@2";
-            byte[] buf = Encoding.ASCII.GetBytes(message);            
-            pipeReader.PipeServer.Write(buf, 0, buf.Length);           
-
-        }
-
         private void ClientMessageGetFolder(IAsyncResult ar)
         {
             if (ar != null)
@@ -224,7 +222,9 @@ namespace TQC.GOC.InterProcessCommunication
                         {
                             var results = message.Split('*');
                             IdealAnalysisFolder = results[1];
-                            m_IdealAnalysisVersion = new Version(results[0]);
+                            Version version = new Version(results[0]);
+                            m_IdealAnalysisVersion = new Version(version.Build, version.Revision);
+                            m_ProtocolVersion = new Version(version.Major, version.Minor);
                         }
                         reader.CanDoNextCommand = true;
                     }
@@ -309,16 +309,20 @@ namespace TQC.GOC.InterProcessCommunication
             m_TerminateHandle.WaitOne();
         }
 
-        private Version m_IdealAnalysisVersion;
-        private string IdealAnalysisFolder { get; set; }
-        private DataRunDetail DataRunDetails { get; set; }
-        private bool CollectingData { get; set; }
 
         public Version IdealFinishAnalysisVersion
         {
             get
             {
                 return m_IdealAnalysisVersion;
+            }
+        }
+
+        public Version ProtocolVersion
+        {
+            get
+            {
+                return m_ProtocolVersion;
             }
         }
         public string DataFolder

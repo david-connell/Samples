@@ -130,7 +130,7 @@ namespace WindowsFormsApplication1
         {
             
             m_PointId = 0;
-            
+            double sampleRate = 1.0; //Once a second
             m_DataRunDetail = new DataRunDetail(
                     "0001-111",
                     new List<Channel>() 
@@ -173,8 +173,8 @@ namespace WindowsFormsApplication1
 
                     },
                     DateTime.Now,
-                    1,
-                    Environment.UserName
+                    sampleRate,
+                    "Name" + Environment.UserName
                     );
             m_Server.DataRunStart(m_DataRunDetail);
             

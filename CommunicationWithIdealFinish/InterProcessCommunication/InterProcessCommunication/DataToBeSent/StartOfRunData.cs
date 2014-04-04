@@ -15,7 +15,16 @@ namespace TQC.GOC.InterProcessCommunication.DataToBeSent
 
         DataRunDetail DataRunDetail { get { return m_RunDetail; } }
 
-        public void Send(NamedPipeServerData namedPipeServerData)
+        public void Send(NamedPipeServerData namedPipeServerData, Version protocolVersion)
+        {
+            if ((protocolVersion.Major == 1) && (protocolVersion.Major == 0))
+            {
+                SendRunDetailsV1(namedPipeServerData);
+            }
+
+        }
+
+        private void SendRunDetailsV1(NamedPipeServerData namedPipeServerData)
         {
             StringBuilder message = new StringBuilder("@4*");
             byte[] buf = Encoding.ASCII.GetBytes(message.ToString());
@@ -31,15 +40,17 @@ namespace TQC.GOC.InterProcessCommunication.DataToBeSent
             request.AddRange(Encoding.ASCII.GetBytes(m_RunDetail.SerialNumber));
             request.Add((byte)0);
             request.AddRange(Encoding.ASCII.GetBytes(m_RunDetail.OperatorName));
+            request.Add((byte)0);
             foreach (var channel in m_RunDetail.Channels)
             {
                 request.Add((byte)channel.ChannelType);
                 request.AddRange(Encoding.ASCII.GetBytes(channel.ChannelName));
                 request.Add((byte)0);
             }
+            request.Add((byte)0);
             namedPipeServerData.PipeServer.Write(request.ToArray(), 0, request.Count);
-
         }
+
         public override string ToString()
         {
             return string.Format("Start '{0}'", m_RunDetail.BatchId);

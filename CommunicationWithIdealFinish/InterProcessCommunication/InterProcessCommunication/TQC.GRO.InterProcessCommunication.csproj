@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataToBeSent\IDataToBeSent.cs" />
+    <Compile Include="DataToBeSent\Ping.cs" />
     <Compile Include="DataToBeSent\StartOfRunData.cs" />
     <Compile Include="DataToBeSent\StopOfRunData.cs" />
     <Compile Include="IdealFinishApplication.cs" />
