@@ -20,7 +20,7 @@ namespace TQC.GOC.InterProcessCommunication.DataToBeSent
 
         private static bool SendPingV1(NamedPipeServerData namedPipeServerData)
         {
-            string message = "@2";
+            string message = "@2*";
             byte[] buf = Encoding.ASCII.GetBytes(message);
             namedPipeServerData.PipeServer.Write(buf, 0, buf.Length);
             return true;

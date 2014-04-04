@@ -183,7 +183,7 @@ namespace TQC.GOC.InterProcessCommunication
         
         private void SendCommandToGetFolder(NamedPipeServerData pipeReader)
         {
-            string message = "@1";
+            string message = "@1*";
             byte[] buf = Encoding.ASCII.GetBytes(message);
             m_Writer.WriteLine("SendCommandToGetFolder");
             pipeReader.PipeServer.Write(buf, 0, buf.Length);
