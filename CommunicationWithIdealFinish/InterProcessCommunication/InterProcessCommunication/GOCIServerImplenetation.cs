@@ -2,143 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TQC.GOC.InterProcessCommunication.DataToBeSent;
 using TQC.GOC.InterProcessCommunication.Model;
 
 namespace TQC.GOC.InterProcessCommunication
 {    
-    internal class NamedPipeServerData
-    {
-        public byte[] Buffer { get; set; }
-        public bool CanDoNextCommand { get; set; }
-        public bool PipeBroken { get; set; }
-        private NamedPipeServerStream m_PipeServer;        
-
-        public NamedPipeServerData(NamedPipeServerStream pipeServer)
-        {
-            m_PipeServer = pipeServer;
-            Buffer = new byte[255];
-        }
-
-        public int Length
-        {
-            get
-            {
-                return Buffer.Length;
-            }
-        }
-
-        public NamedPipeServerStream PipeServer
-        {
-            get
-            {
-                return m_PipeServer;
-            }
-        }
-
-    }
-
-    internal interface IDataToBeSent
-    {
-        void Send(NamedPipeServerData namedPipeServerData);
-    }
-
-    internal class StartOfRunData : IDataToBeSent
-    {
-        DataRunDetail m_RunDetail;
-        public StartOfRunData(DataRunDetail runDetail)
-        {
-            m_RunDetail = runDetail;
-        }
-
-        DataRunDetail DataRunDetail { get { return m_RunDetail; } }
-
-        public void Send(NamedPipeServerData namedPipeServerData)
-        {
-            StringBuilder message = new StringBuilder("@4*");
-            byte[] buf = Encoding.ASCII.GetBytes(message.ToString());
-            List<byte> request = new List<byte>(buf);
-            request.AddRange(BitConverter.GetBytes(m_RunDetail.BatchId));
-            request.AddRange(BitConverter.GetBytes(m_RunDetail.NumberOfChannels));
-            request.AddRange(BitConverter.GetBytes(m_RunDetail.SampleRate));
-            request.AddRange(BitConverter.GetBytes(m_RunDetail.StartOfRun.ToOADate()));
-
-            request.Add((byte)m_RunDetail.DefaultTemperatureUnits);
-            request.Add((byte)m_RunDetail.DefaultThicknessUnits);
-
-            request.AddRange(Encoding.ASCII.GetBytes(m_RunDetail.SerialNumber));
-            request.Add((byte)0);
-            request.AddRange(Encoding.ASCII.GetBytes(m_RunDetail.OperatorName));
-            foreach (var channel in m_RunDetail.Channels)
-            {
-                request.Add((byte)channel.ChannelType);
-                request.AddRange(Encoding.ASCII.GetBytes(channel.ChannelName));
-                request.Add((byte)0);
-            }
-            namedPipeServerData.PipeServer.Write(request.ToArray(), 0, request.Count);           
-
-        }
-        public override string ToString()
-        {
-            return string.Format("Start '{0}'", m_RunDetail.BatchId);
-        }
-    }
-
-    internal class SampleData : IDataToBeSent
-    {
-        SamplePoint m_SamplePoint;
-        public SampleData(SamplePoint runDetail)
-        {
-            m_SamplePoint = runDetail;
-        }
-
-        SamplePoint SamplePoint { get { return m_SamplePoint; } }
-
-        public void Send(NamedPipeServerData namedPipeServerData)
-        {
-            StringBuilder message = new StringBuilder("@5*");
-            List<byte> request = new List<byte>();
-            request.AddRange(Encoding.ASCII.GetBytes(message.ToString() ) );
-            request.AddRange(BitConverter.GetBytes(m_SamplePoint.SampleTime.ToOADate()));                       
-            foreach (var item in m_SamplePoint.Samples)
-            {
-                request.AddRange(BitConverter.GetBytes(item));                
-            }
-            byte[] buf = request.ToArray();
-
-            namedPipeServerData.PipeServer.Write(buf, 0, buf.Length);           
-            
-        }
-        public override string ToString()
-        {
-            return string.Format("Sample '{0}'", m_SamplePoint.Samples[0]);
-        }
-
-    }
-
-    internal class StopOfRunData : IDataToBeSent
-    {
-
-        public StopOfRunData()
-        {
-            
-        }
-
-        public void Send(NamedPipeServerData namedPipeServerData)
-        {
-            string message = "@6";
-            byte[] buf = Encoding.ASCII.GetBytes(message);
-            namedPipeServerData.PipeServer.Write(buf, 0, buf.Length);                       
-        }
-        public override string ToString()
-        {
-            return "DataRunFinish";
-        }
-    }
-
     public class GOCServerImplementation : IIdealFinishAnalysis, IGOCInterProcessServer
     {        
         private Thread m_Server;

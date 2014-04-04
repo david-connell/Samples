@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataToBeSent\IDataToBeSent.cs" />
+    <Compile Include="DataToBeSent\StartOfRunData.cs" />
+    <Compile Include="DataToBeSent\StopOfRunData.cs" />
     <Compile Include="IdealFinishApplication.cs" />
     <Compile Include="IGOCInterProcessServer.cs" />
     <Compile Include="GOCIServerImplenetation.cs" />
@@ -47,7 +50,9 @@
     <Compile Include="Model\Channel.cs" />
     <Compile Include="Model\DataRunDetail.cs" />
     <Compile Include="Model\SamplePoint.cs" />
+    <Compile Include="NamedPipeServerData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DataToBeSent\SampleData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
