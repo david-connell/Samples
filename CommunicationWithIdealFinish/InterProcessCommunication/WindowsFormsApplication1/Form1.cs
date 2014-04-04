@@ -134,7 +134,7 @@ namespace WindowsFormsApplication1
         int m_PointId;
         private void Start(object sender, EventArgs e)
         {
-            
+            m_SendData.Enabled = true;
             m_PointId = 0;
             double sampleRate = 1.0; //Once a second
             m_DataRunDetail = new DataRunDetail(
@@ -210,6 +210,10 @@ namespace WindowsFormsApplication1
         private void Stop(object sender, EventArgs e)
         {
             m_Server.DataRunStop();
+            if (SendSampleTimer.Enabled)
+            {
+                button3_Click(sender, e);
+            }
         }
 
         private void timer2_Tick(object sender, EventArgs e)
@@ -219,7 +223,10 @@ namespace WindowsFormsApplication1
 
         private void button3_Click(object sender, EventArgs e)
         {
-            SendSampleTimer.Enabled = !SendSampleTimer.Enabled;
+            bool sendingSamples = SendSampleTimer.Enabled;
+            SendSampleTimer.Enabled = !sendingSamples;
+            m_SendSamples.Text = string.Format("{0} sending samples", SendSampleTimer.Enabled ? "Stop" : "Start");
+            m_SingleSample.Enabled = sendingSamples;
         }
 
         private void SendSampleTimer_Tick(object sender, EventArgs e)
@@ -233,12 +240,18 @@ namespace WindowsFormsApplication1
         StringBuilder m_output = new StringBuilder();
         public override void Write(char value)
         {
-            m_output.Append(value);
+            lock (m_output)
+            {
+                m_output.Append(value);
+            }
             
         }
         public override string ToString()
         {
-            return m_output.ToString();
+            lock (m_output)
+            {
+                return m_output.ToString();
+            }
         }
 
         public override Encoding Encoding

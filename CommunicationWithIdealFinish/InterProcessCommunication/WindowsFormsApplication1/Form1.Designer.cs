@@ -33,7 +33,7 @@
             this.m_Debug = new System.Windows.Forms.TextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.m_Connected = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.m_SingleSample = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -46,7 +46,7 @@
             this.m_DataRate = new System.Windows.Forms.Label();
             this.m_NumberOfProtocolErrors = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
+            this.m_SendSamples = new System.Windows.Forms.Button();
             this.SendSampleTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
@@ -87,19 +87,19 @@
             this.m_Connected.TabIndex = 3;
             this.m_Connected.Text = "NOT CONNECTED";
             // 
-            // button1
+            // m_SingleSample
             // 
-            this.button1.Location = new System.Drawing.Point(106, 12);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(104, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Send Sample";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.SendSample);
+            this.m_SingleSample.Location = new System.Drawing.Point(106, 12);
+            this.m_SingleSample.Name = "m_SingleSample";
+            this.m_SingleSample.Size = new System.Drawing.Size(124, 23);
+            this.m_SingleSample.TabIndex = 4;
+            this.m_SingleSample.Text = "Send Sample";
+            this.m_SingleSample.UseVisualStyleBackColor = true;
+            this.m_SingleSample.Click += new System.EventHandler(this.SendSample);
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(229, 12);
+            this.button2.Location = new System.Drawing.Point(253, 12);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(104, 23);
             this.button2.TabIndex = 5;
@@ -203,15 +203,15 @@
             this.label7.TabIndex = 14;
             this.label7.Text = "Number of Protocol Errors:";
             // 
-            // button3
+            // m_SendSamples
             // 
-            this.button3.Location = new System.Drawing.Point(106, 39);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(104, 23);
-            this.button3.TabIndex = 16;
-            this.button3.Text = "Send Samples";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.m_SendSamples.Location = new System.Drawing.Point(106, 39);
+            this.m_SendSamples.Name = "m_SendSamples";
+            this.m_SendSamples.Size = new System.Drawing.Size(124, 23);
+            this.m_SendSamples.TabIndex = 16;
+            this.m_SendSamples.Text = "Start sending  samples";
+            this.m_SendSamples.UseVisualStyleBackColor = true;
+            this.m_SendSamples.Click += new System.EventHandler(this.button3_Click);
             // 
             // SendSampleTimer
             // 
@@ -223,7 +223,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(411, 341);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.m_SendSamples);
             this.Controls.Add(this.m_NumberOfProtocolErrors);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.m_DataRate);
@@ -235,7 +235,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.m_SingleSample);
             this.Controls.Add(this.m_Connected);
             this.Controls.Add(this.m_Debug);
             this.Controls.Add(this.m_SendData);
@@ -253,7 +253,7 @@
         private System.Windows.Forms.TextBox m_Debug;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label m_Connected;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button m_SingleSample;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
@@ -266,7 +266,7 @@
         private System.Windows.Forms.Label m_DataRate;
         private System.Windows.Forms.Label m_NumberOfProtocolErrors;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button m_SendSamples;
         private System.Windows.Forms.Timer SendSampleTimer;
     }
 }
