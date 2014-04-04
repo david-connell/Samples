@@ -77,10 +77,10 @@ namespace TQC.GOC.InterProcessCommunication
                 ExceptionThrown(this, new ExceptionEventArgs(e));
         }
 
-        protected virtual void OnGOCServerStatus(GOCServerStatus status)
+        protected virtual void OnGOCServerStatus(GOCServerStatus status, bool protocolStatus)
         {
             if (GOCServerStatus != null)
-                GOCServerStatus(this, new GOCServerStatusEventArgs(status));
+                GOCServerStatus(this, new GOCServerStatusEventArgs(status, protocolStatus));
         }
 
         public DateTime LastPing
@@ -130,13 +130,13 @@ namespace TQC.GOC.InterProcessCommunication
                         if (dataToSend != null)
                         {
                             m_Writer.WriteLine("Send {0}", dataToSend);
-                            dataToSend.Send(namedPipeServerData, m_ProtocolVersion);
-                            OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.SendingDataSamples);
+                            bool status = dataToSend.Send(namedPipeServerData, m_ProtocolVersion);
+                            OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.SendingDataSamples, status);
                         }
                         else
                         {
-                            (new Ping()).Send(namedPipeServerData, m_ProtocolVersion);
-                            OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.PingIng);
+                            bool status = (new Ping()).Send(namedPipeServerData, m_ProtocolVersion);
+                            OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.PingIng, status);
                             lock (m_QueueOfData)
                             {
                                 m_PingLastSend = DateTime.Now;
@@ -203,7 +203,7 @@ namespace TQC.GOC.InterProcessCommunication
             }
             if (m_IsRunning)
             {
-                OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.DataFolderRecieved);
+                OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.DataFolderRecieved, true);
             }
         }
 

@@ -44,6 +44,8 @@
             this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.label5 = new System.Windows.Forms.Label();
             this.m_DataRate = new System.Windows.Forms.Label();
+            this.m_NumberOfProtocolErrors = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // m_SendData
@@ -181,11 +183,31 @@
             this.m_DataRate.TabIndex = 13;
             this.m_DataRate.Text = "label6";
             // 
+            // m_NumberOfProtocolErrors
+            // 
+            this.m_NumberOfProtocolErrors.AutoSize = true;
+            this.m_NumberOfProtocolErrors.Location = new System.Drawing.Point(363, 57);
+            this.m_NumberOfProtocolErrors.Name = "m_NumberOfProtocolErrors";
+            this.m_NumberOfProtocolErrors.Size = new System.Drawing.Size(13, 13);
+            this.m_NumberOfProtocolErrors.TabIndex = 15;
+            this.m_NumberOfProtocolErrors.Text = "0";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(226, 57);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(131, 13);
+            this.label7.TabIndex = 14;
+            this.label7.Text = "Number of Protocol Errors:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(411, 341);
+            this.Controls.Add(this.m_NumberOfProtocolErrors);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.m_DataRate);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -224,6 +246,8 @@
         private System.Windows.Forms.Timer timer2;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label m_DataRate;
+        private System.Windows.Forms.Label m_NumberOfProtocolErrors;
+        private System.Windows.Forms.Label label7;
     }
 }
 

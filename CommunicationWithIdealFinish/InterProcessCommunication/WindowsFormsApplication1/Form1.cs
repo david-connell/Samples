@@ -18,6 +18,7 @@ namespace WindowsFormsApplication1
     {
         ConsoleTextWriter m_TextWriter = new ConsoleTextWriter();
         GOCServerImplementation m_Server = new GOCServerImplementation();
+        int m_protocolErrors = 0;
         public Form1()
         {
             InitializeComponent();
@@ -38,6 +39,11 @@ namespace WindowsFormsApplication1
             {
                 BeginInvoke((MethodInvoker)(() => m_Server_GOCServerStatus(sender, e)));
                 return;
+            }
+            if (!e.ProtocolStatus)
+            {
+                m_protocolErrors++;
+                m_NumberOfProtocolErrors.Text = m_protocolErrors.ToString();
             }
             switch (e.Status)
             {

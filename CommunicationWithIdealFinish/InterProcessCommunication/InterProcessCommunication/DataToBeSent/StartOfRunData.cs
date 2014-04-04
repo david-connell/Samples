@@ -15,16 +15,17 @@ namespace TQC.GOC.InterProcessCommunication.DataToBeSent
 
         DataRunDetail DataRunDetail { get { return m_RunDetail; } }
 
-        public void Send(NamedPipeServerData namedPipeServerData, Version protocolVersion)
+        public bool Send(NamedPipeServerData namedPipeServerData, Version protocolVersion)
         {
-            if ((protocolVersion.Major == 1) && (protocolVersion.Major == 0))
+            bool status = false;
+            if ((protocolVersion.Major == 1) && (protocolVersion.Minor == 0))
             {
-                SendRunDetailsV1(namedPipeServerData);
+                status = SendRunDetailsV1(namedPipeServerData);
             }
-
+            return status;
         }
 
-        private void SendRunDetailsV1(NamedPipeServerData namedPipeServerData)
+        private bool SendRunDetailsV1(NamedPipeServerData namedPipeServerData)
         {
             StringBuilder message = new StringBuilder("@4*");
             byte[] buf = Encoding.ASCII.GetBytes(message.ToString());
@@ -49,6 +50,7 @@ namespace TQC.GOC.InterProcessCommunication.DataToBeSent
             }
             request.Add((byte)0);
             namedPipeServerData.PipeServer.Write(request.ToArray(), 0, request.Count);
+            return true;
         }
 
         public override string ToString()

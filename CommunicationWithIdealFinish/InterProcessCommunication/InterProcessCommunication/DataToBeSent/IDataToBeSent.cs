@@ -8,6 +8,6 @@ namespace TQC.GOC.InterProcessCommunication.DataToBeSent
 {
     internal interface IDataToBeSent
     {
-        void Send(NamedPipeServerData namedPipeServerData, Version protocolVersion);
+        bool Send(NamedPipeServerData namedPipeServerData, Version protocolVersion);
     }
 }

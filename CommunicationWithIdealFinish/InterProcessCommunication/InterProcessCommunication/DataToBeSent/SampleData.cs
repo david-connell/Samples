@@ -15,15 +15,17 @@ namespace TQC.GOC.InterProcessCommunication.DataToBeSent
 
         SamplePoint SamplePoint { get { return m_SamplePoint; } }
 
-        public void Send(NamedPipeServerData namedPipeServerData, Version protocolVersion)
+        public bool Send(NamedPipeServerData namedPipeServerData, Version protocolVersion)
         {
-            if ((protocolVersion.Major == 1) && (protocolVersion.Major == 0))
+            bool status = false;
+            if ((protocolVersion.Major == 1) && (protocolVersion.Minor == 0))
             {
-                SendSampleDataV1(namedPipeServerData);
+                status = SendSampleDataV1(namedPipeServerData);                
             }
+            return status;
         }
 
-        private void SendSampleDataV1(NamedPipeServerData namedPipeServerData)
+        private bool SendSampleDataV1(NamedPipeServerData namedPipeServerData)
         {
             StringBuilder message = new StringBuilder("@5*");
             List<byte> request = new List<byte>();
@@ -36,6 +38,7 @@ namespace TQC.GOC.InterProcessCommunication.DataToBeSent
             byte[] buf = request.ToArray();
 
             namedPipeServerData.PipeServer.Write(buf, 0, buf.Length);
+            return true;
         }
 
         public override string ToString()

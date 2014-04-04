@@ -44,9 +44,11 @@ namespace TQC.GOC.InterProcessCommunication
     public class GOCServerStatusEventArgs : EventArgs
     {
         public GOCServerStatus Status { get; private set; }
-        public GOCServerStatusEventArgs(GOCServerStatus status)
+        public bool ProtocolStatus { get; private set; }
+        public GOCServerStatusEventArgs(GOCServerStatus status, bool protocolStatus)
         {
             Status = status;
+            ProtocolStatus = protocolStatus;
         }
     }
     public class ExceptionEventArgs : EventArgs
