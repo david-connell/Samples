@@ -85,6 +85,7 @@ namespace WindowsFormsApplication1
 
         }
 
+        bool m_InShow;
         void m_Server_ExceptionThrown(object sender, ExceptionEventArgs e)
         {
             if (this.InvokeRequired)
@@ -92,8 +93,12 @@ namespace WindowsFormsApplication1
                 BeginInvoke((MethodInvoker)(() => m_Server_ExceptionThrown(sender, e)));
                 return;
             }
-
-            MessageBox.Show(e.Exception.Message);
+            if (!m_InShow)
+            {
+                m_InShow = true;
+                MessageBox.Show(e.Exception.Message);
+                m_InShow = false;
+            }
         }
 
         void m_Server_Connect(object sender, EventArgs e)

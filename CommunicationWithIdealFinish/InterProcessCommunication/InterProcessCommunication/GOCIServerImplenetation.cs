@@ -244,11 +244,10 @@ namespace TQC.GOC.InterProcessCommunication
 
         protected void ProcessNextClient()
         {
-            
-            using (NamedPipeServerStream pipeServer = 
-                new NamedPipeServerStream("TQC.GradientOven", PipeDirection.InOut,
-                    1, PipeTransmissionMode.Message, PipeOptions.Asynchronous))
+            NamedPipeServerStream pipeServer = null;
+            try
             {
+                pipeServer = new NamedPipeServerStream("TQC.GradientOven", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
                 m_Writer.WriteLine("[Server] Pipe created {0}", pipeServer.GetHashCode());
 
                 var data = new NamedPipeServerData(pipeServer);
@@ -281,7 +280,24 @@ namespace TQC.GOC.InterProcessCommunication
                     }
                 }
 
-            }            
+            }
+            catch (IOException ex)
+            {
+                OnException(ex);
+                Thread.Sleep(10000);
+            }
+            catch (Exception ex)
+            {
+                OnException(ex);
+            }
+            finally
+            {
+                if (pipeServer != null)
+                {
+                    pipeServer.Dispose();
+                }
+            }
+            
         }
 
         private void WaitForConnectionCallBack(IAsyncResult iar)
