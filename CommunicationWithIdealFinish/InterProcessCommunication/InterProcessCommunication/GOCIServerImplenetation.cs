@@ -94,12 +94,17 @@ namespace TQC.GOC.InterProcessCommunication
 
         private void ServerLoop()
         {
-            while (m_IsRunning)
+            try
             {
-                ProcessNextClient();
+                while (m_IsRunning)
+                {
+                    ProcessNextClient();
+                }
             }
-
-            m_TerminateHandle.Set();
+            finally
+            {
+                m_TerminateHandle.Set();
+            }
         }
         
         
@@ -201,7 +206,7 @@ namespace TQC.GOC.InterProcessCommunication
                     break;
                 }
             }
-            if (m_IsRunning)
+            if (m_IsRunning && !pipeReader.PipeBroken)
             {
                 OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.DataFolderRecieved, true);
             }
@@ -221,10 +226,17 @@ namespace TQC.GOC.InterProcessCommunication
                         lock (m_Server)
                         {
                             var results = message.Split('*');
-                            IdealAnalysisFolder = results[1];
-                            Version version = new Version(results[0]);
-                            m_IdealAnalysisVersion = new Version(version.Build, version.Revision);
-                            m_ProtocolVersion = new Version(version.Major, version.Minor);
+                            if (results.Length >= 2)
+                            {
+                                IdealAnalysisFolder = results[1];
+                                Version version = new Version(results[0]);
+                                m_IdealAnalysisVersion = new Version(version.Build, version.Revision);
+                                m_ProtocolVersion = new Version(version.Major, version.Minor);
+                            }
+                            else
+                            {
+                                reader.PipeBroken = true;
+                            }
                         }
                         reader.CanDoNextCommand = true;
                     }
@@ -265,16 +277,16 @@ namespace TQC.GOC.InterProcessCommunication
                 }
                 while (true)
                 {
+                    if (!m_IsRunning)
+                    {
+                        return;
+                    }
                     m_TerminateHandle.Reset();
                     if (m_TerminateHandle.WaitOne(1000))
                     {
                         return;
                     }
                     if (data.PipeBroken)
-                    {
-                        return;
-                    }
-                    if (!m_IsRunning)
                     {
                         return;
                     }
