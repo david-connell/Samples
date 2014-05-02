@@ -205,7 +205,7 @@ namespace WindowsFormsApplication1
                 }
                 else
                 {
-                    vals.Add(Math.Sin((dataPoint+channelId) / 20.0 ) * channelId );
+                    vals.Add(Math.Sin((dataPoint+channelId) / 20.0 ) * channelId +50);
                 }
             }
             m_Server.Data(
