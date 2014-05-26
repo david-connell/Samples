@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("TQC.GradientOven.InterProcessCommunication")]
-[assembly: AssemblyDescription("Communication between the gradient oven and Ideal Finish")]
+[assembly: AssemblyDescription("Communication between the Gradient Oven and TQC Ideal Finish Analysis")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("TQC")]
 [assembly: AssemblyProduct("TQC.GradientOven.InterProcessCommunication")]
@@ -27,5 +27,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.1")]
-[assembly: AssemblyFileVersion("1.0.0.1")]
+[assembly: AssemblyVersion("1.0.0.2")]
