@@ -21,7 +21,7 @@ namespace TQC.GOC.InterProcessCommunication
         /// The server is created at this point. It's Thread safe and is non-blocking
         /// </summary>
         /// <param name="writer"></param>
-        void CreateServer(TextWriter writer);
+        void CreateServer(TextWriter writer, System.ComponentModel.IContainer container, System.Drawing.Icon icon);
 
         /// <summary>
         /// Last time ping was sent

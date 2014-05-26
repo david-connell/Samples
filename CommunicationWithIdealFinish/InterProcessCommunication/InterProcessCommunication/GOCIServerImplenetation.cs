@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TQC.GOC.InterProcessCommunication.DataToBeSent;
 using TQC.GOC.InterProcessCommunication.Model;
+using TQC.GOC.InterProcessCommunication.ToolTray;
 
 namespace TQC.GOC.InterProcessCommunication
 {    
@@ -22,6 +23,7 @@ namespace TQC.GOC.InterProcessCommunication
         private string IdealAnalysisFolder { get; set; }
         private DataRunDetail DataRunDetails { get; set; }
         private bool CollectingData { get; set; }
+        private ToolTrayUI m_ToolTray;
 
 
         private bool m_IsTerminating;
@@ -35,15 +37,20 @@ namespace TQC.GOC.InterProcessCommunication
         public GOCServerImplementation()
         {
             m_ProtocolVersion = new Version(1, 0);  //Default version
+            
         }
 
-        public void CreateServer(TextWriter writer)
-        {
+        public void CreateServer(TextWriter writer, System.ComponentModel.IContainer container, System.Drawing.Icon icon)
+        {            
             if (m_IsRunning)
             {
                 Exception ex = new Exception("Cannot create more than one InterProcessServer");
                 OnException(ex);
                 throw ex;
+            }
+            if (container != null)
+            {
+                m_ToolTray = new ToolTrayUI(this, container, icon);
             }
             m_IsRunning = true;
             m_Writer = writer;

@@ -30,7 +30,7 @@ namespace WindowsFormsApplication1
             m_Server.GOCServerStatus += m_Server_GOCServerStatus;
 
             //Hook this up afterwards to make sure that we don't miss anything...
-            m_Server.CreateServer(m_TextWriter);
+            m_Server.CreateServer(m_TextWriter, components, Icon);
         }
 
         void m_Server_GOCServerStatus(object sender, GOCServerStatusEventArgs e)
@@ -42,15 +42,12 @@ namespace WindowsFormsApplication1
             }
             if (!e.ProtocolStatus)
             {
-                m_protocolErrors++;
-                m_NumberOfProtocolErrors.Text = m_protocolErrors.ToString();
+                
             }
             switch (e.Status)
             {
                 case GOCServerStatus.DataFolderRecieved:
                     {
-                        m_Version.Text = m_Server.IdealFinishAnalysisVersion.ToString();
-                        m_Path.Text = m_Server.DataFolder;
                     }
                     break;
                 case GOCServerStatus.PingIng:
@@ -59,33 +56,17 @@ namespace WindowsFormsApplication1
                 case GOCServerStatus.SendingDataHeader:
                 case GOCServerStatus.SendingDataSamples:
                 case GOCServerStatus.SendEndOfData:
-                    TransmittedData(1);
+                    
                     break;
 
 
             }
         }
 
-        DateTime m_CurrentPoint = DateTime.Now;
-        int m_PacketsPerSecond = 0;
-
-        private void TransmittedData(int packets)
-        {
-            DateTime currentTime = DateTime.Now;
-            if ((currentTime - m_CurrentPoint).TotalSeconds > 1)
-            {
-                m_CurrentPoint = currentTime;
-                m_PacketsPerSecond = packets;
-            }
-            else
-            {
-                m_PacketsPerSecond += packets;
-            }
-            m_DataRate.Text = m_PacketsPerSecond.ToString();
-
-        }
+        
 
         bool m_InShow;
+
         void m_Server_ExceptionThrown(object sender, ExceptionEventArgs e)
         {
             if (this.InvokeRequired)
@@ -107,8 +88,7 @@ namespace WindowsFormsApplication1
             {
                 BeginInvoke((MethodInvoker ) (() =>m_Server_Connect(sender, e)));
                 return;
-            }
-            m_Connected.Text = "CONNECTED";
+            }            
         }
 
         void m_Server_Disconnect(object sender, EventArgs e)
@@ -118,17 +98,11 @@ namespace WindowsFormsApplication1
                 BeginInvoke((MethodInvoker)(() => m_Server_Disconnect(sender, e)));
                 return;
             }
-
-            m_Connected.Text = "DISCONNECTED";
-            m_Version.Text = "";
-            m_Path.Text = "";
-
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            m_Debug.Text = m_TextWriter.ToString();
-            TransmittedData(0);
+            m_Debug.Text = m_TextWriter.ToString();            
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -193,6 +167,8 @@ namespace WindowsFormsApplication1
 
         private void SendSample(object sender, EventArgs e)
         {
+            if (m_DataRunDetail == null)
+                return;
             ++m_PointId;
             double dataPoint = m_PointId;
             DateTime sampleTime = m_DataRunDetail.StartOfRun.AddSeconds(m_PointId * m_DataRunDetail.SampleRate);
@@ -220,12 +196,7 @@ namespace WindowsFormsApplication1
                 button3_Click(sender, e);
             }
         }
-
-        private void timer2_Tick(object sender, EventArgs e)
-        {
-            label4.Text = (DateTime.Now - m_Server.LastPing).ToString();
-        }
-
+       
         private void button3_Click(object sender, EventArgs e)
         {
             bool sendingSamples = SendSampleTimer.Enabled;
