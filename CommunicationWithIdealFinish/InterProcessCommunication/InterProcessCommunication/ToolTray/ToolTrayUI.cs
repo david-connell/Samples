@@ -17,10 +17,33 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
         public event EventHandler Update;
         public event EventHandler DataRateUpdate;
 
-        string m_Status;
-        int m_protocolErrors;
-        string m_Version;
-        string m_Path;
+        private string m_Status;
+        private int m_protocolErrors;
+        private string m_Version;
+        private string m_Path;
+
+
+        internal ToolTrayUI(GOCServerImplementation server, System.ComponentModel.IContainer mainFormComponents, System.Drawing.Icon icon)
+        {
+            m_Server = server;
+            m_NotifyIcon = new System.Windows.Forms.NotifyIcon(mainFormComponents);
+            // 
+            // notifyIcon1
+            // 
+            m_NotifyIcon.Icon = icon;
+            m_NotifyIcon.Text = "GOC->Ideal Finish Comunication";
+            m_NotifyIcon.Visible = true;
+            m_NotifyIcon.ContextMenuStrip = new ContextMenuStrip();
+
+            m_NotifyIcon.ContextMenuStrip.Opening += ContextMenuStrip_Opening;
+            m_NotifyIcon.DoubleClick += notifyIcon_DoubleClick;
+
+            m_Server.Connect += m_Server_Connect;
+            m_Server.Disconnect += m_Server_Disconnect;
+            m_Server.ExceptionThrown += m_Server_ExceptionThrown;
+            m_Server.GOCServerStatus += m_Server_GOCServerStatus;            
+        }
+
 
         public string Status
         {
@@ -77,27 +100,6 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
             }
         }
 
-        internal ToolTrayUI(GOCServerImplementation server, System.ComponentModel.IContainer mainFormComponents, System.Drawing.Icon icon)
-        {
-            m_Server = server;
-            m_NotifyIcon = new System.Windows.Forms.NotifyIcon(mainFormComponents);
-            // 
-            // notifyIcon1
-            // 
-            m_NotifyIcon.Icon = icon;
-            m_NotifyIcon.Text = "GOC->Ideal Finish Comunication";
-            m_NotifyIcon.Visible = true;
-            m_NotifyIcon.ContextMenuStrip = new ContextMenuStrip();
-
-            m_NotifyIcon.ContextMenuStrip.Opening += ContextMenuStrip_Opening;
-            m_NotifyIcon.DoubleClick += notifyIcon_DoubleClick;
-
-            m_Server.Connect += m_Server_Connect;
-            m_Server.Disconnect += m_Server_Disconnect;
-            m_Server.ExceptionThrown += m_Server_ExceptionThrown;
-            m_Server.GOCServerStatus += m_Server_GOCServerStatus;            
-        }
-
         private void HelpAboutForm()
         {
             if (m_HelpAboutForm == null)
@@ -135,11 +137,6 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
         private void helpAboutForm_Closed(object sender, EventArgs e)        { m_HelpAboutForm = null;   }
         
         
-
-        private System.ComponentModel.IContainer components;	// a list of components to dispose when the context is disposed
-        private NotifyIcon notifyIcon;				            // the icon that sits in the system tray
-
-
         private void ContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = false;
