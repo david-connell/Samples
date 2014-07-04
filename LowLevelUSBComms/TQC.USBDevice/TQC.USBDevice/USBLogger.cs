@@ -11,6 +11,13 @@ namespace TQC.USBDevice
 
     public class USBLogger : IDisposable
     {
+        public enum ProbeType
+        {
+            Gloss = 0,
+            Temperature=1,
+            Humidity=2,
+        }
+
         public enum DeviceType
         {
             Unknown = -1,
@@ -34,10 +41,11 @@ namespace TQC.USBDevice
         }
         private TQC.IF.USBLogger.USBGeneric m_Logger;
 
-        public USBLogger()
+        internal USBLogger()
         {
             m_Logger = new IF.USBLogger.USBGeneric();
         }
+
         ~USBLogger()
         {
             Dispose(false);
@@ -53,12 +61,17 @@ namespace TQC.USBDevice
             }
         }
 
+        virtual protected void ClearCachedData()
+        {
+
+        }
         public bool Open(USBProductId id)
         {
             int result = -1;
             try
             {
                 result = m_Logger.Open(0, 0, 0, null, (uint)id);
+                ClearCachedData();
             }
             catch (COMException ex)
             {
@@ -82,13 +95,15 @@ namespace TQC.USBDevice
             OffloadData = 0x04,
             ReadCurrentProbeVals = 0x05,
             ReadCurrentRawProbeVals = 0x05,
+            WriteSetup = 0x17,
             GROSetCommand = 0x60,
             GROReadCommand = 0x61,
         }
 
-        internal byte[] Request(Commands command, byte[] request)
+
+        internal byte[] Request(Commands command, byte[] request, byte conversationId = 0)
         {
-            return m_Logger.GenericCommand(0, (byte) command, request);
+            return m_Logger.GenericCommand(conversationId, (byte) command, request);
         }
         public string Version
         {
@@ -109,19 +124,24 @@ namespace TQC.USBDevice
         public DeviceType LoggerType
         {
             get
-            {
-                switch (m_Logger.LoggerType)
-                {
-                    case 1: return DeviceType.SoloGlossmeter;
-                    case 2: return DeviceType.DuoGlossmeter;
-                    case 3: return DeviceType.PolyGlossmeter;
-                    case 4: return DeviceType.CurveX3_Basic;
-                    case 5: return DeviceType.CurveX3_Mid;
-                    case 6: return DeviceType.CurveX3_High;
-                    case 7: return DeviceType.GRO;
-                }
-                return DeviceType.Unknown;
+            {                
+                return LoggerTypeToDeviceType(m_Logger.LoggerType);
             }
+        }
+
+        protected static DeviceType LoggerTypeToDeviceType(int deviceType)
+        {
+            switch (deviceType)
+            {
+                case 1: return DeviceType.SoloGlossmeter;
+                case 2: return DeviceType.DuoGlossmeter;
+                case 3: return DeviceType.PolyGlossmeter;
+                case 4: return DeviceType.CurveX3_Basic;
+                case 5: return DeviceType.CurveX3_Mid;
+                case 6: return DeviceType.CurveX3_High;
+                case 7: return DeviceType.GRO;
+            }
+            return DeviceType.Unknown;
         }
 
         public void Dispose()
@@ -163,7 +183,7 @@ namespace TQC.USBDevice
             get
             {
                 object result = null;
-                m_Logger.GetCalibrationData(0, 1, ref result);
+                m_Logger.GetCalibrationData(0, 2, ref result);
                 return DateTime.FromOADate((double)result);
             }
         }

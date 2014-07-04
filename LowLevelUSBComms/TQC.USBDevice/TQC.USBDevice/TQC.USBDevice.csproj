@@ -46,7 +46,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GROUsbDevice.cs" />
+    <Compile Include="GradientOven\GOCChildException.cs" />
+    <Compile Include="GradientOven\GROChildDevice.cs" />
+    <Compile Include="GradientOven\IGROMainBoard.cs" />
+    <Compile Include="GradientOven\GROUsbDevice.cs" />
+    <Compile Include="ISimpleTQCDevice.cs" />
     <Compile Include="TQCUsbLogger.cs" />
     <Compile Include="USBLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

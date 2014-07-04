@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TQC.USBDevice.GradientOven
-{
+{    
     public enum PowerState : byte
     {
         ON = 1,
@@ -56,8 +56,37 @@ namespace TQC.USBDevice.GradientOven
         public byte SpeedMillimetersPerSecond { get; private set; }
     }
 
-    public class GROUsbDevice : TQCUsbLogger
+
+    public class GROMainBoard : TQCUsbLogger , IGROMainBoard
     {
+        Dictionary<byte, IGROThermoCoupleBoard> m_ChildDevices = new Dictionary<byte, IGROThermoCoupleBoard>();
+
+        public IGROThermoCoupleBoard GetChildDevice(byte id)
+        {
+            IGROThermoCoupleBoard result = null;
+            if (ThermocoupleBoardIDs.Contains(id))
+            {
+                if (!m_ChildDevices.ContainsKey(id))
+                {
+                    m_ChildDevices[id] = new GROThermocoupleBoard(this, id);
+                }
+                return m_ChildDevices[id];
+            }
+            else
+            {
+                throw new GocChildException(string.Format("Child device {0} does not exist", id));   
+            }            
+        }
+
+        public IEnumerable<byte> ThermocoupleBoardIDs
+        {
+            get
+            {
+                //ToDo request this information 
+                return new byte [] { 1, 2, 3, 4 };
+            }
+        }
+
         public Percentage FanSpeed
         {
             get
@@ -194,7 +223,15 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
+        byte AbsoluteFanIdToThermcoupleBoardID(short fanId)
+        {
+            return (byte)((fanId / 8) + 1);
+        }
 
+        byte AbsoluteFanIdToLocalFanId(short fanId)
+        {
+            return (byte)(fanId % 8) ;
+        }
         /// <summary>
         /// Gets the Fan setting
         /// </summary>
@@ -205,8 +242,8 @@ namespace TQC.USBDevice.GradientOven
             if (fanId < 0 || fanId > 32)
             {
                 throw new ArgumentOutOfRangeException("fanId", "Valid fans 0->32");
-            }
-            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)100 + fanId));            
+            }            
+            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)100 + AbsoluteFanIdToLocalFanId(fanId)), AbsoluteFanIdToThermcoupleBoardID(fanId) );
             return new Percentage(response[0]);
         }
 
@@ -224,10 +261,10 @@ namespace TQC.USBDevice.GradientOven
 
             List<byte> request = new List<byte>();
 
-            request.AddRange(BitConverter.GetBytes((short)100+fanId));
+            request.AddRange(BitConverter.GetBytes((short)100 + AbsoluteFanIdToLocalFanId(fanId)) );
             request.Add(fanSetting.Value);
 
-            Request(Commands.GROSetCommand, request.ToArray());
+            Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(fanId));
             return ;
 
         }
@@ -239,7 +276,7 @@ namespace TQC.USBDevice.GradientOven
             {
                 throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
             }
-            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)200 + slotId));
+            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)200 + AbsoluteFanIdToLocalFanId(slotId)), AbsoluteFanIdToThermcoupleBoardID(slotId));
             return BitConverter.ToUInt16(response, 0)/ 10.0f ;
         }
 
@@ -256,10 +293,10 @@ namespace TQC.USBDevice.GradientOven
 
             List<byte> request = new List<byte>();
 
-            request.AddRange(BitConverter.GetBytes((short)200 + fanId));
+            request.AddRange(BitConverter.GetBytes((short)200 + AbsoluteFanIdToLocalFanId(fanId)));
             request.AddRange(BitConverter.GetBytes(((UInt16)(temperatureSettingInDegreesC* 10.0f+0.5)) ));
 
-            Request(Commands.GROSetCommand, request.ToArray());
+            Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(fanId));
             return;
 
         }

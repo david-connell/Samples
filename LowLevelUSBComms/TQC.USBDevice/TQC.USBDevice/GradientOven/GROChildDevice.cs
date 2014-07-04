@@ -1,0 +1,144 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TQC.USBDevice.GradientOven
+{
+
+    internal class GROThermocoupleBoard : IGROThermoCoupleBoard
+    {
+        GROMainBoard ParentDevice { get; set; }
+        byte ChildDeviceID { get; set; }
+
+
+        internal GROThermocoupleBoard(GROMainBoard parent, byte childDeviceId)
+        {
+            ParentDevice = parent;
+            ChildDeviceID = childDeviceId;
+        }
+
+        public Int32 SerialNumber
+        {
+            get
+            {
+                return ParentDevice._SerialNumber(ChildDeviceID);
+            }
+        }
+
+        public Version SoftwareVersion
+        {
+            get
+            {
+                return ParentDevice._SoftwareVersion(ChildDeviceID);
+            }
+        }
+
+        public Version HardwareVersion
+        {
+            get
+            {
+                return ParentDevice._HardwareVersion(ChildDeviceID);
+            }
+        }
+
+        public string DeviceName
+        {
+            get
+            {
+                return ParentDevice._DeviceName(ChildDeviceID);
+            }
+        }
+
+        public string ManufactureName
+        {
+            get
+            {
+                return ParentDevice._ManufactureName(ChildDeviceID);
+            }
+        }
+
+        public DateTime ManufactureDate
+        {
+            get
+            {
+                return ParentDevice._ManufactureDate(ChildDeviceID);
+            }
+        }
+
+        public Int32 NumberOfProbes
+        {
+            get
+            {
+                return ParentDevice._NumberOfProbes(ChildDeviceID);
+            }
+        }
+
+        public string ProbeName (int probeId)
+        {                        
+            return ParentDevice._ProbeName(ChildDeviceID, probeId);         
+        }
+
+        public USBLogger.ProbeType ProbeType(int probeId)
+        {
+            return ParentDevice._ProbeType(ChildDeviceID, probeId);
+        }
+
+        public Version ProtocolVersion
+        {
+            get
+            {
+                return ParentDevice._ProtocolVersion(ChildDeviceID);
+            }
+        }
+
+        public USBLogger.DeviceType DeviceType
+        {
+            get
+            {
+                return ParentDevice._DeviceType(ChildDeviceID);
+            }
+        }
+
+        public DateTime Calibration
+        {
+            get
+            {
+                return ParentDevice._Calibration(ChildDeviceID);
+            }
+        }
+
+        public String CalibrationUserName
+        {
+            get
+            {
+                return ParentDevice._CalibrationUserName(ChildDeviceID);
+            }
+        }
+
+        public String CalibrationCompany
+        {
+            get
+            {
+                return ParentDevice._CalibrationCompany(ChildDeviceID);
+            }
+        }
+
+        public IEnumerable<double> ColdJunctions
+        {
+            get
+            {
+                return ParentDevice._ColdJunctions(ChildDeviceID);
+            }
+        }
+
+        public IEnumerable<double> ProbeValues
+        {
+            get
+            {
+                return ParentDevice._ProbeValues(ChildDeviceID);
+            }
+        }
+    }
+}
