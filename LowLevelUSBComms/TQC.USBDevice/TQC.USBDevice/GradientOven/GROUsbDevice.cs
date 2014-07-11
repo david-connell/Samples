@@ -257,8 +257,7 @@ namespace TQC.USBDevice.GradientOven
             if (fanId < 0 || fanId > 32)
             {
                 throw new ArgumentOutOfRangeException("fanId", "Valid fans 0->32");
-            }
-
+            }           
             List<byte> request = new List<byte>();
 
             request.AddRange(BitConverter.GetBytes((short)(100 + fanId) ) );
@@ -288,7 +287,7 @@ namespace TQC.USBDevice.GradientOven
             }
             if ((temperatureSettingInDegreesC < 0.0f) || (temperatureSettingInDegreesC > 500.0f) )
             {
-                throw new Exception("Temeprature our of range");
+                throw new ArgumentOutOfRangeException("temperatureSettingInDegreesC", "Valid Temeprature 0->500C");
             }
 
             List<byte> request = new List<byte>();
