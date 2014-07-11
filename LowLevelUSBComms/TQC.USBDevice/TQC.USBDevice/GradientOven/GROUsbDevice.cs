@@ -242,8 +242,8 @@ namespace TQC.USBDevice.GradientOven
             if (fanId < 0 || fanId > 32)
             {
                 throw new ArgumentOutOfRangeException("fanId", "Valid fans 0->32");
-            }            
-            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)100 + AbsoluteFanIdToLocalFanId(fanId)), AbsoluteFanIdToThermcoupleBoardID(fanId) );
+            }
+            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)(100 + fanId)));
             return new Percentage(response[0]);
         }
 
@@ -261,10 +261,10 @@ namespace TQC.USBDevice.GradientOven
 
             List<byte> request = new List<byte>();
 
-            request.AddRange(BitConverter.GetBytes((short)100 + AbsoluteFanIdToLocalFanId(fanId)) );
+            request.AddRange(BitConverter.GetBytes((short)(100 + fanId) ) );
             request.Add(fanSetting.Value);
 
-            Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(fanId));
+            Request(Commands.GROSetCommand, request.ToArray());
             return ;
 
         }
@@ -276,7 +276,7 @@ namespace TQC.USBDevice.GradientOven
             {
                 throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
             }
-            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)200 + AbsoluteFanIdToLocalFanId(slotId)), AbsoluteFanIdToThermcoupleBoardID(slotId));
+            byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)(200 + AbsoluteFanIdToLocalFanId(slotId))), AbsoluteFanIdToThermcoupleBoardID(slotId));
             return BitConverter.ToUInt16(response, 0)/ 10.0f ;
         }
 
@@ -293,7 +293,7 @@ namespace TQC.USBDevice.GradientOven
 
             List<byte> request = new List<byte>();
 
-            request.AddRange(BitConverter.GetBytes((short)200 + AbsoluteFanIdToLocalFanId(fanId)));
+            request.AddRange(BitConverter.GetBytes((short)(200 + AbsoluteFanIdToLocalFanId(fanId))));
             request.AddRange(BitConverter.GetBytes(((UInt16)(temperatureSettingInDegreesC* 10.0f+0.5)) ));
 
             Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(fanId));
