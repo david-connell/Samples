@@ -8,8 +8,8 @@ namespace IntegrationTestProject1
     [TestClass]
     public class GradientOvenTests
     {
-        //USBLogger.USBProductId ProductId = USBLogger.USBProductId.GRADIENT_OVEN;
-        USBLogger.USBProductId ProductId = USBLogger.USBProductId.Glossmeter;
+        USBLogger.USBProductId ProductId = USBLogger.USBProductId.GRADIENT_OVEN;
+        //USBLogger.USBProductId ProductId = USBLogger.USBProductId.Glossmeter;
         [TestMethod]
         public void TestConnectivity()
         {
