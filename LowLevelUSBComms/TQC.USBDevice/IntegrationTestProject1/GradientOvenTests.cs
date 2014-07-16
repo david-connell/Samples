@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TQC.USBDevice;
+using TQC.USBDevice.GradientOven;
 
 namespace IntegrationTestProject1
 {
@@ -20,6 +22,29 @@ namespace IntegrationTestProject1
                     Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
                     Console.WriteLine("Version: '{0}'", logger.Version);
                     //Assert.AreEqual(logger.LoggerType, USBLogger.DeviceType.PolyGlossmeter);
+                    logger.Close();
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ReadProbes()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var thermocoupleBoard = logger.GetChildDevice(1);
+                    var vals = thermocoupleBoard.ProbeValues;
+                    Assert.IsTrue(vals.Count() == 8);
+                    foreach (var value in vals)
+                    {
+                        Assert.IsTrue(value > 0);    
+                    }
                     logger.Close();
                 }
                 else
@@ -101,7 +126,7 @@ namespace IntegrationTestProject1
             {
                 if (logger.Open(ProductId))
                 {                    
-                    Assert.IsTrue(logger.NumberOfProbes == 3);                    
+                    Assert.IsTrue(logger.NumberOfProbes == 0);                    
                     logger.Close();
                 }
                 else
