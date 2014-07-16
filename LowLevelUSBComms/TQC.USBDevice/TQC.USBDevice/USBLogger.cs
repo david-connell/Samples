@@ -94,7 +94,7 @@ namespace TQC.USBDevice
             ReadLoggedInfo = 0x03,
             OffloadData = 0x04,
             ReadCurrentProbeVals = 0x05,
-            ReadCurrentRawProbeVals = 0x05,
+            ReadCurrentRawProbeVals = 0x06,
             WriteSetup = 0x17,
             GROSetCommand = 0x60,
             GROReadCommand = 0x61,

@@ -28,7 +28,8 @@ namespace TQC.USBDevice
             var response = Request(command, request.ToArray(), deviceId);
             return response;
         }
-        private byte[] GetProbeValues(byte deviceId, byte mode, byte setid)
+
+        protected byte[] GetProbeValues(byte deviceId, byte mode, byte setid)
         {
             List<byte> request = new List<byte>();
             request.Add(mode);
@@ -60,6 +61,8 @@ namespace TQC.USBDevice
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 1);
             return new Version(result[0], result[1], result[2], result[3]);
         }
+
+        
 
         public Version HardwareVersion
         {
@@ -159,6 +162,25 @@ namespace TQC.USBDevice
                 ProbesPerDevice[deviceId] = GetInt8(deviceId, Commands.ReadDeviceInfo, 11);
             }
             return ProbesPerDevice[deviceId];
+        }
+
+        internal LinearCalibrationDetails _Calibration(byte deviceId, int probeId)
+        {
+            if (probeId >= 0 && probeId < _NumberOfProbes(deviceId))
+            {
+                var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 20 + probeId);
+
+                return new LinearCalibrationDetails(BitConverter.ToSingle(result, 0), BitConverter.ToSingle(result,4));
+            }
+            else
+            {
+                throw new IndexOutOfRangeException("probeId");
+            }
+        }
+
+        public LinearCalibrationDetails CalibrationDetails(int probeId)
+        {
+            return _Calibration(0, probeId);
         }
 
         internal string _ProbeName(byte deviceId, int probeId)
@@ -280,14 +302,15 @@ namespace TQC.USBDevice
         {
             List<double> data = new List<double>();
             int totalNumberOfProbes = _NumberOfProbes(deviceId);
-            int maxNumberOfSets = (int)(totalNumberOfProbes / 6 + 0.999);
+            int maxNumberOfSets = 1;
             for (int setId = 1; setId < maxNumberOfSets; setId++)
             {
-                var result = GetProbeValues(deviceId, 0x06, 1);
+                var result = GetProbeValues(deviceId, 0x06, (byte)setId);
                 const int lengthOfData = sizeof(float);
-                for (int i = 0; i < result.Length / lengthOfData; i++)
+                const int startOffset = 6;
+                for (int i = 0; i < (result.Length-startOffset) / lengthOfData; i++)
                 {
-                    double value = BitConverter.ToSingle(result, i * lengthOfData);
+                    double value = BitConverter.ToSingle(result, startOffset + i * lengthOfData);
                     data.Add(value);
                 }
             }
@@ -309,19 +332,16 @@ namespace TQC.USBDevice
         {
             List<double> data = new List<double>();
             int totalNumberOfProbes = _NumberOfProbes(deviceId);
-            int maxNumberOfSets = (int)(totalNumberOfProbes / 8 + 0.999);
+            int maxNumberOfSets = 1; // (int)(totalNumberOfProbes / 8 + 0.999);
             for (int setId = 1; setId < maxNumberOfSets; setId++)
             {
-                var result = GetProbeValues(deviceId, 0x05, 1);
+                var result = GetProbeValues(deviceId, 0x05, (byte)setId);
                 const int lengthOfData = 2 ;
-                for (int i = 0; i < result.Length / lengthOfData; i++)
+                const int startOffset = 6;
+                for (int i = 1; i < (result.Length-startOffset) / lengthOfData; i++)
                 {
-                    Int16 value = BitConverter.ToInt16(result, i * lengthOfData);
-
-                    //Assume temperature. (this will be wrong)
-
-
-                    data.Add(value/10.0);
+                    Int16 value = BitConverter.ToInt16(result, startOffset + i * lengthOfData);                    
+                    data.Add((double)value/10.0);
                 }
             }
             return data;
@@ -368,10 +388,7 @@ namespace TQC.USBDevice
                     request.AddRange(BitConverter.GetBytes((short)11));
                     request.AddRange(BitConverter.GetBytes((UInt32)(sampleRate*10) ));
                     request.AddRange(BitConverter.GetBytes((UInt32)secsToWait));
-                    var response = Request(Commands.WriteSetup, request.ToArray(), 0);
-
-                    
-
+                    var response = Request(Commands.WriteSetup, request.ToArray(), 0);                   
                     return true;       
                 }                
             }

@@ -269,6 +269,39 @@ namespace TQC.USBDevice.GradientOven
         }
 
 
+        public void UserInterfaceStatus(out byte buttonStatus, out Int32 status)
+        {
+            buttonStatus = 0;
+            status = 0;
+
+            var response = GetProbeValues(0, 0x30, 0);
+            
+            if (response.Length == 7)
+            {
+                buttonStatus = response[2];
+                status = BitConverter.ToInt32(response, 3);
+            }
+            return;
+        }
+
+        public IList<UInt16> InternalChannels()
+        {
+            List<UInt16> values = new List<ushort>();
+            var response = GetProbeValues(0, 0x11, 0);
+            const int minBufLen = 6;
+            if (response.Length > minBufLen)
+            {
+                for (int index = 0; index < (response.Length - minBufLen) / 2; index++)
+                {
+                    var value = BitConverter.ToUInt16(response, minBufLen + index *2 );
+                    values.Add(value);
+                }
+                
+                
+            }
+            return values;
+        }
+
         public float GetTempSetting(short slotId)
         {
             if (slotId < 0 || slotId > 32)
