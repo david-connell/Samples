@@ -17,6 +17,7 @@ namespace IntegrationTestNUnit
             {
                 ProductId = product;
             }
+
             [Test]
             public void TestConnectivity()
             {
@@ -26,6 +27,25 @@ namespace IntegrationTestNUnit
                     {
                         Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
                         Console.WriteLine("Version: '{0}'", logger.Version);                        
+                        logger.Close();
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
+            [Test]
+            public void InvalidCommand()
+            {
+                using (var logger = new USBLogger())
+                {
+                    if (logger.Open(ProductId))
+                    {
+                        Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
+                        Console.WriteLine("Version: '{0}'", logger.Version);
+                        var response = logger.Request(TQC.USBDevice.USBLogger.Commands.GROReadCommand, BitConverter.GetBytes((short)1));
                         logger.Close();
                     }
                     else
@@ -81,6 +101,7 @@ namespace IntegrationTestNUnit
                     }
                 }
             }
+
             [Test]
             public void GetDeviceName()
             {

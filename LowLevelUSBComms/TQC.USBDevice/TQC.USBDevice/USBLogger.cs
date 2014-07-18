@@ -99,11 +99,98 @@ namespace TQC.USBDevice
             GROSetCommand = 0x60,
             GROReadCommand = 0x61,
         }
+        public enum USBCommandResponseCode
+        {
+            OK, 
+            UnknownError,
+            CommandCorrupt,
+            CommandOutOfSequence,
+            CommandUnexpected,
+            DeviceBusy,
+            CommandNotSuported,
+            EnumerationNotSuported,
+            BatchNotAvailable,
+            DataOutOfRange,
+            CommandModeNotSupported,
+            Unknown,
+        }
 
+        
+        
+        const int DISP_E_MEMBERNOTFOUND = unchecked((int)(0x80020003L));
+        const int STG_E_DOCFILECORRUPT = unchecked((int)(0x80030109L));
+        const int STG_E_BADBASEADDRESS = unchecked((int)(0x80030110L));
+        const int RPC_E_UNEXPECTED = unchecked((int)(0x8001FFFFL));
+        const int STG_E_INUSE = unchecked((int)(0x80030100L));
+        const int CO_E_INCOMPATIBLESTREAMVERSION = unchecked((int)(0x8001013BL));
+        const int SEC_E_UNSUPPORTED_FUNCTION = unchecked((int)(0x80090302L));
+        const int SPAPI_E_MACHINE_UNAVAILABLE = unchecked((int)(0x800F0222L));
+        const int OSS_OUT_OF_RANGE = unchecked((int)(0x80093021L));
+        const int CO_E_FAILEDTOOPENPROCESSTOKEN = unchecked((int)(0x8001013CL));
+
+
+        private static DeviceResponseUnexpectedException UsbErrorToException(COMException ex)
+        {
+            switch (ex.HResult)
+            {
+                case DISP_E_MEMBERNOTFOUND:
+                    return new DeviceUnknownErrorException();
+                case STG_E_DOCFILECORRUPT:
+                    {
+                        return new CommandCorruptException();
+                    }
+                case STG_E_BADBASEADDRESS:
+                    {
+                        return new CommandOutOfSequenceException();
+                    }
+                case RPC_E_UNEXPECTED:
+                    {
+                        return new CommandUnexpectedException();
+                    }
+                case STG_E_INUSE:
+                    {
+                        return new DeviceBusyException();                        
+                    }
+                case CO_E_INCOMPATIBLESTREAMVERSION:
+                    {
+                        return new CommandNotSuportedException();
+                    }
+                case SEC_E_UNSUPPORTED_FUNCTION:
+                    {
+                        return new EnumerationNotSuportedException();
+                    }
+                case SPAPI_E_MACHINE_UNAVAILABLE:
+                    {
+                        return new BatchNotAvailableException();
+                    }
+                case OSS_OUT_OF_RANGE:
+                    {
+                        return new DataOutOfRangeException();
+                    }
+                case CO_E_FAILEDTOOPENPROCESSTOKEN:
+                    {
+                        return new CommandModeNotSupportedException();
+                    }
+                default:
+                    return null;
+            }
+        }
 
         internal byte[] Request(Commands command, byte[] request, byte conversationId = 0)
         {
-            return m_Logger.GenericCommand(conversationId, (byte) command, request);
+            try
+            {
+                return m_Logger.GenericCommand(conversationId, (byte)command, request);
+            }
+            catch (COMException ex)
+            {
+                var newException = UsbErrorToException(ex);
+                if (newException != null)
+                {
+                    throw newException;
+                }
+                throw;
+            }
         }
         public string Version
         {

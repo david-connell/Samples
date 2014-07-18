@@ -156,7 +156,7 @@ namespace TQC.USBDevice.GradientOven
 
                 request.AddRange(BitConverter.GetBytes((short)7));
                 request.Add((byte)value);
-                Request(Commands.GROSetCommand, request.ToArray());
+                IssueGROSetCommand(request);                
             }
         }
 
@@ -176,8 +176,13 @@ namespace TQC.USBDevice.GradientOven
 
                 request.AddRange(BitConverter.GetBytes((short)4));
                 request.Add((byte)value );
-                Request(Commands.GROSetCommand, request.ToArray());
+                IssueGROSetCommand(request);
             }
+        }
+
+        private void IssueGROSetCommand(List<byte> request)
+        {
+            Request(Commands.GROSetCommand, request.ToArray());            
         }
 
         /// <summary>
@@ -196,8 +201,8 @@ namespace TQC.USBDevice.GradientOven
                 List<byte> request = new List<byte>();
 
                 request.AddRange(BitConverter.GetBytes((short)5));
-                request.Add(value.PositionInMilliMeters);                
-                Request(Commands.GROSetCommand, request.ToArray());
+                request.Add(value.PositionInMilliMeters);
+                IssueGROSetCommand(request);                
             }
         }
 
@@ -219,7 +224,7 @@ namespace TQC.USBDevice.GradientOven
 
                 request.AddRange(BitConverter.GetBytes((short)6));
                 request.Add(value.SpeedMillimetersPerSecond);
-                Request(Commands.GROSetCommand, request.ToArray());
+                IssueGROSetCommand(request);
             }
         }
 
