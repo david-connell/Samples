@@ -125,11 +125,15 @@ namespace TQC.USBDevice
         internal DateTime _ManufactureDate(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 5);
-            var unixTimeStamp = BitConverter.ToInt32(result, 0);
+            return ResultToDateTime(result, 0);            
+        }
 
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+        private static DateTime ResultToDateTime(byte[] result, int offset)
+        {
+            var unixTimeStamp = BitConverter.ToInt32(result, offset);
+
+            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-
             return dtDateTime;
         }
 
@@ -247,8 +251,7 @@ namespace TQC.USBDevice
         internal DateTime _Calibration(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 0);
-            double dateTime = BitConverter.ToDouble(result, 0);
-            return DateTime.FromOADate(dateTime);
+            return ResultToDateTime(result, 0);
         }
 
         /// <summary>
