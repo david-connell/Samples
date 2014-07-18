@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace TQC.USBDevice
 {
-
-
     public class USBLogger : IDisposable
     {
         public enum ProbeType
@@ -85,6 +83,7 @@ namespace TQC.USBDevice
             m_Logger.Close();
 
         }
+
         internal enum Commands
         {
             ReadDeviceInfo = 0x01,
@@ -100,6 +99,7 @@ namespace TQC.USBDevice
             GROReadCommand = 0x61,
             NotValidCommand = 0x7F,
         }
+
         public enum USBCommandResponseCode
         {
             /// <summary>
@@ -124,7 +124,6 @@ namespace TQC.USBDevice
             ResponsePacketErrorTimeout,
             ResponsePacketErrorBadLength,
             ResponsePacketErrorBadCommand,
-
 
             Unknown,
         }
@@ -215,6 +214,7 @@ namespace TQC.USBDevice
                 throw;
             }
         }
+
         public string Version
         {
             get
