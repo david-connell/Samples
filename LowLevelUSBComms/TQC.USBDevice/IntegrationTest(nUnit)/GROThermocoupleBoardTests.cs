@@ -116,6 +116,17 @@ namespace IntegrationTestNUnit
             }
         }
 
+        [Test]
+        public void ReadProtocolVersion()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                var value = thermocoupleBoard.Board.ProtocolVersion;
+                Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
+                Console.WriteLine(value);
+            }
+        }
+
 
         [TestCase(0, USBLogger.ProbeType.Temperature)]
         [TestCase(1, USBLogger.ProbeType.Temperature)]

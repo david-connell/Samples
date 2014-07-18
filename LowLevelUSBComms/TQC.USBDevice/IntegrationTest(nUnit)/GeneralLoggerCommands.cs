@@ -179,6 +179,25 @@ namespace IntegrationTestNUnit
             }
 
             [Test]
+            public void ReadProtocolVersion()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.Open(ProductId))
+                    {
+                        var value = logger.ProtocolVersion;
+                        Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
+                        Console.WriteLine(value);
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+            
+
+            [Test]
             public void GetCalibrationRawAndNormal()
             {
                 using (var logger = new USBLogger())
