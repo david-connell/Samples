@@ -45,7 +45,14 @@ namespace IntegrationTestNUnit
                     {
                         Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
                         Console.WriteLine("Version: '{0}'", logger.Version);
-                        var response = logger.Request(TQC.USBDevice.USBLogger.Commands.GROReadCommand, BitConverter.GetBytes((short)1));
+                        //logger.Request(TQC.USBDevice.USBLogger.Commands.NotValidCommand, BitConverter.GetBytes((short)1));
+                        Assert.Throws(typeof(CommandNotSuportedException), 
+                            ()=>
+                                logger.Request(TQC.USBDevice.USBLogger.Commands.NotValidCommand, BitConverter.GetBytes((short)1))
+                                );
+	  
+
+                        
                         logger.Close();
                     }
                     else
@@ -54,6 +61,7 @@ namespace IntegrationTestNUnit
                     }
                 }
             }
+
             
 
             [Test]

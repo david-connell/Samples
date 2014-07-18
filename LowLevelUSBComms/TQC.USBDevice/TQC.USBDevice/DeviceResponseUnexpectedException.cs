@@ -114,6 +114,48 @@ namespace TQC.USBDevice
         }
     }
     
+
+    
+
+    [Serializable]
+    public class ResponsePacketErrorCRCException : DeviceResponseUnexpectedException
+    {
+        public ResponsePacketErrorCRCException()
+            : base(USBLogger.USBCommandResponseCode.ResponsePacketErrorCRC)
+        {
+        }
+    }
+
+    
+
+        [Serializable]
+    public class ResponsePacketErrorBadLengthException : DeviceResponseUnexpectedException
+    {
+        public ResponsePacketErrorBadLengthException()
+            : base(USBLogger.USBCommandResponseCode.ResponsePacketErrorBadLength)
+        {
+        }
+    }
+
+    
+        [Serializable]
+    public class ResponsePacketErrorBadCommandException : DeviceResponseUnexpectedException
+    {
+        public ResponsePacketErrorBadCommandException()
+            : base(USBLogger.USBCommandResponseCode.ResponsePacketErrorBadCommand)
+        {
+        }
+    }
+
+    
+    [Serializable]
+    public class ResponsePacketErrorTimeoutException : DeviceResponseUnexpectedException
+    {
+        public ResponsePacketErrorTimeoutException ()
+            : base(USBLogger.USBCommandResponseCode.ResponsePacketErrorTimeout)
+        {
+        }
+    }
     
 
     
