@@ -239,7 +239,7 @@ namespace TQC.USBDevice
             }
         }
 
-        protected static DeviceType LoggerTypeToDeviceType(int deviceType)
+        protected static DeviceType LoggerTypeToDeviceType(Int16 deviceType)
         {
             switch (deviceType)
             {

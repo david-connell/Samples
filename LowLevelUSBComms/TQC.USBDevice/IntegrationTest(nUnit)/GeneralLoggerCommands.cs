@@ -195,7 +195,40 @@ namespace IntegrationTestNUnit
                     }
                 }
             }
-            
+
+            [Test]
+            public void ReadDeviceType()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.Open(ProductId))
+                    {
+                        var value = logger.DeviceType;
+                        switch (ProductId)
+                        {
+                            case USBLogger.USBProductId.Glossmeter:
+                                Assert.That(value, Is.EqualTo(USBLogger.DeviceType.PolyGlossmeter));
+                                break;
+                            case USBLogger.USBProductId.GRADIENT_OVEN:
+                                Assert.That(value, Is.EqualTo(USBLogger.DeviceType.GRO));
+                                break;
+                            case USBLogger.USBProductId.USB_CURVEX_3:
+                            case USBLogger.USBProductId.USB_CURVEX_3a:
+                                Assert.That(value, Is.EqualTo(USBLogger.DeviceType.CurveX3_Basic));
+                                break;
+                            default:
+                                throw new Exception("Unknown logger type");
+                        }
+                        
+                        Console.WriteLine(value);
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
 
             [Test]
             public void GetCalibrationRawAndNormal()
@@ -223,26 +256,7 @@ namespace IntegrationTestNUnit
             }
 
             [Test]
-            public void GetDeviceName()
-            {
-                using (var logger = new TQCUsbLogger())
-                {
-                    if (logger.Open(ProductId))
-                    {
-                        var deviceName = logger.DeviceName;
-                        Assert.IsFalse(String.IsNullOrEmpty(deviceName));
-                        Console.WriteLine("Device {0}", deviceName);
-                        logger.Close();
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
-                }
-            }
-
-            [Test]
-            public void GeNumberOfProbes()
+            public void ReadNumberOfProbes()
             {
                 using (var logger = new TQCUsbLogger())
                 {

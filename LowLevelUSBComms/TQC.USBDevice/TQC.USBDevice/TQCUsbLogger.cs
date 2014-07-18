@@ -21,6 +21,12 @@ namespace TQC.USBDevice
             return BitConverter.ToInt32(GetResponse(deviceId, command, commandId), 0);
         }
 
+        private Int16 GetInt16(byte deviceId, Commands command, int commandId)
+        {
+            return BitConverter.ToInt16(GetResponse(deviceId, command, commandId), 0);
+        }
+
+
         private byte[] GetResponse(byte deviceId, Commands command, int commandId)
         {
             List<byte> request = new List<byte>();
@@ -289,7 +295,7 @@ namespace TQC.USBDevice
 
         internal DeviceType _DeviceType(byte deviceId)
         {
-            return LoggerTypeToDeviceType(GetInt32(deviceId, Commands.ReadDeviceInfo, 102));
+            return LoggerTypeToDeviceType(GetInt16(deviceId, Commands.ReadDeviceInfo, 102));
         }
 
 

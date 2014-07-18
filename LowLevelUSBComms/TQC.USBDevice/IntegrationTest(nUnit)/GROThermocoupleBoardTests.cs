@@ -127,6 +127,17 @@ namespace IntegrationTestNUnit
             }
         }
 
+        [Test]
+        public void ReadDeviceType()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                var value = thermocoupleBoard.Board.DeviceType;
+                Assert.That(value, Is.GreaterThanOrEqualTo(0));
+                Console.WriteLine(value);
+            }
+        }
+
 
         [TestCase(0, USBLogger.ProbeType.Temperature)]
         [TestCase(1, USBLogger.ProbeType.Temperature)]
