@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTestProject1", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GOC", "..\..\..\GOC\GOC.002\GOC\GOC.csproj", "{D800F72E-7E46-477B-82AF-7D54C33FA95E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTest(nUnit)", "IntegrationTest(nUnit)\IntegrationTest(nUnit).csproj", "{95C8969B-0A6E-48A1-8B02-FA4F64549B00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,16 @@ Global
 		{D800F72E-7E46-477B-82AF-7D54C33FA95E}.Release|Mixed Platforms.Build.0 = Release|x86
 		{D800F72E-7E46-477B-82AF-7D54C33FA95E}.Release|x86.ActiveCfg = Release|x86
 		{D800F72E-7E46-477B-82AF-7D54C33FA95E}.Release|x86.Build.0 = Release|x86
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{95C8969B-0A6E-48A1-8B02-FA4F64549B00}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
