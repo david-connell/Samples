@@ -47,6 +47,7 @@
     <Compile Include="..\TQC.USBDevice\Properties\AssemblyInfoShared.cs">
       <Link>Properties\AssemblyInfoShared.cs</Link>
     </Compile>
+    <Compile Include="GROThermocoupleBoardTests.cs" />
     <Compile Include="ThermocoupleBoard.cs" />
     <Compile Include="GeneralLoggerCommands.cs" />
     <Compile Include="GROMotherBoardCommands.cs" />
