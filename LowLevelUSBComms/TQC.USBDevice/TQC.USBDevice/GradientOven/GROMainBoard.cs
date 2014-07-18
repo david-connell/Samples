@@ -24,13 +24,39 @@ namespace TQC.USBDevice.GradientOven
         Down = 0,
     }
 
-    public class CarrierPosition
+    public class CarrierPosition : IEqualityComparer<CarrierPosition>
     {
         public CarrierPosition(byte positionInMilliMeters)
         {
             PositionInMilliMeters = positionInMilliMeters;
         }
         public byte PositionInMilliMeters { get; private set; }
+
+        public bool Equals(CarrierPosition x, CarrierPosition y)
+        {
+            return x.PositionInMilliMeters.Equals(y.PositionInMilliMeters);
+        }
+
+        public int GetHashCode(CarrierPosition obj)
+        {
+            return obj.PositionInMilliMeters.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return PositionInMilliMeters.GetHashCode();
+        }
+        public override string ToString()
+        {
+            return string.Format("{0}mm", PositionInMilliMeters);
+        }
+        public override bool Equals(object obj)
+        {
+            CarrierPosition value = obj as CarrierPosition;
+            if (value == null)
+                return false;
+            return Equals(this, value);
+        }
     }
 
 
@@ -74,13 +100,40 @@ namespace TQC.USBDevice.GradientOven
         }
     }
 
-    public class Speed
+    public class Speed : IEqualityComparer<Speed>
     {
         public Speed(byte speed)
         {
             SpeedMillimetersPerSecond = speed;
         }
         public byte SpeedMillimetersPerSecond { get; private set; }
+
+        public bool Equals(Speed x, Speed y)
+        {
+            return x.SpeedMillimetersPerSecond.Equals(y.SpeedMillimetersPerSecond);
+        }
+        public override int GetHashCode()
+        {
+            return SpeedMillimetersPerSecond.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            Speed other = obj as Speed;
+            if (other == null)
+            {
+                return false;
+            }
+            return Equals(this, other);
+        }
+        public override string ToString()
+        {
+            return string.Format("{0}mm/sec", SpeedMillimetersPerSecond);
+        }
+
+        public int GetHashCode(Speed obj)
+        {
+            return obj.SpeedMillimetersPerSecond.GetHashCode();
+        }
     }
 
 

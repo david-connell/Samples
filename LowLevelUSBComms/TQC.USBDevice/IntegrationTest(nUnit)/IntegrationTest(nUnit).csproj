@@ -49,7 +49,9 @@
     </Compile>
     <Compile Include="GeneralLogger\CalibrationCommands.cs" />
     <Compile Include="GeneralLogger\ReadValues.cs" />
+    <Compile Include="General\CarrierPositionTests.cs" />
     <Compile Include="General\PercentageTests.cs" />
+    <Compile Include="General\SpeedTests.cs" />
     <Compile Include="GRO\GROThermocoupleBoardCalibrationTests.cs" />
     <Compile Include="GRO\GROThermocoupleBoardsReadingTests.cs" />
     <Compile Include="GRO\GROThermocoupleBoardTests.cs" />

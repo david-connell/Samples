@@ -106,6 +106,33 @@ namespace IntegrationTestNUnit
         }
 
         [Test]
+        public void SetCooling()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.Cooling;
+                    Console.WriteLine("Cooling = {0}", val);
+
+                    if (val.Value < 10)
+                        val = new Percentage((byte)(val.Value + 1));
+                    else
+                        val = new Percentage((byte)(val.Value - 1));
+                    Console.WriteLine("Set Cooling = {0}", val);
+
+                    logger.Cooling = val;
+                    Thread.Sleep(100);
+                    Assert.That(logger.Cooling, Is.EqualTo(val));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+        [Test]
         public void ReadPowerSupply()
         {
             using (var logger = new GROMainBoard())
@@ -114,6 +141,26 @@ namespace IntegrationTestNUnit
                 {
                     var val = logger.Power;
                     Console.WriteLine("Power = {0}", val);
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+
+        [Test]
+        public void SetPowerSupply()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.Power;
+                    Console.WriteLine("Power = {0}", val);
+                    logger.Power = PowerState.OFF;
+                    Assert.That(logger.Power, Is.EqualTo(val));
                 }
                 else
                 {
@@ -141,6 +188,28 @@ namespace IntegrationTestNUnit
         }
 
         [Test]
+        public void SetClamp()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.Clamp;
+                    Console.WriteLine("Clamp = {0}", val);
+                    val = val == ClampState.Open ? ClampState.Closed : ClampState.Open;
+                    Console.WriteLine("Setting Clamp = {0}", val);
+                    logger.Clamp = val;
+                    Thread.Sleep(5000);
+                    Assert.That(logger.Clamp, Is.EqualTo(val));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+        [Test]
         public void ReadCarrierPosition()
         {
             using (var logger = new GROMainBoard())
@@ -149,6 +218,31 @@ namespace IntegrationTestNUnit
                 {
                     var val = logger.CarrierPosition;
                     Console.WriteLine("CarrierPosition = {0}", val);
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+        [Test]
+        public void SetCarrierPosition()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.CarrierPosition;
+                    Console.WriteLine("CarrierPosition = {0}", val);
+                    if (val.PositionInMilliMeters < 10)
+                        val = new CarrierPosition((byte)(val.PositionInMilliMeters + 1));
+                    else
+                        val = new CarrierPosition((byte)(val.PositionInMilliMeters - 1));
+                    Console.WriteLine("Set CarrierPosition = {0}", val);
+                    logger.CarrierPosition = val;
+                    Thread.Sleep(1000);
+                    Assert.That(logger.CarrierPosition, Is.EqualTo(val));
                 }
                 else
                 {
@@ -176,6 +270,31 @@ namespace IntegrationTestNUnit
         }
 
         [Test]
+        public void SetCarrierSpeed()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.CarrierSpeed;
+                    Console.WriteLine("CarrierSpeed = {0}", val);
+                    if (val.SpeedMillimetersPerSecond < 10)
+                        val = new Speed((byte)(val.SpeedMillimetersPerSecond + 1));
+                    else
+                        val = new Speed((byte)(val.SpeedMillimetersPerSecond - 1));
+                    Console.WriteLine("Set CarrierSpeed = {0}", val);
+                    logger.CarrierSpeed = val;
+                    Assert.That(logger.CarrierSpeed, Is.EqualTo(val));
+
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+        [Test]
         public void ReadLift()
         {
             using (var logger = new GROMainBoard())
@@ -192,8 +311,31 @@ namespace IntegrationTestNUnit
             }
         }
 
+
+        [Test]
+        public void SetLift()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.Lift;
+                    Console.WriteLine("Lift = {0}", val);
+                    val = val == LiftState.Down ? LiftState.Up : LiftState.Down;
+                    Console.WriteLine("Set to Lift = {0}", val);
+                    logger.Lift = val;
+                    Thread.Sleep(5000);
+                    Assert.That(logger.Lift, Is.EqualTo(val));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
         [TestCase(1)]
-        public void ReadTemperatureHeater(short id)
+        public void SetTemperatureHeater(short id)
         {
             using (var logger = new GROMainBoard())
             {
@@ -201,6 +343,12 @@ namespace IntegrationTestNUnit
                 {
                     var val = logger.GetTempSetting(id);
                     Console.WriteLine("GetTempSetting {0} = {1}", id, val);
+                    var newVal = val+1;
+                    Console.WriteLine("SetTempSetting {0} = {1}", id, newVal);
+                    logger.SetTempSetting(id, newVal);
+                    Thread.Sleep(1000);
+                    Assert.That(Math.Abs(logger.GetTempSetting(id) - newVal), Is.LessThan(0.5));
+                    logger.SetTempSetting(id, val);
                 }
                 else
                 {
