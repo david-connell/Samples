@@ -5,15 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice;
-using TQC.USBDevice.GradientOven;
 
 namespace IntegrationTestNUnit
 {
-        
-        public class GradientOvenTests
-        {
-            //USBLogger.USBProductId ProductId = USBLogger.USBProductId.GRADIENT_OVEN;
-            USBLogger.USBProductId ProductId = USBLogger.USBProductId.Glossmeter;
+        [TestFixture(USBLogger.USBProductId.Glossmeter)]
+        public class GeneralLoggerCommands
+        {            
+            USBLogger.USBProductId ProductId ;
+
+            public GeneralLoggerCommands(USBLogger.USBProductId product)
+            {
+                ProductId = product;
+            }
             [Test]
             public void TestConnectivity()
             {
@@ -22,8 +25,7 @@ namespace IntegrationTestNUnit
                     if (logger.Open(ProductId))
                     {
                         Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
-                        Console.WriteLine("Version: '{0}'", logger.Version);
-                        //Assert.AreEqual(logger.LoggerType, USBLogger.DeviceType.PolyGlossmeter);
+                        Console.WriteLine("Version: '{0}'", logger.Version);                        
                         logger.Close();
                     }
                     else
@@ -32,30 +34,7 @@ namespace IntegrationTestNUnit
                     }
                 }
             }
-
-            [Test]
-            public void ReadProbes()
-            {
-                using (var logger = new GROMainBoard())
-                {
-                    if (logger.Open(ProductId))
-                    {
-                        var thermocoupleBoard = logger.GetChildDevice(1);
-                        var vals = thermocoupleBoard.ProbeValues;
-                        Assert.IsTrue(vals.Count() == 8);
-                        foreach (var value in vals)
-                        {
-                            Assert.IsTrue(value > 0);
-                        }
-                        logger.Close();
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
-                }
-            }
-
+            
 
             [Test]
             public void GetSerialNummberRawAndNormal()
@@ -128,7 +107,17 @@ namespace IntegrationTestNUnit
                 {
                     if (logger.Open(ProductId))
                     {
-                        Assert.IsTrue(logger.NumberOfProbes == 0);
+                        switch(ProductId)
+                        {
+                            case USBLogger.USBProductId.Glossmeter:
+                                Assert.That(logger.NumberOfProbes, Is.EqualTo(3));
+                                break;
+                            case USBLogger.USBProductId.GRADIENT_OVEN:
+                                Assert.That(logger.NumberOfProbes, Is.EqualTo(0));
+                                break;
+                            default:
+                                throw new Exception(string.Format("Logger {0} is currently not supported", ProductId));
+                        }
                         logger.Close();
                     }
                     else
