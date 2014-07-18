@@ -48,9 +48,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfoShared.cs" />
     <Compile Include="GradientOven\GOCChildException.cs" />
-    <Compile Include="GradientOven\GROChildDevice.cs" />
+    <Compile Include="GradientOven\GROThermocoupleBoard.cs" />
     <Compile Include="GradientOven\IGROMainBoard.cs" />
-    <Compile Include="GradientOven\GROUsbDevice.cs" />
+    <Compile Include="GradientOven\GROMainBoard.cs" />
     <Compile Include="ISimpleTQCDevice.cs" />
     <Compile Include="TQCUsbLogger.cs" />
     <Compile Include="USBLogger.cs" />
