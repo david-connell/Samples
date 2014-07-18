@@ -89,21 +89,7 @@ namespace IntegrationTestNUnit
             }
         }
 
-        [Test]
-        public void ReadProbes()
-        {
-            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
-            {
-                var probeValues = thermocoupleBoard.Board.ProbeValues;
-                Assert.IsTrue(probeValues.Count() == 8);
-                Console.WriteLine(probeValues.Count());
-                foreach (var value in probeValues)
-                {
-                    Assert.IsTrue(value > 0);
-                    Console.WriteLine(value);
-                }
-            }
-        }
+
 
         [Test]
         public void ReadNumberOfProbes()
@@ -139,23 +125,6 @@ namespace IntegrationTestNUnit
         }
 
 
-        [TestCase(0, USBLogger.ProbeType.Temperature)]
-        [TestCase(1, USBLogger.ProbeType.Temperature)]
-        [TestCase(2, USBLogger.ProbeType.Temperature)]
-        [TestCase(3, USBLogger.ProbeType.Temperature)]
-        [TestCase(4, USBLogger.ProbeType.Temperature)]
-        [TestCase(5, USBLogger.ProbeType.Temperature)]
-        [TestCase(6, USBLogger.ProbeType.Temperature)]
-        [TestCase(7, USBLogger.ProbeType.Temperature)]
-        public void ReadProbeType(byte probeId, USBLogger.ProbeType probeType)
-        {
-            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
-            {
-                var type = thermocoupleBoard.Board.ProbeType(probeId);
-                Assert.That(type, Is.EqualTo(probeType));
-                Console.WriteLine(type);
-            }
-        }
 
     }
 }

@@ -201,7 +201,11 @@ namespace TQC.USBDevice
             if (probeId >= 0 && probeId < _NumberOfProbes(deviceId))
             {
                 var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 200 + probeId);
-                return Encoding.UTF8.GetString(result, 0, result.Length);
+                var probeName =  result == null ? "***" : Encoding.UTF8.GetString(result, 0, result.Length);
+
+                probeName = probeName.Replace('\0', ' ');
+                
+                return probeName.TrimEnd();
             }
             else
             {
@@ -263,7 +267,7 @@ namespace TQC.USBDevice
         /// <summary>
         /// This is not supported by the GRO!
         /// </summary>
-        public String CalibrationCompany
+        public new String CalibrationCompany
         {
             get
             {
@@ -274,12 +278,12 @@ namespace TQC.USBDevice
         internal String _CalibrationCompany(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 1);
-            return Encoding.UTF8.GetString(result, 0, result.Length);
+            return result == null ? "" : Encoding.UTF8.GetString(result, 0, result.Length);
         }
         /// <summary>
         /// This is not supported by the GRO!
         /// </summary>
-        public String CalibrationUserName
+        public new String CalibrationUserName
         {
             get
             {
@@ -289,8 +293,9 @@ namespace TQC.USBDevice
 
         internal String _CalibrationUserName(byte deviceId)
         {
-            var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 2);            
-            return Encoding.UTF8.GetString(result, 0, result.Length);
+            var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 2);
+
+            return result == null ? "": Encoding.UTF8.GetString(result, 0, result.Length);
         }
 
         internal DeviceType _DeviceType(byte deviceId)
@@ -315,7 +320,7 @@ namespace TQC.USBDevice
             List<double> data = new List<double>();
             int totalNumberOfProbes = _NumberOfProbes(deviceId);
             int maxNumberOfSets = 1;
-            for (int setId = 1; setId < maxNumberOfSets; setId++)
+            for (int setId = 1; setId <= maxNumberOfSets; setId++)
             {
                 var result = GetProbeValues(deviceId, 0x06, (byte)setId);
                 const int lengthOfData = sizeof(float);
@@ -345,12 +350,22 @@ namespace TQC.USBDevice
             List<double> data = new List<double>();
             int totalNumberOfProbes = _NumberOfProbes(deviceId);
             int maxNumberOfSets = 1; // (int)(totalNumberOfProbes / 8 + 0.999);
-            for (int setId = 1; setId < maxNumberOfSets; setId++)
+            for (int setId = 1; setId <= maxNumberOfSets; setId++)
             {
-                var result = GetProbeValues(deviceId, 0x05, (byte)setId);
+                byte mode = 0x05;
+                switch(_DeviceType(deviceId))
+                {
+                    case DeviceType.PolyGlossmeter:
+                    case DeviceType.DuoGlossmeter:
+                    case DeviceType.SoloGlossmeter:
+                        mode = 0x01;
+                        break;
+
+                }
+                var result = GetProbeValues(deviceId, mode, (byte)setId);
                 const int lengthOfData = 2 ;
                 const int startOffset = 6;
-                for (int i = 1; i < (result.Length-startOffset) / lengthOfData; i++)
+                for (int i = 0; i < (result.Length-startOffset) / lengthOfData; i++)
                 {
                     Int16 value = BitConverter.ToInt16(result, startOffset + i * lengthOfData);                    
                     data.Add((double)value/10.0);

@@ -47,10 +47,14 @@
     <Compile Include="..\TQC.USBDevice\Properties\AssemblyInfoShared.cs">
       <Link>Properties\AssemblyInfoShared.cs</Link>
     </Compile>
-    <Compile Include="GROThermocoupleBoardTests.cs" />
-    <Compile Include="ThermocoupleBoard.cs" />
-    <Compile Include="GeneralLoggerCommands.cs" />
-    <Compile Include="GROMotherBoardCommands.cs" />
+    <Compile Include="GeneralLogger\CalibrationCommands.cs" />
+    <Compile Include="GeneralLogger\ReadValues.cs" />
+    <Compile Include="GRO\GROThermocoupleBoardCalibrationTests.cs" />
+    <Compile Include="GRO\GROThermocoupleBoardsReadingTests.cs" />
+    <Compile Include="GRO\GROThermocoupleBoardTests.cs" />
+    <Compile Include="GRO\ThermocoupleBoard.cs" />
+    <Compile Include="GeneralLogger\BasicCommands.cs" />
+    <Compile Include="GRO\GROMotherBoardCommands.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -25,6 +25,10 @@ namespace TQC.USBDevice
             M = m;
             C = c;
         }
+        public override string ToString()
+        {
+            return string.Format("Y={0}X + {1}", M, C);
+        }
     }
 
     public interface ISimpleTQCDevice : ICoreCommands

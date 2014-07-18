@@ -10,11 +10,11 @@ namespace IntegrationTestNUnit
 {
         [TestFixture(USBLogger.USBProductId.Glossmeter)]
         [TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
-        public class GeneralLoggerCommands
+        public class BasicCommands
         {            
             USBLogger.USBProductId ProductId ;
 
-            public GeneralLoggerCommands(USBLogger.USBProductId product)
+            public BasicCommands(USBLogger.USBProductId product)
             {
                 ProductId = product;
             }
