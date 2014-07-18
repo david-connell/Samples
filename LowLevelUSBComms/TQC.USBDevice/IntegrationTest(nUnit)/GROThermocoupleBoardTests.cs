@@ -27,6 +27,7 @@ namespace IntegrationTestNUnit
             {
                 var value = thermocoupleBoard.Board.SerialNumber;
                 Assert.That(value, Is.GreaterThan(0));
+                Console.WriteLine(value);
             }
         }
 
@@ -37,6 +38,7 @@ namespace IntegrationTestNUnit
             {
                 var value = thermocoupleBoard.Board.SoftwareVersion;
                 Assert.That(value.Major, Is.EqualTo(0));
+                Console.WriteLine(value);
             }
         }
 
@@ -47,6 +49,7 @@ namespace IntegrationTestNUnit
             {
                 var value = thermocoupleBoard.Board.HardwareVersion;
                 Assert.That(value.Major, Is.EqualTo(0));
+                Console.WriteLine(value);
             }
         }
 
@@ -58,6 +61,7 @@ namespace IntegrationTestNUnit
                 var value = thermocoupleBoard.Board.DeviceName;
                 Assert.That(value, Is.Not.Null);
                 Assert.That(value, Is.Not.EqualTo(""));
+                Console.WriteLine(value);
             }
         }
 
@@ -69,6 +73,7 @@ namespace IntegrationTestNUnit
                 var value = thermocoupleBoard.Board.ManufactureName;
                 Assert.That(value, Is.Not.Null);
                 Assert.That(value, Is.Not.EqualTo(""));
+                Console.WriteLine(value);
             }
         }
 
@@ -80,6 +85,7 @@ namespace IntegrationTestNUnit
             {
                 var value = thermocoupleBoard.Board.ManufactureDate;
                 Assert.That(value, Is.GreaterThan(new DateTime(200, 1, 1)));
+                Console.WriteLine(value);
             }
         }
 
@@ -90,9 +96,11 @@ namespace IntegrationTestNUnit
             {
                 var probeValues = thermocoupleBoard.Board.ProbeValues;
                 Assert.IsTrue(probeValues.Count() == 8);
+                Console.WriteLine(probeValues.Count());
                 foreach (var value in probeValues)
                 {
                     Assert.IsTrue(value > 0);
+                    Console.WriteLine(value);
                 }
             }
         }
@@ -104,6 +112,7 @@ namespace IntegrationTestNUnit
             {
                 var numberOfProbes = thermocoupleBoard.Board.NumberOfProbes;
                 Assert.That(numberOfProbes, Is.EqualTo(8));
+                Console.WriteLine(numberOfProbes);
             }
         }
 
@@ -122,6 +131,7 @@ namespace IntegrationTestNUnit
             {
                 var type = thermocoupleBoard.Board.ProbeType(probeId);
                 Assert.That(type, Is.EqualTo(probeType));
+                Console.WriteLine(type);
             }
         }
 

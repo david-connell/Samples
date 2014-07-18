@@ -95,7 +95,7 @@ namespace IntegrationTestNUnit
                     {
                         var value = logger.SoftwareVersion;
                         Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
-                        logger.Close();
+                        Console.WriteLine(value);
                     }
                     else
                     {
@@ -112,7 +112,8 @@ namespace IntegrationTestNUnit
                     if (logger.Open(ProductId))
                     {
                         var value = logger.HardwareVersion;
-                        Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));                        
+                        Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
+                        Console.WriteLine(value);
                     }
                     else
                     {
@@ -130,7 +131,8 @@ namespace IntegrationTestNUnit
                     {
                         var value = logger.DeviceName;
                         Assert.That(value, Is.Not.Null);
-                        Assert.That(value, Is.Not.EqualTo(""));                                                
+                        Assert.That(value, Is.Not.EqualTo(""));
+                        Console.WriteLine(value);
                     }
                     else
                     {
@@ -149,6 +151,7 @@ namespace IntegrationTestNUnit
                         var value = logger.ManufactureName;
                         Assert.That(value, Is.Not.Null);
                         Assert.That(value, Is.Not.EqualTo(""));
+                        Console.WriteLine(value);
                     }
                     else
                     {
@@ -166,6 +169,7 @@ namespace IntegrationTestNUnit
                     {
                         var value = logger.ManufactureDate;
                         Assert.That(value, Is.GreaterThan(new DateTime(200, 1, 1)));
+                        Console.WriteLine(value);
                     }
                     else
                     {
