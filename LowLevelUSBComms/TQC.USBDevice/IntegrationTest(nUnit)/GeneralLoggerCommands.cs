@@ -9,6 +9,7 @@ using TQC.USBDevice;
 namespace IntegrationTestNUnit
 {
         [TestFixture(USBLogger.USBProductId.Glossmeter)]
+        [TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
         public class GeneralLoggerCommands
         {            
             USBLogger.USBProductId ProductId ;
@@ -77,6 +78,94 @@ namespace IntegrationTestNUnit
                         Assert.AreEqual(serialNumberAsInt, serialNumberViaCommand);
 
                         logger.Close();
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
+            [Test]
+            public void ReadSoftwareVersion()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.Open(ProductId))
+                    {
+                        var value = logger.SoftwareVersion;
+                        Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
+                        logger.Close();
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
+            [Test]
+            public void ReadHardwareVersion()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.Open(ProductId))
+                    {
+                        var value = logger.HardwareVersion;
+                        Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));                        
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
+            [Test]
+            public void ReadDeviceName()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.Open(ProductId))
+                    {
+                        var value = logger.DeviceName;
+                        Assert.That(value, Is.Not.Null);
+                        Assert.That(value, Is.Not.EqualTo(""));                                                
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
+            [Test]
+            public void ReadManufactureName()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.Open(ProductId))
+                    {
+                        var value = logger.ManufactureName;
+                        Assert.That(value, Is.Not.Null);
+                        Assert.That(value, Is.Not.EqualTo(""));
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
+            [Test]
+            public void ReadManufactureDate()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.Open(ProductId))
+                    {
+                        var value = logger.ManufactureDate;
+                        Assert.That(value, Is.GreaterThan(new DateTime(200, 1, 1)));
                     }
                     else
                     {

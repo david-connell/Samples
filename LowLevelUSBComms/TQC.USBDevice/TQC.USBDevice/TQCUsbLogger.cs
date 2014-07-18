@@ -125,9 +125,12 @@ namespace TQC.USBDevice
         internal DateTime _ManufactureDate(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 5);
-            double dateTime = BitConverter.ToDouble(result, 0);
+            var unixTimeStamp = BitConverter.ToInt32(result, 0);
 
-            return DateTime.FromOADate(dateTime);
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+
+            return dtDateTime;
         }
 
         public DateTime ManufactureDate

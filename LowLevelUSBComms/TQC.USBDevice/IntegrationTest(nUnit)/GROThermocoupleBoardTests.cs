@@ -20,7 +20,70 @@ namespace IntegrationTestNUnit
             ThermocoupleBoard = thermocoupleBoard;
         }
 
-        
+        [Test]
+        public void ReadSerialNumber()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                var value = thermocoupleBoard.Board.SerialNumber;
+                Assert.That(value, Is.GreaterThan(0));
+            }
+        }
+
+        [Test]
+        public void ReadSoftwareVersion()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                var value = thermocoupleBoard.Board.SoftwareVersion;
+                Assert.That(value.Major, Is.EqualTo(0));
+            }
+        }
+
+        [Test]
+        public void ReadHardwareVersion()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                var value = thermocoupleBoard.Board.HardwareVersion;
+                Assert.That(value.Major, Is.EqualTo(0));
+            }
+        }
+
+        [Test]
+        public void ReadDeviceName()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                var value = thermocoupleBoard.Board.DeviceName;
+                Assert.That(value, Is.Not.Null);
+                Assert.That(value, Is.Not.EqualTo(""));
+            }
+        }
+
+        [Test]
+        public void ReadManufactureName()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                var value = thermocoupleBoard.Board.ManufactureName;
+                Assert.That(value, Is.Not.Null);
+                Assert.That(value, Is.Not.EqualTo(""));
+            }
+        }
+
+
+        [Test]
+        public void ReadManufactureDate()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                var value = thermocoupleBoard.Board.ManufactureDate;
+                Assert.That(value, Is.GreaterThan(new DateTime(200, 1, 1)));
+            }
+        }
+
+        [Test]
         public void ReadProbes()
         {
             using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
@@ -34,7 +97,7 @@ namespace IntegrationTestNUnit
             }
         }
 
-        
+        [Test]
         public void ReadNumberOfProbes()
         {
             using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
