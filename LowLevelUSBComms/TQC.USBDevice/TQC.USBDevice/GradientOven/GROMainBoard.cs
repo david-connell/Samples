@@ -274,20 +274,6 @@ namespace TQC.USBDevice.GradientOven
         }
 
 
-        public void UserInterfaceStatus(out byte buttonStatus, out Int32 status)
-        {
-            buttonStatus = 0;
-            status = 0;
-
-            var response = GetProbeValues(0, 0x30, 0);
-            
-            if (response.Length == 7)
-            {
-                buttonStatus = response[2];
-                status = BitConverter.ToInt32(response, 3);
-            }
-            return;
-        }
 
         public IList<UInt16> InternalChannels()
         {

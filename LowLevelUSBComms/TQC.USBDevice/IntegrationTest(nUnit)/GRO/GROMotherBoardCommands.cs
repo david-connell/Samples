@@ -21,6 +21,26 @@ namespace IntegrationTestNUnit
         }
 
 
+        [Test]
+        public void ReadInternalStatus()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var channels = logger.InternalChannels();
+                    int id = 1;
+                    foreach (var channel in channels)
+                    {
+                        Console.WriteLine("Channel {0} = {1}", id++, channel);
+                    }                    
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
 
 
     }

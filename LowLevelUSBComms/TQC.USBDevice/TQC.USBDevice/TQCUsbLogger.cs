@@ -334,6 +334,22 @@ namespace TQC.USBDevice
             return data;                        
         }
 
+        public void UserInterfaceStatus(out byte buttonStatus, out Int32 status)
+        {
+            buttonStatus = 0;
+            status = 0;
+
+            var response = GetProbeValues(0, 0x30, 0);
+
+            if (response.Length == 7)
+            {
+                buttonStatus = response[2];
+                status = BitConverter.ToInt32(response, 3);
+            }
+            return;
+        }
+
+
         /// <summary>
         /// This is not valid for GRO
         /// </summary>

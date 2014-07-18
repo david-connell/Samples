@@ -68,5 +68,27 @@ namespace IntegrationTestNUnit.GeneralLogger
             }
         }
 
+
+        [Test]
+        public void ReadUserInterfaceStatus()
+        {
+            using (var logger = new TQCUsbLogger())
+            {
+                if (logger.Open(ProductId))
+                {
+                    byte buttonStatus;
+                    int status;
+                    logger.UserInterfaceStatus(out buttonStatus, out status);
+
+                    Console.WriteLine("Status = {0}", status);
+                    Console.WriteLine("Button Status = {0}", buttonStatus);                    
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
     }
 }
