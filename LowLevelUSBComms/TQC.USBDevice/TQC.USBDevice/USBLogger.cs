@@ -197,22 +197,43 @@ namespace TQC.USBDevice
                     return null;
             }
         }
-
+        const int MAX_RETRY_ATTEMPTS = 20;
         internal byte[] Request(Commands command, byte[] request, byte conversationId = 0)
         {
-            try
+            bool retry;
+            int attempts = MAX_RETRY_ATTEMPTS;
+
+            do
             {
-                return m_Logger.GenericCommand(conversationId, (byte)command, request);
-            }
-            catch (COMException ex)
-            {
-                var newException = UsbErrorToException(ex);
-                if (newException != null)
+                retry = false;
+                try
                 {
-                    throw newException;
+                    return m_Logger.GenericCommand(conversationId, (byte)command, request);
                 }
-                throw;
+                catch (COMException ex)
+                {
+                    var newException = UsbErrorToException(ex);
+
+                    if (newException != null)
+                    {
+                        if (attempts != 0 && (newException.GetType() == typeof(TQC.USBDevice.ResponsePacketErrorTimeoutException)))
+                        {
+                            attempts = attempts - 1;
+                            retry = true;
+                        }
+                        else
+                        {
+                            throw newException;
+                        }
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
             }
+            while (retry);
+            return null;
         }
 
         public string Version
