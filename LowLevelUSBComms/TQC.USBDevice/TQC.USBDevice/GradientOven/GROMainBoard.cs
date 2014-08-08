@@ -140,6 +140,9 @@ namespace TQC.USBDevice.GradientOven
     public class GROMainBoard : TQCUsbLogger , IGROMainBoard
     {
         Dictionary<byte, IGROThermoCoupleBoard> m_ChildDevices = new Dictionary<byte, IGROThermoCoupleBoard>();
+        const int NumberOfFansPerBoard = 8;
+        const int NumberOfProbesPerBoard = 8;
+
 
         public IGROThermoCoupleBoard GetChildDevice(byte id)
         {
@@ -156,6 +159,52 @@ namespace TQC.USBDevice.GradientOven
             {
                 throw new GocChildException(string.Format("Child device {0} does not exist", id));   
             }            
+        }
+
+
+        byte AbsoluteProbeIdToThermcoupleBoardID(short fanId)
+        {
+            return (byte)((fanId / NumberOfProbesPerBoard) + 1);
+        }
+
+        byte AbsoluteProbeIdToLocalProbeId(short fanId)
+        {
+            return (byte)(fanId % NumberOfFansPerBoard);
+        }
+
+        byte AbsoluteFanIdToThermcoupleBoardID(short fanId)
+        {
+            return (byte)((fanId / NumberOfFansPerBoard) + 1);
+        }
+
+        byte AbsoluteFanIdToLocalFanId(short fanId)
+        {
+            return (byte)(fanId % NumberOfFansPerBoard);
+        }
+
+        public override string ProbeName(int probeId)
+        {
+            string probeName = string.Empty;
+            var thermocoupleBoard = GetChildDevice(AbsoluteProbeIdToThermcoupleBoardID((short)probeId));
+            try
+            {
+                probeName = thermocoupleBoard.ProbeName(AbsoluteProbeIdToLocalProbeId((short)probeId));
+            }
+            catch (Exception ex)
+            {
+            }
+            if (string.IsNullOrEmpty(probeName))
+            {
+                probeName = string.Format("Probe {0}", probeId);
+            }
+            return probeName;
+        }
+
+
+        public override ProbeType ProbeType(int probeId)
+        {
+            var thermocoupleBoard = GetChildDevice(AbsoluteProbeIdToThermcoupleBoardID((short)probeId));
+            return thermocoupleBoard.ProbeType(AbsoluteProbeIdToLocalProbeId((short)probeId));
         }
 
         public IEnumerable<byte> ThermocoupleBoardIDs
@@ -306,16 +355,6 @@ namespace TQC.USBDevice.GradientOven
                 request.Add(value.SpeedMillimetersPerSecond);
                 IssueGROSetCommand(request);
             }
-        }
-
-        byte AbsoluteFanIdToThermcoupleBoardID(short fanId)
-        {
-            return (byte)((fanId / 8) + 1);
-        }
-
-        byte AbsoluteFanIdToLocalFanId(short fanId)
-        {
-            return (byte)(fanId % 8) ;
         }
         /// <summary>
         /// Gets the Fan setting

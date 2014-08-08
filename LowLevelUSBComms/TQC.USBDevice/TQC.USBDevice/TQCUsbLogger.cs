@@ -213,7 +213,7 @@ namespace TQC.USBDevice
             }
         }
 
-        public string ProbeName(int probeId)
+        public virtual string ProbeName(int probeId)
         {
             return _ProbeName(0, probeId);            
         }
@@ -231,7 +231,7 @@ namespace TQC.USBDevice
             }
         }
         
-        public ProbeType ProbeType(int probeId)
+        public virtual ProbeType ProbeType(int probeId)
         {
             //get
             {
