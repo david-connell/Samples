@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice.GradientOven;
 
-namespace IntegrationTestNUnit.General
+namespace IntegrationTestNUnit.CodeInfrastructure
 {
-    class SpeedTests
+    class CarrierPositionTests
     {
         [Test]
         public void Equality()
         {
-            Speed val1 = new Speed(1);
-            Speed val2 = new Speed(1);
+            CarrierPosition val1 = new CarrierPosition(1);
+            CarrierPosition val2 = new CarrierPosition(1);
 
             Assert.That(val1, Is.EqualTo(val2));
         }

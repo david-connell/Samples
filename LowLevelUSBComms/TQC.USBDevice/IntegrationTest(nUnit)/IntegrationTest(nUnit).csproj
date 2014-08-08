@@ -47,17 +47,17 @@
     <Compile Include="..\TQC.USBDevice\Properties\AssemblyInfoShared.cs">
       <Link>Properties\AssemblyInfoShared.cs</Link>
     </Compile>
-    <Compile Include="GeneralLogger\CalibrationCommands.cs" />
-    <Compile Include="GeneralLogger\ReadValues.cs" />
-    <Compile Include="General\CarrierPositionTests.cs" />
-    <Compile Include="General\PercentageTests.cs" />
-    <Compile Include="General\SpeedTests.cs" />
-    <Compile Include="GRO\GROThermocoupleBoardCalibrationTests.cs" />
-    <Compile Include="GRO\GROThermocoupleBoardsReadingTests.cs" />
-    <Compile Include="GRO\GROThermocoupleBoardTests.cs" />
-    <Compile Include="GRO\ThermocoupleBoard.cs" />
-    <Compile Include="GeneralLogger\BasicCommands.cs" />
-    <Compile Include="GRO\GROMotherBoardCommands.cs" />
+    <Compile Include="Logger\GeneralLogger\CalibrationCommands.cs" />
+    <Compile Include="Logger\GeneralLogger\ReadValues.cs" />
+    <Compile Include="CodeInfrastructure\CarrierPositionTests.cs" />
+    <Compile Include="CodeInfrastructure\PercentageTests.cs" />
+    <Compile Include="CodeInfrastructure\SpeedTests.cs" />
+    <Compile Include="Logger\GeneralLogger\BasicCommands.cs" />
+    <Compile Include="Logger\GRO\MotherBoard\General.cs" />
+    <Compile Include="Logger\GRO\ThermocoupleBoard\Calibration.cs" />
+    <Compile Include="Logger\GRO\ThermocoupleBoard\Readings.cs" />
+    <Compile Include="Logger\GRO\ThermocoupleBoard\General.cs" />
+    <Compile Include="Logger\GRO\ThermocoupleBoard\Helpers\ThermocoupleBoard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +69,7 @@
       <Name>TQC.USBDevice</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -7,10 +7,11 @@ using NUnit.Framework;
 using TQC.USBDevice;
 
 
-namespace IntegrationTestNUnit.GeneralLogger
+namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
     [TestFixture(USBLogger.USBProductId.Glossmeter)]
     [TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
+    [TestFixture(USBLogger.USBProductId.USB_CURVEX_3a)]
     class CalibrationCommands
     {
         USBLogger.USBProductId ProductId;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TQC.USBDevice;
 using TQC.USBDevice.GradientOven;
 
-namespace IntegrationTestNUnit
+namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
 {
     class ThermocoupleBoard : IDisposable
     {

@@ -8,17 +8,16 @@ using NUnit.Framework;
 using TQC.USBDevice;
 using TQC.USBDevice.GradientOven;
 
-namespace IntegrationTestNUnit
+namespace IntegrationTestNUnit.Logger.GRO
 {
-    
-    [TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
-    class GROMotherBoardCommands
+        
+    class General
     {
         USBLogger.USBProductId ProductId;
 
-        public GROMotherBoardCommands(USBLogger.USBProductId product)
+        public General()
         {
-            ProductId = product;
+            ProductId = USBLogger.USBProductId.GRADIENT_OVEN;
         }
 
 

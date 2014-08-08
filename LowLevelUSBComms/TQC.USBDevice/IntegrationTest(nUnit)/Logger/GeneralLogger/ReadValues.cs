@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice;
 
-namespace IntegrationTestNUnit.GeneralLogger
+namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
     [TestFixture(USBLogger.USBProductId.Glossmeter)]
     [TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]

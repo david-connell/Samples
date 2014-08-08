@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice;
 
-namespace IntegrationTestNUnit
+namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
         [TestFixture(USBLogger.USBProductId.Glossmeter)]
         [TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
+        [TestFixture(USBLogger.USBProductId.USB_CURVEX_3a)]
         public class BasicCommands
         {            
             USBLogger.USBProductId ProductId ;

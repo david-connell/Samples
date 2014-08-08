@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice.GradientOven;
 
-namespace IntegrationTestNUnit.General
+namespace IntegrationTestNUnit.CodeInfrastructure
 {
-    class PercentageTests
+    class SpeedTests
     {
         [Test]
         public void Equality()
         {
-            Percentage val1 = new Percentage(1);
-            Percentage val2 = new Percentage(1);
+            Speed val1 = new Speed(1);
+            Speed val2 = new Speed(1);
 
             Assert.That(val1, Is.EqualTo(val2));
         }

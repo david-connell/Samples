@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice;
 
-namespace IntegrationTestNUnit
+namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
 {
-    [TestFixture(USBLogger.USBProductId.GRADIENT_OVEN, 1)]
-    class GROThermocoupleBoardTests
+    [TestFixture((byte)1)]
+    class General
     {
         USBLogger.USBProductId ProductId { get; set; }
         byte ThermocoupleBoard { get; set; }
 
-        public GROThermocoupleBoardTests(USBLogger.USBProductId product, byte thermocoupleBoard)
+        public General(byte thermocoupleBoard)
         {
-            ProductId = product;
+            ProductId = USBLogger.USBProductId.GRADIENT_OVEN;
             ThermocoupleBoard = thermocoupleBoard;
         }
 
