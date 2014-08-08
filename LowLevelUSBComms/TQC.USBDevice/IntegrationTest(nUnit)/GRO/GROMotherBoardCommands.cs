@@ -22,6 +22,42 @@ namespace IntegrationTestNUnit
         }
 
 
+        [TestCase(1)]
+        public void ReadProbeName(short id)
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.ProbeName(id);
+                    Console.WriteLine("ProbeName {0} = {1}", id, val);
+                    var newVal = val + 1;
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+        [TestCase(1)]
+        public void ReadProbeType(short id)
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.ProbeType(id);
+                    Console.WriteLine("ProbeType {0} = {1}", id, val);
+                    var newVal = val + 1;
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
         [Test]
         public void ReadInternalStatus()
         {
