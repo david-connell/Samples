@@ -47,12 +47,16 @@
     <Compile Include="..\TQC.USBDevice\Properties\AssemblyInfoShared.cs">
       <Link>Properties\AssemblyInfoShared.cs</Link>
     </Compile>
+    <Compile Include="Logger\USBProduct2\Basic.cs" />
+    <Compile Include="Logger\Curvex3\Basic.cs" />
     <Compile Include="Logger\GeneralLogger\CalibrationCommands.cs" />
     <Compile Include="Logger\GeneralLogger\ReadValues.cs" />
     <Compile Include="CodeInfrastructure\CarrierPositionTests.cs" />
     <Compile Include="CodeInfrastructure\PercentageTests.cs" />
     <Compile Include="CodeInfrastructure\SpeedTests.cs" />
     <Compile Include="Logger\GeneralLogger\BasicCommands.cs" />
+    <Compile Include="Logger\Glossmeter\Basic.cs" />
+    <Compile Include="Logger\GRO\MotherBoard\Basic.cs" />
     <Compile Include="Logger\GRO\MotherBoard\General.cs" />
     <Compile Include="Logger\GRO\ThermocoupleBoard\Calibration.cs" />
     <Compile Include="Logger\GRO\ThermocoupleBoard\Readings.cs" />

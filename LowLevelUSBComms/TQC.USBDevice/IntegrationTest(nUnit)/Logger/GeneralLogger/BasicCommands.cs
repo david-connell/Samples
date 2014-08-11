@@ -8,10 +8,10 @@ using TQC.USBDevice;
 
 namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
-        [TestFixture(USBLogger.USBProductId.Glossmeter)]
-        [TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
-        [TestFixture(USBLogger.USBProductId.USB_CURVEX_3a)]
-        public class BasicCommands
+        //[TestFixture(USBLogger.USBProductId.Glossmeter)]
+        //[TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
+        //[TestFixture(USBLogger.USBProductId.USB_CURVEX_3a)]
+        public abstract class BasicCommands
         {            
             USBLogger.USBProductId ProductId ;
 
