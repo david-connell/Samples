@@ -47,6 +47,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeviceResponseUnexpectedException.cs" />
+    <Compile Include="GradientOven\CarrierPosition.cs" />
+    <Compile Include="GradientOven\ClampState.cs" />
+    <Compile Include="GradientOven\LiftState.cs" />
+    <Compile Include="GradientOven\Percentage.cs" />
+    <Compile Include="GradientOven\PowerState.cs" />
+    <Compile Include="GradientOven\Speed.cs" />
     <Compile Include="Properties\AssemblyInfoShared.cs" />
     <Compile Include="GradientOven\GOCChildException.cs" />
     <Compile Include="GradientOven\GROThermocoupleBoard.cs" />

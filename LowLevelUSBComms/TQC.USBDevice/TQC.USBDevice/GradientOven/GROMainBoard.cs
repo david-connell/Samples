@@ -1,145 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace TQC.USBDevice.GradientOven
-{    
-    public enum PowerState : byte
-    {
-        ON = 1,
-        OFF = 0,
-    }
-
-    public enum ClampState : byte
-    {
-        Open = 1,
-        Closed = 0,
-    }
-
-    public enum LiftState : byte
-    {
-        Up = 1,
-        Down = 0,
-    }
-
-    public class CarrierPosition : IEqualityComparer<CarrierPosition>
-    {
-        public CarrierPosition(byte positionInMilliMeters)
-        {
-            PositionInMilliMeters = positionInMilliMeters;
-        }
-        public byte PositionInMilliMeters { get; private set; }
-
-        public bool Equals(CarrierPosition x, CarrierPosition y)
-        {
-            return x.PositionInMilliMeters.Equals(y.PositionInMilliMeters);
-        }
-
-        public int GetHashCode(CarrierPosition obj)
-        {
-            return obj.PositionInMilliMeters.GetHashCode();
-        }
-
-        public override int GetHashCode()
-        {
-            return PositionInMilliMeters.GetHashCode();
-        }
-        public override string ToString()
-        {
-            return string.Format("{0}mm", PositionInMilliMeters);
-        }
-        public override bool Equals(object obj)
-        {
-            CarrierPosition value = obj as CarrierPosition;
-            if (value == null)
-                return false;
-            return Equals(this, value);
-        }
-    }
-
-
-    public class Percentage : IEqualityComparer<Percentage>
-    {
-        public Percentage(byte percentage)
-        {
-            if (percentage > 100)
-            {
-                throw new ArgumentOutOfRangeException("percentage", "Max range is 0->100");
-            }
-            Value = percentage;
-        }
-        public byte Value { get; private set; }
-
-        public bool Equals(Percentage x, Percentage y)
-        {
-            return x.Value.Equals(y.Value);
-        }
-        public override int GetHashCode()
-        {
-            return Value.GetHashCode();
-        }
-        public override bool Equals(object obj)
-        {
-            Percentage other = obj as Percentage;
-            if (other == null)
-            {
-                return false;
-            }
-            return Equals(this, other);
-        }
-        public override string ToString()
-        {
-            return string.Format("{0}%", Value);
-        }
-
-        public int GetHashCode(Percentage obj)
-        {
-            return obj.Value.GetHashCode();
-        }
-    }
-
-    public class Speed : IEqualityComparer<Speed>
-    {
-        public Speed(byte speed)
-        {
-            SpeedMillimetersPerSecond = speed;
-        }
-        public byte SpeedMillimetersPerSecond { get; private set; }
-
-        public bool Equals(Speed x, Speed y)
-        {
-            return x.SpeedMillimetersPerSecond.Equals(y.SpeedMillimetersPerSecond);
-        }
-        public override int GetHashCode()
-        {
-            return SpeedMillimetersPerSecond.GetHashCode();
-        }
-        public override bool Equals(object obj)
-        {
-            Speed other = obj as Speed;
-            if (other == null)
-            {
-                return false;
-            }
-            return Equals(this, other);
-        }
-        public override string ToString()
-        {
-            return string.Format("{0}mm/sec", SpeedMillimetersPerSecond);
-        }
-
-        public int GetHashCode(Speed obj)
-        {
-            return obj.SpeedMillimetersPerSecond.GetHashCode();
-        }
-    }
-
-
+{
     public class GROMainBoard : TQCUsbLogger , IGROMainBoard
     {
-        Dictionary<byte, IGROThermoCoupleBoard> m_ChildDevices = new Dictionary<byte, IGROThermoCoupleBoard>();
+        readonly Dictionary<byte, IGROThermoCoupleBoard> m_ChildDevices = new Dictionary<byte, IGROThermoCoupleBoard>();
         const int NumberOfFansPerBoard = 8;
         const int NumberOfProbesPerBoard = 8;
 
@@ -388,8 +256,6 @@ namespace TQC.USBDevice.GradientOven
             request.Add(fanSetting.Value);
 
             Request(Commands.GROSetCommand, request.ToArray());
-            return ;
-
         }
 
 
@@ -405,9 +271,7 @@ namespace TQC.USBDevice.GradientOven
                 {
                     var value = BitConverter.ToUInt16(response, minBufLen + index *2 );
                     values.Add(value);
-                }
-                
-                
+                }                               
             }
             return values;
         }
@@ -437,10 +301,7 @@ namespace TQC.USBDevice.GradientOven
 
             request.AddRange(BitConverter.GetBytes((short)(200 + AbsoluteFanIdToLocalFanId(fanId))));
             request.AddRange(BitConverter.GetBytes(((UInt16)(temperatureSettingInDegreesC* 10.0f+0.5)) ));
-
             Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(fanId));
-            return;
-
         }
     }
 }
