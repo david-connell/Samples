@@ -286,9 +286,9 @@ namespace TQC.USBDevice.GradientOven
             return BitConverter.ToUInt16(response, 0)/ 10.0f ;
         }
 
-        public void SetTempSetting(short fanId, float  temperatureSettingInDegreesC)
+        public void SetTempSetting(short channelId, float  temperatureSettingInDegreesC)
         {
-            if (fanId < 0 || fanId > 32)
+            if (channelId < 0 || channelId > 32)
             {
                 throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
             }
@@ -299,9 +299,9 @@ namespace TQC.USBDevice.GradientOven
 
             List<byte> request = new List<byte>();
 
-            request.AddRange(BitConverter.GetBytes((short)(200 + AbsoluteFanIdToLocalFanId(fanId))));
+            request.AddRange(BitConverter.GetBytes((short)(200 + AbsoluteFanIdToLocalFanId(channelId))));
             request.AddRange(BitConverter.GetBytes(((UInt16)(temperatureSettingInDegreesC* 10.0f+0.5)) ));
-            Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(fanId));
+            Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(channelId));
         }
     }
 }
