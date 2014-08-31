@@ -340,8 +340,11 @@ namespace TQC.GOC.InterProcessCommunication
 
         public void Dispose()
         {
-            m_IsRunning = false;
-            m_TerminateHandle.WaitOne();
+            if (m_IsRunning)
+            {
+                m_IsRunning = false;
+                m_TerminateHandle.WaitOne();
+            }
         }
 
 
