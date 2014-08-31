@@ -159,7 +159,8 @@ namespace TQC.USBDevice
                 return _SoftwareVersion(0);
             }
         }
-        public Int32 NumberOfProbes
+
+        public virtual Int32 NumberOfProbes
         {
             get
             {

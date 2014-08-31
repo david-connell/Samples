@@ -30,14 +30,14 @@ namespace TQC.USBDevice.GradientOven
         }
 
 
-        byte AbsoluteProbeIdToThermcoupleBoardID(short fanId)
+        byte AbsoluteProbeIdToThermcoupleBoardID(short probeId)
         {
-            return (byte)((fanId / NumberOfProbesPerBoard) + 1);
+            return (byte)((probeId / NumberOfProbesPerBoard) + 1);
         }
 
-        byte AbsoluteProbeIdToLocalProbeId(short fanId)
+        byte AbsoluteProbeIdToLocalProbeId(short probeId)
         {
-            return (byte)(fanId % NumberOfFansPerBoard);
+            return (byte)(probeId % NumberOfFansPerBoard);
         }
 
         byte AbsoluteFanIdToThermcoupleBoardID(short fanId)
@@ -303,5 +303,20 @@ namespace TQC.USBDevice.GradientOven
             request.AddRange(BitConverter.GetBytes(((UInt16)(temperatureSettingInDegreesC* 10.0f+0.5)) ));
             Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(channelId));
         }
+
+        //Combines the boards
+        public override Int32 NumberOfProbes
+        {
+            get
+            {
+                Int32 total = 0;
+                foreach (var item in ThermocoupleBoardIDs)
+                {
+                    total += _NumberOfProbes(item);
+                }
+                return total;
+            }
+        }
+
     }
 }
