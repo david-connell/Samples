@@ -48,7 +48,7 @@ namespace TQC.GOC.InterProcessCommunication
                 // on the desktop, it must terminate itself or you can do it programmatically 
                 // from this application using the Kill method.
             }
-            catch (Exception e)
+            catch (Exception )
             {
                 
             }

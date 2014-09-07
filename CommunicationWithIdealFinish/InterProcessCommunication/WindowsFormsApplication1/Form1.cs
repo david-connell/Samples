@@ -18,7 +18,7 @@ namespace WindowsFormsApplication1
     {
         ConsoleTextWriter m_TextWriter = new ConsoleTextWriter();
         GOCServerImplementation m_Server = new GOCServerImplementation();
-        int m_protocolErrors = 0;
+        
         public Form1()
         {
             InitializeComponent();

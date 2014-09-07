@@ -238,7 +238,7 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
         }
 
         DateTime m_CurrentPoint = DateTime.Now;
-        int m_PacketsPerSecond = 0;
+        
 
         private void TransmittedData(int packets)
         {

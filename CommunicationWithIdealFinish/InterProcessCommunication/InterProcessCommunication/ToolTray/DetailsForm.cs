@@ -31,10 +31,10 @@ namespace TQC.GOC.InterProcessCommunication
 
         void parent_Update(object sender, EventArgs e)
         {
-             Update();
+             UpdateUI();
         }
 
-        private void Update()
+        private void UpdateUI()
         {
             m_ConnectionStatus.Text = m_Parent.Status;
             m_Path.Text = m_Parent.Path;
@@ -43,7 +43,7 @@ namespace TQC.GOC.InterProcessCommunication
         }
         private void DetailsForm_Load(object sender, EventArgs e)
         {
-            Update();
+            UpdateUI();
         }
 
         private void timer2_Tick(object sender, EventArgs e)

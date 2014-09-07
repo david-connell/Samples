@@ -167,7 +167,7 @@ namespace TQC.GOC.InterProcessCommunication
                     }
                 }
             }
-            catch (IOException ioex)
+            catch (IOException )
             {
                 namedPipeServerData.PipeBroken = true;
             }
@@ -247,7 +247,7 @@ namespace TQC.GOC.InterProcessCommunication
                         }
                         reader.CanDoNextCommand = true;
                     }
-                    catch (IOException ex)
+                    catch (IOException )
                     {
                         reader.PipeBroken = true;                        
                     }
@@ -274,7 +274,7 @@ namespace TQC.GOC.InterProcessCommunication
                 {
                     pipeServer.BeginWaitForConnection(new AsyncCallback(WaitForConnectionCallBack), data);
                 }
-                catch (IOException ex)
+                catch (IOException )
                 {
                     pipeServer.Disconnect();
                 }
