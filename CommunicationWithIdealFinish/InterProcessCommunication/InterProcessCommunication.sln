@@ -5,6 +5,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TQC.GRO.InterProcessCommuni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication1", "WindowsFormsApplication1\WindowsFormsApplication1.csproj", "{23FD177F-9232-4483-B9EA-B0A1ADDDC93E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClassToCommunicate", "TestClassToCommunicate\TestClassToCommunicate.csproj", "{27F38797-3166-4DAC-9DD7-BB78D118B29B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NunitTest", "NunitTest\NunitTest.csproj", "{406C4841-742B-4232-AEDD-73BB17815BD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +23,14 @@ Global
 		{23FD177F-9232-4483-B9EA-B0A1ADDDC93E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23FD177F-9232-4483-B9EA-B0A1ADDDC93E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23FD177F-9232-4483-B9EA-B0A1ADDDC93E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27F38797-3166-4DAC-9DD7-BB78D118B29B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27F38797-3166-4DAC-9DD7-BB78D118B29B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27F38797-3166-4DAC-9DD7-BB78D118B29B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27F38797-3166-4DAC-9DD7-BB78D118B29B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{406C4841-742B-4232-AEDD-73BB17815BD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{406C4841-742B-4232-AEDD-73BB17815BD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{406C4841-742B-4232-AEDD-73BB17815BD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{406C4841-742B-4232-AEDD-73BB17815BD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
