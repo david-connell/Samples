@@ -25,7 +25,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var probeValues = logger.ProbeValues;
                     
@@ -49,7 +49,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var probeValues = logger.ColdJunctions;
 
@@ -74,7 +74,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     byte buttonStatus;
                     int status;

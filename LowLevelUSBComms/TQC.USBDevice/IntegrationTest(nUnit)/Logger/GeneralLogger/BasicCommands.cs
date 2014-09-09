@@ -25,7 +25,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new USBLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
                         Console.WriteLine("Version: '{0}'", logger.Version);                        
@@ -43,7 +43,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new USBLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
                         Console.WriteLine("Version: '{0}'", logger.Version);
@@ -71,7 +71,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         string serialNumber = logger.LoggerSerialNumber;
                         int serialNumberAsInt = int.Parse(serialNumber);
@@ -92,7 +92,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         var value = logger.SoftwareVersion;
                         Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
@@ -110,7 +110,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         var value = logger.HardwareVersion;
                         Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
@@ -128,7 +128,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         var value = logger.DeviceName;
                         Assert.That(value, Is.Not.Null);
@@ -147,7 +147,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         var value = logger.ManufactureName;
                         Assert.That(value, Is.Not.Null);
@@ -166,7 +166,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         var value = logger.ManufactureDate;
                         Assert.That(value, Is.GreaterThan(new DateTime(200, 1, 1)));
@@ -184,7 +184,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         var value = logger.ProtocolVersion;
                         Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
@@ -202,7 +202,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         var value = logger.DeviceType;
                         switch (ProductId)
@@ -236,7 +236,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new USBLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         string calibrationCompany = logger.CalibrationCompany;
 
@@ -261,7 +261,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         switch(ProductId)
                         {
@@ -270,6 +270,9 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                                 break;
                             case USBLogger.USBProductId.GRADIENT_OVEN:
                                 Assert.That(logger.NumberOfProbes, Is.EqualTo(0));
+                                break;
+                            case USBLogger.USBProductId.USB_CURVEX_3a:
+                                Assert.That(logger.NumberOfProbes, Is.EqualTo(4));
                                 break;
                             default:
                                 throw new Exception(string.Format("Logger {0} is currently not supported", ProductId));
@@ -288,7 +291,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.Open(ProductId))
+                    if (logger.OpenWithMinumumRequests(ProductId))
                     {
                         Assert.IsTrue(logger.CanOffload);
                         Assert.IsTrue(logger.CanSendSetup);

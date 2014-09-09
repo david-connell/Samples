@@ -25,7 +25,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var value = logger.CalibrationDate;
                     Assert.That(value, Is.GreaterThan(new DateTime(2000, 1, 1)));
@@ -43,7 +43,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var value = logger.CalibrationCompany;
                     Assert.That(value, Is.Not.Null);
@@ -63,7 +63,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var value = logger.CalibrationUserName;
                     Assert.That(value, Is.Not.Null);
@@ -81,7 +81,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     int maxProbes = logger.NumberOfProbes;
                     for (int probeId = 0 ; probeId < maxProbes; probeId++)
@@ -108,7 +108,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     int maxProbes = logger.NumberOfProbes;
                     for (int probeId = 0; probeId < maxProbes; probeId++)
@@ -137,7 +137,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     int maxProbes = logger.NumberOfProbes;
                     for (int probeId = 0; probeId < maxProbes; probeId++)

@@ -63,12 +63,17 @@ namespace TQC.USBDevice
         {
 
         }
-        public bool Open(USBProductId id)
+
+        public bool OpenWithMinumumRequests(USBProductId id)
+        {
+            return Open(id, true);
+        }
+        public bool Open(USBProductId id, bool minimumCommunications = false)
         {
             int result = -1;
             try
             {
-                result = m_Logger.Open(0, 0, 0, null, (uint)id);
+                result = m_Logger.Open(minimumCommunications ? 2 : 0, 0, 0, null, (uint)id);
                 ClearCachedData();
             }
             catch (COMException ex)
