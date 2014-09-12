@@ -8,8 +8,8 @@ namespace IntegrationTests
     [TestClass]
     public class UnitTest1
     {
-        String m_fileName = @"..\..\..\TestData\climate2.pfs";
-        String m_fileName2 = @"..\..\..\TestData\51200 @ 20120416 #18.18.10.pfs";
+        String m_fileName = @"..\..\TestData\climate2.pfs";
+        String m_fileName2 = @"..\..\TestData\51200 @ 20120416 #18.18.10.pfs";
 
         [TestMethod]
         public void ReadValidFile()
@@ -61,8 +61,8 @@ namespace IntegrationTests
                 Assert.IsTrue(probe.Color.Name == "0");
 
                 var data = probe.Data;
-                Assert.AreEqual<PFSReading>(data[0].ToReading(), 21.7.ToReading());
-                Assert.AreEqual<PFSReading>(data[1].ToReading(), 21.4.ToReading());
+                Assert.AreEqual<PFSReading>(data[0], 21.7.ToReading());
+                Assert.AreEqual<PFSReading>(data[1], 21.4.ToReading());
 
             }
         }
@@ -76,8 +76,8 @@ namespace IntegrationTests
                 var probe = file.getProbe(4);
 
                 var data = probe.Data;
-                Assert.AreEqual<PFSReading>(data[0].ToReading(), 4.9.ToReading());
-                Assert.AreEqual<PFSReading>(data[1].ToReading(), 3.7.ToReading());
+                Assert.AreEqual<PFSReading>(data[0], 4.9.ToReading());
+                Assert.AreEqual<PFSReading>(data[1], 3.7.ToReading());
 
             }
         }
@@ -91,13 +91,13 @@ namespace IntegrationTests
                 var probe = file.getProbe(0);
 
                 var data = probe.Data;
-                Assert.AreEqual<PFSReading>(data[0].ToReading(), 17.7.ToReading());
-                Assert.AreEqual<PFSReading>(data[1].ToReading(), 17.2.ToReading());
+                Assert.AreEqual<PFSReading>(data[0], 17.7.ToReading());
+                Assert.AreEqual<PFSReading>(data[1], 17.2.ToReading());
 
                 probe = file.getProbe(1);
 
                 data = probe.Data;
-                Assert.AreEqual<PFSReading>(new PFSReading (State.OpenCircuit ) , data[0].ToReading());
+                Assert.AreEqual<PFSReading>(data[0], new PFSReading (State.OpenCircuit ) );
                 
 
             }

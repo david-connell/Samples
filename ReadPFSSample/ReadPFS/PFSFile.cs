@@ -132,12 +132,17 @@ namespace TQC.IdealFinish.PFSWrapper
             /// <summary>
             /// Get all Synchronous Data
             /// </summary>
-            public double[] Data
+            public PFSReading[] Data
             {
                 get
                 {
                     ValidateFileNotChanged();
-                    return m_File.m_pfsWrapper.ProbeData(m_ProbeId);
+                    var data = new List<PFSReading>();
+                    foreach (var item in m_File.m_pfsWrapper.ProbeData(m_ProbeId))
+                    {
+                        data.Add(new PFSReading(item));
+                    }
+                    return data.ToArray();
                 }
             }
 
