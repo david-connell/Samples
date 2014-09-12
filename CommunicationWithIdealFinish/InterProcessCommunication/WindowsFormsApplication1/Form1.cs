@@ -31,6 +31,7 @@ namespace WindowsFormsApplication1
 
             //Hook this up afterwards to make sure that we don't miss anything...
             m_Server.CreateServer(m_TextWriter, components, Icon);
+            m_EnableOutput.Checked = m_TextWriter.IsEnabled;
         }
 
         void m_Server_GOCServerStatus(object sender, GOCServerStatusEventArgs e)
@@ -209,16 +210,25 @@ namespace WindowsFormsApplication1
         {
             SendSample(sender, e);
         }
+
+        private void m_EnableOutput_CheckedChanged(object sender, EventArgs e)
+        {
+            m_TextWriter.IsEnabled = m_EnableOutput.Checked;
+        }
     }
 
     public class ConsoleTextWriter : TextWriter
     {
         StringBuilder m_output = new StringBuilder();
+        public bool IsEnabled { get; set; }
         public override void Write(char value)
         {
-            lock (m_output)
+            if (IsEnabled)
             {
-                m_output.Append(value);
+                lock (m_output)
+                {
+                    m_output.Append(value);
+                }
             }
             
         }

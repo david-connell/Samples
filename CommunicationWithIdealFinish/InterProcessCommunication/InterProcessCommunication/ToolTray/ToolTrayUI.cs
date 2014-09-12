@@ -290,5 +290,29 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
                 return m_Server.LastPing;
             }
         }
+
+        public string ServerState 
+        {
+            get
+            {
+                return m_Server.ServerStatus.ToString() ;
+            }
+        }
+
+        public int QueueSize
+        {
+            get
+            {
+                return m_Server.SizeOfQueue;
+            }
+        }
+        public int NumberOfSamples
+        {
+            get
+            {
+                return m_Server.NumberOfSamples;
+            }
+        }
+
     }
 }

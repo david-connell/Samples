@@ -10,7 +10,18 @@ using TQC.GOC.InterProcessCommunication.Model;
 using TQC.GOC.InterProcessCommunication.ToolTray;
 
 namespace TQC.GOC.InterProcessCommunication
-{    
+{
+    public enum ServerStatus
+    {
+        Starting,
+        DataReplay,
+        DataReplayFinished,
+        HaveData,
+        Idle,
+        NotRunning,
+        NotRunningAtAll,
+    }
+
     public class GOCServerImplementation : IIdealFinishAnalysis, IGOCInterProcessServer
     {        
         private Thread m_Server;
@@ -113,22 +124,25 @@ namespace TQC.GOC.InterProcessCommunication
                 m_TerminateHandle.Set();
             }
         }
-        
+
         
 
         private void ProcessClientThread(object o)
         {
             NamedPipeServerData namedPipeServerData = (NamedPipeServerData)o;
+            ServerStatus = ServerStatus.Starting;
             lock (m_QueueOfData)
             {
                 Clear();
                 if (CollectingData)
                 {
+                    ServerStatus = ServerStatus.DataReplay;
                     Push(new StartOfRunData(DataRunDetails));
                     foreach (var sample in DataRunDetails.Samples)
                     {
                         Push(new SampleData(sample));
                     }
+                    ServerStatus = ServerStatus.DataReplayFinished;
                 }
             }
             try
@@ -136,25 +150,31 @@ namespace TQC.GOC.InterProcessCommunication
                 SendCommandToGetFolder(namedPipeServerData);
                 while (m_IsRunning && !namedPipeServerData.PipeBroken && !m_IsTerminating)
                 {
+                    int time2Wait = 1;
                     while (m_IsRunning)
                     {
+                        
                         var dataToSend = Pop();
                         if (dataToSend != null)
                         {
+                            ServerStatus = ServerStatus.HaveData;
                             m_Writer.WriteLine("Send {0}", dataToSend);
-                            bool status = dataToSend.Send(namedPipeServerData, m_ProtocolVersion);
+                            bool status = dataToSend.Send(namedPipeServerData, m_ProtocolVersion);                            
                             OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.SendingDataSamples, status);
+                            time2Wait = 1;
                         }
                         else
                         {
                             bool status = (new Ping()).Send(namedPipeServerData, m_ProtocolVersion);
+                            ServerStatus = ServerStatus.Idle;
                             OnGOCServerStatus(InterProcessCommunication.GOCServerStatus.PingIng, status);
                             lock (m_QueueOfData)
                             {
                                 m_PingLastSend = DateTime.Now;
                             }
+                            time2Wait = 100;                            
                         }
-                        if (m_TerminateHandle.WaitOne(100))
+                        if (m_TerminateHandle.WaitOne(time2Wait))
                         {
                             m_IsTerminating = true;
                             break;
@@ -165,6 +185,7 @@ namespace TQC.GOC.InterProcessCommunication
                         }
 
                     }
+                    ServerStatus = ServerStatus.NotRunning;
                 }
             }
             catch (IOException )
@@ -189,7 +210,8 @@ namespace TQC.GOC.InterProcessCommunication
 
             }
             namedPipeServerData.PipeBroken = true;
-            OnDisconnect(EventArgs.Empty);            
+            OnDisconnect(EventArgs.Empty);
+            ServerStatus = ServerStatus.NotRunningAtAll;
         }
 
         
@@ -434,7 +456,32 @@ namespace TQC.GOC.InterProcessCommunication
             {
                 m_QueueOfData.Clear();
             }            
-        }        
+        }
+
+        public ServerStatus ServerStatus { get; set; }
+
+
+        public int SizeOfQueue
+        {
+            get
+            {
+                lock (m_QueueOfData)
+                {
+                    return m_QueueOfData.Count;
+                }
+            }
+        }
+        public int NumberOfSamples
+        {
+            get
+            {
+                if (DataRunDetails == null)
+                {
+                    return -1;
+                }
+                return DataRunDetails.Samples.Count;
+            }
+        }
     }
 
 }

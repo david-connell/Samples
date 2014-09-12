@@ -36,6 +36,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.m_SendSamples = new System.Windows.Forms.Button();
             this.SendSampleTimer = new System.Windows.Forms.Timer(this.components);
+            this.m_EnableOutput = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // m_SendData
@@ -99,14 +100,28 @@
             // 
             // SendSampleTimer
             // 
-            this.SendSampleTimer.Interval = 200;
+            this.SendSampleTimer.Interval = 10;
             this.SendSampleTimer.Tick += new System.EventHandler(this.SendSampleTimer_Tick);
+            // 
+            // m_EnableOutput
+            // 
+            this.m_EnableOutput.AutoSize = true;
+            this.m_EnableOutput.Checked = true;
+            this.m_EnableOutput.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.m_EnableOutput.Location = new System.Drawing.Point(12, 181);
+            this.m_EnableOutput.Name = "m_EnableOutput";
+            this.m_EnableOutput.Size = new System.Drawing.Size(92, 17);
+            this.m_EnableOutput.TabIndex = 17;
+            this.m_EnableOutput.Text = "Enable output";
+            this.m_EnableOutput.UseVisualStyleBackColor = true;
+            this.m_EnableOutput.CheckedChanged += new System.EventHandler(this.m_EnableOutput_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(411, 341);
+            this.Controls.Add(this.m_EnableOutput);
             this.Controls.Add(this.m_SendSamples);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.m_SingleSample);
@@ -129,6 +144,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button m_SendSamples;
         private System.Windows.Forms.Timer SendSampleTimer;
+        private System.Windows.Forms.CheckBox m_EnableOutput;
     }
 }
 
