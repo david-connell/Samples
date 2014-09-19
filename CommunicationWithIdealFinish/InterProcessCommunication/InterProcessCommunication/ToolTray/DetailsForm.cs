@@ -2,6 +2,8 @@
 using System.Windows.Forms;
 using System.Drawing;
 using TQC.GOC.InterProcessCommunication.ToolTray;
+using System.Windows.Forms.DataVisualization.Charting;
+using TQC.GOC.InterProcessCommunication.Model;
 
 
 namespace TQC.GOC.InterProcessCommunication
@@ -12,8 +14,7 @@ namespace TQC.GOC.InterProcessCommunication
         public DetailsForm(ToolTrayUI parent)
         {
             InitializeComponent();
-            m_Parent = parent;
-            dataGridView.CellFormatting += hostsDataGridView_CellFormatting;
+            m_Parent = parent;            
             parent.Update += parent_Update;
             parent.DataRateUpdate += parent_DataRateUpdate;
 
@@ -72,7 +73,7 @@ namespace TQC.GOC.InterProcessCommunication
         {
             UpdateUI();
         }
-
+        
         private void timer2_Tick(object sender, EventArgs e)
         {
             m_ProtocolErrors.Text = m_Parent.ProtocolErrors.ToString() ;
@@ -80,13 +81,24 @@ namespace TQC.GOC.InterProcessCommunication
             m_ServerState.Text = m_Parent.ServerState;
             m_QueueSize.Text = m_Parent.QueueSize.ToString();
             m_NumberOfSamples.Text = m_Parent.NumberOfSamples.ToString();
+            var series = chart1.Series["CurrentTemperatures"];
+            series.Points.Clear();
+            SamplePoint readings = m_Parent.CurrentReadings;
+            if (readings != null)
+            {
+                for (int i = 0; i < readings.Samples.Length; i++)
+                {                    
+                    series.Points.AddXY(i + 1, readings.Samples[i]);                    
+                }
+            }
+            //series.ChartType = SeriesChartType.FastLine;
+            //series.Color = Color.Red;
+
+
             DataRateUpdate();            
         }
 
-        private void hostsDataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-     
-        }
+        
         
 
     }

@@ -37,6 +37,9 @@
             this.m_SendSamples = new System.Windows.Forms.Button();
             this.SendSampleTimer = new System.Windows.Forms.Timer(this.components);
             this.m_EnableOutput = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.trackBar1 = new System.Windows.Forms.TrackBar();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
             // m_SendData
@@ -100,7 +103,6 @@
             // 
             // SendSampleTimer
             // 
-            this.SendSampleTimer.Interval = 10;
             this.SendSampleTimer.Tick += new System.EventHandler(this.SendSampleTimer_Tick);
             // 
             // m_EnableOutput
@@ -116,11 +118,34 @@
             this.m_EnableOutput.UseVisualStyleBackColor = true;
             this.m_EnableOutput.CheckedChanged += new System.EventHandler(this.m_EnableOutput_CheckedChanged);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 133);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(119, 13);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "Speed of Sending data:";
+            // 
+            // trackBar1
+            // 
+            this.trackBar1.Location = new System.Drawing.Point(147, 133);
+            this.trackBar1.Maximum = 1000;
+            this.trackBar1.Minimum = 1;
+            this.trackBar1.Name = "trackBar1";
+            this.trackBar1.Size = new System.Drawing.Size(151, 45);
+            this.trackBar1.TabIndex = 19;
+            this.trackBar1.TickFrequency = 100;
+            this.trackBar1.Value = 100;
+            this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(411, 341);
+            this.Controls.Add(this.trackBar1);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.m_EnableOutput);
             this.Controls.Add(this.m_SendSamples);
             this.Controls.Add(this.button2);
@@ -130,6 +155,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -145,6 +171,8 @@
         private System.Windows.Forms.Button m_SendSamples;
         private System.Windows.Forms.Timer SendSampleTimer;
         private System.Windows.Forms.CheckBox m_EnableOutput;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TrackBar trackBar1;
     }
 }
 

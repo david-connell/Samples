@@ -1,0 +1,30 @@
+# Object files
+
+
+# Libraries
+
+#Build Files
+*.suo
+*.sdf
+*.opensdf
+*.user
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+*.map
+*.stackdump
+
+# Executables
+*.exe
+*.out
+*.app
+*.bin
+*.pdb
+*.cache
+*.xml
+*.txt
+*.nuspec
+*.nupkg

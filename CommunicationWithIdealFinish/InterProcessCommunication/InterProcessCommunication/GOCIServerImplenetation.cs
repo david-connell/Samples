@@ -482,6 +482,19 @@ namespace TQC.GOC.InterProcessCommunication
                 return DataRunDetails.Samples.Count;
             }
         }
+
+        public SamplePoint CurrentReadings
+        { 
+            get
+            {
+                if (DataRunDetails == null)
+                {
+                    return null;
+                }
+                return DataRunDetails.CurrentReadings;
+
+            }  
+        }
     }
 
 }

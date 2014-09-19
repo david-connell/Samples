@@ -21,7 +21,7 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
             m_Name.Text = desc.Description;
 
             var title = assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute)) as AssemblyTitleAttribute;
-            Text += " " + title.Title;
+            Text += " - " + title.Title;
 
             var copyright = assembly.GetCustomAttribute(typeof(AssemblyCopyrightAttribute)) as AssemblyCopyrightAttribute;
             m_Copyright.Text = copyright.Copyright;

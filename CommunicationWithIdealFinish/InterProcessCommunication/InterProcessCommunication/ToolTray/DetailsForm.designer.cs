@@ -29,8 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DetailsForm));
-            this.dataGridView = new System.Windows.Forms.DataGridView();
             this.label = new System.Windows.Forms.Label();
             this.m_ConnectionStatus = new System.Windows.Forms.Label();
             this.m_TimeSinceLastPing = new System.Windows.Forms.Label();
@@ -50,22 +51,9 @@
             this.label8 = new System.Windows.Forms.Label();
             this.m_NumberOfSamples = new System.Windows.Forms.Label();
             this.m_QueueSize = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // dataGridView
-            // 
-            this.dataGridView.AllowUserToAddRows = false;
-            this.dataGridView.AllowUserToDeleteRows = false;
-            this.dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Location = new System.Drawing.Point(0, 133);
-            this.dataGridView.Name = "dataGridView";
-            this.dataGridView.ReadOnly = true;
-            this.dataGridView.Size = new System.Drawing.Size(563, 72);
-            this.dataGridView.TabIndex = 0;
             // 
             // label
             // 
@@ -235,11 +223,36 @@
             this.m_QueueSize.TabIndex = 27;
             this.m_QueueSize.Text = "0";
             // 
+            // chart1
+            // 
+            this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            chartArea1.AxisX.Interval = 8D;
+            chartArea1.AxisX.LabelStyle.Enabled = false;
+            chartArea1.AxisX.Maximum = 32D;
+            chartArea1.AxisX.Minimum = 1D;
+            chartArea1.AxisX.Title = "Across Gradient Oven";
+            chartArea1.AxisY.Title = "Current\\nTemp. (°C)";
+            chartArea1.AxisY.TitleFont = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            this.chart1.Location = new System.Drawing.Point(-1, 115);
+            this.chart1.Name = "chart1";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+            series1.Name = "CurrentTemperatures";
+            this.chart1.Series.Add(series1);
+            this.chart1.Size = new System.Drawing.Size(562, 88);
+            this.chart1.TabIndex = 28;
+            this.chart1.Text = "chart1";
+            // 
             // DetailsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(562, 204);
+            this.Controls.Add(this.chart1);
             this.Controls.Add(this.m_QueueSize);
             this.Controls.Add(this.m_NumberOfSamples);
             this.Controls.Add(this.label8);
@@ -258,16 +271,15 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.m_ConnectionStatus);
             this.Controls.Add(this.label);
-            this.Controls.Add(this.dataGridView);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "DetailsForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Status";
+            this.Text = "Current Status - TQC Gradient Oven - Interprocess Communication";
             this.Load += new System.EventHandler(this.DetailsForm_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -275,7 +287,6 @@
 
         #endregion
 
-        private System.Windows.Forms.DataGridView dataGridView;
         private System.Windows.Forms.Label label;
         private System.Windows.Forms.Label m_ConnectionStatus;
         private System.Windows.Forms.Label m_TimeSinceLastPing;
@@ -295,6 +306,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label m_NumberOfSamples;
         private System.Windows.Forms.Label m_QueueSize;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
 
     }
 }

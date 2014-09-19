@@ -215,6 +215,13 @@ namespace WindowsFormsApplication1
         {
             m_TextWriter.IsEnabled = m_EnableOutput.Checked;
         }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            //trackBar1.Value = 999;
+            SendSampleTimer.Interval = trackBar1.Value;
+            
+        }
     }
 
     public class ConsoleTextWriter : TextWriter

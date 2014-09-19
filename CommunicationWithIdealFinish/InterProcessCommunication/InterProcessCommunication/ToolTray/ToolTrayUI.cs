@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TQC.GOC.InterProcessCommunication.Model;
 
 namespace TQC.GOC.InterProcessCommunication.ToolTray
 {
@@ -299,6 +300,13 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
             }
         }
 
+        public SamplePoint CurrentReadings
+        {
+            get
+            {
+                return m_Server.CurrentReadings;
+            }
+        }
         public int QueueSize
         {
             get

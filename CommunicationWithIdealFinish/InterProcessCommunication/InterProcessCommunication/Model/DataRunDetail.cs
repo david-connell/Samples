@@ -83,6 +83,7 @@ namespace TQC.GOC.InterProcessCommunication.Model
                 throw new ArgumentException("Incorrect number of channel passed for given data run", "point");
             }
             m_Samples.Add(point);
+            CurrentReadings = point.Clone();
         }
         internal IList<SamplePoint> Samples
         {
@@ -92,5 +93,11 @@ namespace TQC.GOC.InterProcessCommunication.Model
             }
         }
 
+
+        public SamplePoint CurrentReadings 
+        { 
+            get; 
+            set; 
+        }
     }
 }

@@ -15,5 +15,10 @@ namespace TQC.GOC.InterProcessCommunication.Model
         }
         public DateTime SampleTime { get; private set; }
         public double[] Samples { get; private set; }
+
+        internal SamplePoint Clone()
+        {
+            return new SamplePoint(SampleTime, Samples);
+        }
     }
 }
