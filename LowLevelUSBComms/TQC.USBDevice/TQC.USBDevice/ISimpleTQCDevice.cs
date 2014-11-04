@@ -3,34 +3,6 @@ using System.Collections.Generic;
 
 namespace TQC.USBDevice
 {
-    public interface ICoreCommands
-    {
-        DateTime ManufactureDate { get; }
-        string ManufactureName { get; }
-        Version ProtocolVersion { get; }
-        Version HardwareVersion { get; }
-        Version SoftwareVersion { get; }
-
-        string DeviceName { get; }
-        TQC.USBDevice.USBLogger.DeviceType DeviceType { get; }
-        int SerialNumber { get; }
-    }
-
-    public class LinearCalibrationDetails
-    {
-        public double M { get; private set; }
-        public double C { get; private set; }
-        public LinearCalibrationDetails(double m, double c)
-        {
-            M = m;
-            C = c;
-        }
-        public override string ToString()
-        {
-            return string.Format("Y={0}X + {1}", M, C);
-        }
-    }
-
     public interface ISimpleTQCDevice : ICoreCommands
     {
         int NumberOfProbes { get; }
