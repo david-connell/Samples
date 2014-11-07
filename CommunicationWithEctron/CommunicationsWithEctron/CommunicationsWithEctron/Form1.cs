@@ -38,6 +38,9 @@ namespace CommunicationsWithEctron
                 try
                 {
                     m_GPIB.Open(ids[0]);
+                    //This may be required
+                    //m_GPIB.EnableVoltage();
+
                     m_Voltage.Text = string.Format("{0}V", m_GPIB.Voltage);
                     m_GPIB.Close();
                 }
@@ -61,6 +64,8 @@ namespace CommunicationsWithEctron
                 try
                 {
                     m_GPIB.Open(ids[0]);
+                    //This may be required
+                    //m_GPIB.EnableTemperature();
                     m_Temp.Text = string.Format("{0}C", m_GPIB.Temperature);
                     m_GPIB.Close();
                 }
