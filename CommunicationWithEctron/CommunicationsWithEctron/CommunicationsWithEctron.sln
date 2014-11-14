@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationsWithEctron", "CommunicationsWithEctron\CommunicationsWithEctron.csproj", "{CDE388B7-1409-4964-82E2-BBBE60BB96F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject1", "UnitTestProject1\UnitTestProject1.csproj", "{2788BF8A-9DCC-4699-A870-410FFA2F662F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{CDE388B7-1409-4964-82E2-BBBE60BB96F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDE388B7-1409-4964-82E2-BBBE60BB96F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDE388B7-1409-4964-82E2-BBBE60BB96F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2788BF8A-9DCC-4699-A870-410FFA2F662F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2788BF8A-9DCC-4699-A870-410FFA2F662F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2788BF8A-9DCC-4699-A870-410FFA2F662F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2788BF8A-9DCC-4699-A870-410FFA2F662F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
