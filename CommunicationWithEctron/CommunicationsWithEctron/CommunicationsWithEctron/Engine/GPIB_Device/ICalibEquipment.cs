@@ -15,8 +15,8 @@ namespace CommunicationsWithEctron.Engine.GPIB_Device
         ENABLE_READING,
         VOLTAGE_GET,
         VOLTAGE_SET,
-        //TEMPERATURE_READ,
-        //VOLTAGE_READ,
+        TEMPERATURE_READ,
+        VOLTAGE_READ,
 
     } ;
     public interface ICalibEquipment
