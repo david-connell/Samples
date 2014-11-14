@@ -65,7 +65,7 @@ namespace CommunicationsWithEctron.Engine
 :INST:TEMP:STAND ITS-90
 ";
                 case CALIBRATION_COMMAND.TEMPERATURE_GET:
-                    return ":SOURCE:TEMP:VAL?";
+                    return ":SENS:VAL?";
                 case CALIBRATION_COMMAND.TEMPERATURE_SET:
                     return ":SOURCE:TEMP:VAL {0}";
 

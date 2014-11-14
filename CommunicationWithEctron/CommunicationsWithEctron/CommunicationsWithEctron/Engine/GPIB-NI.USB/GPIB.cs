@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CommunicationsWithEctron.Engine.GPIB_Device;
 using NationalInstruments.NI4882;
+using System.Windows.Forms;
 
 namespace CommunicationsWithEctron.Engine.GPIB_NI.USB
 {
@@ -142,9 +143,16 @@ namespace CommunicationsWithEctron.Engine.GPIB_NI.USB
             val = Read();
             int offset = val.IndexOf(unit);
             val = val.Substring(0, offset);
-            double.TryParse(val, out result);
+            
+            //double.TryParse(val, out result);
+
+            // Replace the ectron decimal point to whatever the system uses as decimal separator and convert to double
+            val = val.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator);
+            result = System.Convert.ToDouble(val);
+            
             return result;
         }
+
         public void Dispose()
         {
             Close();
