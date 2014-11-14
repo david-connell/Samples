@@ -59,21 +59,21 @@ namespace CommunicationsWithEctron.Engine
                     return "*IDN?";
 
                 case CALIBRATION_COMMAND.ENABLE_TEMPERATURE:
-                    return @":INST:MODE:ENTR TEMP
-:INST:MAT ALLOY
-:UNIT:TEMP C
-:INST:TEMP:STAND ITS-90
-";
+                    return @":INST:MODE:ENTR TEMP";
+//@":INST:MAT ALLOY
+//:UNIT:TEMP C
+//:INST:TEMP:STAND ITS-90
+//";
                 case CALIBRATION_COMMAND.TEMPERATURE_GET:
-                    return ":SENS:VAL?";
+                    return ":SOURCE:TEMP:VAL?";
                 case CALIBRATION_COMMAND.TEMPERATURE_SET:
                     return ":SOURCE:TEMP:VAL {0}";
 
 
 
                 case CALIBRATION_COMMAND.ENABLE_READING:
-                    return @":INST:MODE:ENTR VOLT
-:INST:MAT COPPER";
+                    return @":INST:MODE:ENTR VOLT";
+//@":INST:MAT COPPER";
 
                 case CALIBRATION_COMMAND.VOLTAGE_GET:
                     return ":SOURCE:VOLT:VAL?";
@@ -81,10 +81,10 @@ namespace CommunicationsWithEctron.Engine
                     return ":SOURCE:VOLT:VAL {0}";
 
 
-                //case CALIBRATION_COMMAND.VOLTAGE_READ:
-                //        return ":MEASure:VOLTage:DC?";
-                //case CALIBRATION_COMMAND.TEMPERATURE_READ:
-                //        return ":MEASure:TEMP:VAL?";
+                case CALIBRATION_COMMAND.VOLTAGE_READ:
+                    return "SENS:VAL?";
+                case CALIBRATION_COMMAND.TEMPERATURE_READ:
+                    return "SENS:VAL?";
 
             }
             throw new NotImplementedException();

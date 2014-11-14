@@ -5,6 +5,7 @@ using System.Text;
 using CommunicationsWithEctron.Engine.GPIB_Device;
 using NationalInstruments.NI4882;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace CommunicationsWithEctron.Engine.GPIB_NI.USB
 {
@@ -100,15 +101,15 @@ namespace CommunicationsWithEctron.Engine.GPIB_NI.USB
             return ReadDebugCommand(CalibEquipment.CommandString(GPIB_Device.CALIBRATION_COMMAND.ENABLE_READING));
         }
 
-        //public double ReadCurrentTemp()
-        //{
-        //    return ReadValueBackFromDevice(GPIB_Device.CALIBRATION_COMMAND.TEMPERATURE_READ, 'C');
-        //}
+        public double ReadCurrentTemp()
+        {
+            return ReadValueBackFromDevice(GPIB_Device.CALIBRATION_COMMAND.TEMPERATURE_READ, 'C');
+        }
 
-        //public double ReadCurrentVoltage()
-        //{
-        //    return ReadValueBackFromDevice(GPIB_Device.CALIBRATION_COMMAND.VOLTAGE_READ, 'V');
-        //}
+        public double ReadCurrentVoltage()
+        {
+            return ReadValueBackFromDevice(GPIB_Device.CALIBRATION_COMMAND.VOLTAGE_READ, 'V');
+        }
         public double Voltage
         {
             get
@@ -136,21 +137,33 @@ namespace CommunicationsWithEctron.Engine.GPIB_NI.USB
         }
 
         private double ReadValueBackFromDevice(GPIB_Device.CALIBRATION_COMMAND command, char unit)
-        {
-            double result = 0;
+        {            
             string val;
             Write(CalibEquipment.CommandString(command));
             val = Read();
+
+            return EctronParseStringToDouble(unit, val);                       
+        }
+
+        private static double EctronParseStringToDouble(char unit, string val)
+        {
             int offset = val.IndexOf(unit);
             val = val.Substring(0, offset);
-            
-            //double.TryParse(val, out result);
+            var nfi = new NumberFormatInfo();            
+            nfi.NumberDecimalSeparator = "."; //The Ectron always does this!
+            return Double.Parse(val, nfi);
 
+        }
+
+        private static double ParseStringToDouble(char unit,  string val)
+        {
+            int offset = val.IndexOf(unit);
+            val = val.Substring(0, offset);
+
+            //double.TryParse(val, out result);
             // Replace the ectron decimal point to whatever the system uses as decimal separator and convert to double
             val = val.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator);
-            result = System.Convert.ToDouble(val);
-            
-            return result;
+            return System.Convert.ToDouble(val);
         }
 
         public void Dispose()
