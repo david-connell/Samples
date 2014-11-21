@@ -35,6 +35,7 @@ namespace TQC.USBDevice
             USB_CURVEX_3 = 0x2047FFFE,
             USB_CURVEX_3a = 0x20470827,
             GRADIENT_OVEN = 0x04037B60,
+            USB_THERMOCOUPLE_SIMULATOR = 0x20470828,
 
         }
         private TQC.IF.USBLogger.USBGeneric m_Logger;

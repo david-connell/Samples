@@ -47,6 +47,7 @@
     <Compile Include="..\TQC.USBDevice\Properties\AssemblyInfoShared.cs">
       <Link>Properties\AssemblyInfoShared.cs</Link>
     </Compile>
+    <Compile Include="Logger\ThermocoupleSimulator\Basic.cs" />
     <Compile Include="Logger\USBProduct2\Basic.cs" />
     <Compile Include="Logger\Curvex3\Basic.cs" />
     <Compile Include="Logger\GeneralLogger\CalibrationCommands.cs" />
