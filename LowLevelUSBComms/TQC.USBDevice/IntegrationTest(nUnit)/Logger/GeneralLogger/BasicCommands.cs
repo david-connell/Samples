@@ -10,7 +10,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
         public abstract class BasicCommands
         {            
-            USBLogger.USBProductId ProductId ;
+            protected USBLogger.USBProductId ProductId ;
 
             public BasicCommands(USBLogger.USBProductId product)
             {

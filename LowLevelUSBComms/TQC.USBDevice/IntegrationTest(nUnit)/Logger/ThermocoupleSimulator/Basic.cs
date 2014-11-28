@@ -16,6 +16,70 @@ namespace IntegrationTestNUnit.Logger.ThermocoupleSimulator
             : base(USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR)
         {
         }
+
+        [Test]
+        public void ColdJunctionTemperature()
+        {
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    var temp = logger.ColdJunctionTemperature;
+
+                    Console.WriteLine("Temp = {0}", temp);
+                    Assert.That(temp, Is.GreaterThan(10));
+                    Assert.That(temp, Is.LessThan(30));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+
+        }
+
+        [Test]
+        public void BoardTemperature()
+        {
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    var temp = logger.BoardTemperature;
+
+                    Console.WriteLine("Temp = {0}", temp);
+                    Assert.That(temp, Is.GreaterThan(10));
+                    Assert.That(temp, Is.LessThan(30));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+
+        }
+
+
+        [TestCase(0)]
+        [TestCase(100)]
+        [TestCase(200)]
+        [TestCase(300)]
+        public void SetTemperatureOutput(double temp)
+        {
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    Console.WriteLine("Temp = {0}", temp);
+                    logger.SetTemperatureOutput(temp);                    
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+
+        }
     }
 
     [TestFixture]
