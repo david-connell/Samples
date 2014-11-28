@@ -24,6 +24,7 @@ namespace TQC.USBDevice
         CurveX3_Mid,
         CurveX3_High,
         GRO,
+        ThermocoupleSimulator = 9,
     }
     public class USBLogger : IDisposable
     {
@@ -278,6 +279,7 @@ namespace TQC.USBDevice
                 case 5: return DeviceType.CurveX3_Mid;
                 case 6: return DeviceType.CurveX3_High;
                 case 7: return DeviceType.GRO;
+                case 9: return DeviceType.ThermocoupleSimulator;
             }
             return DeviceType.Unknown;
         }

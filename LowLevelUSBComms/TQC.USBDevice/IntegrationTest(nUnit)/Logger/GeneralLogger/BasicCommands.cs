@@ -8,9 +8,6 @@ using TQC.USBDevice;
 
 namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
-        //[TestFixture(USBLogger.USBProductId.Glossmeter)]
-        //[TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
-        //[TestFixture(USBLogger.USBProductId.USB_CURVEX_3a)]
         public abstract class BasicCommands
         {            
             USBLogger.USBProductId ProductId ;
@@ -217,8 +214,11 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                             case USBLogger.USBProductId.USB_CURVEX_3a:
                                 Assert.That(value, Is.EqualTo(DeviceType.CurveX3_Basic));
                                 break;
+                            case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR:
+                                Assert.That(value, Is.EqualTo(DeviceType.ThermocoupleSimulator));
+                                break;
                             default:
-                                throw new Exception("Unknown logger type");
+                                throw new Exception(string.Format("Unknown logger type {0} value {1}", ProductId, value));
                         }
                         
                         Console.WriteLine(value);
