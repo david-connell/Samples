@@ -80,7 +80,7 @@ namespace TQC.USBDevice.GradientOven
             return ParentDevice._ProbeName(ChildDeviceID, probeId);         
         }
 
-        public USBLogger.ProbeType ProbeType(int probeId)
+        public ProbeType ProbeType(int probeId)
         {
             return ParentDevice._ProbeType(ChildDeviceID, probeId);
         }
@@ -93,7 +93,7 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
-        public USBLogger.DeviceType DeviceType
+        public DeviceType DeviceType
         {
             get
             {

@@ -7,26 +7,27 @@ using System.Threading.Tasks;
 
 namespace TQC.USBDevice
 {
+    public enum ProbeType
+    {
+        Gloss = 0,
+        Temperature = 1,
+        Humidity = 2,
+    }
+
+    public enum DeviceType
+    {
+        Unknown = -1,
+        SoloGlossmeter,
+        DuoGlossmeter,
+        PolyGlossmeter,
+        CurveX3_Basic,
+        CurveX3_Mid,
+        CurveX3_High,
+        GRO,
+    }
     public class USBLogger : IDisposable
     {
-        public enum ProbeType
-        {
-            Gloss = 0,
-            Temperature = 1,
-            Humidity = 2,
-        }
-
-        public enum DeviceType
-        {
-            Unknown = -1,
-            SoloGlossmeter,
-            DuoGlossmeter,
-            PolyGlossmeter,
-            CurveX3_Basic,
-            CurveX3_Mid,
-            CurveX3_High,
-            GRO,
-        }
+        
 
         public enum USBProductId
         {

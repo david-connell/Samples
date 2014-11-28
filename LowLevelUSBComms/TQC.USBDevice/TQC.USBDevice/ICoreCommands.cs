@@ -11,7 +11,7 @@ namespace TQC.USBDevice
         Version SoftwareVersion { get; }
 
         string DeviceName { get; }
-        TQC.USBDevice.USBLogger.DeviceType DeviceType { get; }
+        DeviceType DeviceType { get; }
         int SerialNumber { get; }
     }
 }

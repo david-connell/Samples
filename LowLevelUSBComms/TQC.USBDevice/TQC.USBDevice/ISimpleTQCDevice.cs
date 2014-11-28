@@ -7,7 +7,7 @@ namespace TQC.USBDevice
     {
         int NumberOfProbes { get; }
         string ProbeName(int probeId);
-        USBLogger.ProbeType ProbeType(int probeId);
+        ProbeType ProbeType(int probeId);
         LinearCalibrationDetails CalibrationDetails(int probeId);
 
         DateTime Calibration { get; }

@@ -208,14 +208,14 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                         switch (ProductId)
                         {
                             case USBLogger.USBProductId.Glossmeter:
-                                Assert.That(value, Is.EqualTo(USBLogger.DeviceType.PolyGlossmeter));
+                                Assert.That(value, Is.EqualTo(DeviceType.PolyGlossmeter));
                                 break;
                             case USBLogger.USBProductId.GRADIENT_OVEN:
-                                Assert.That(value, Is.EqualTo(USBLogger.DeviceType.GRO));
+                                Assert.That(value, Is.EqualTo(DeviceType.GRO));
                                 break;
                             case USBLogger.USBProductId.USB_CURVEX_3:
                             case USBLogger.USBProductId.USB_CURVEX_3a:
-                                Assert.That(value, Is.EqualTo(USBLogger.DeviceType.CurveX3_Basic));
+                                Assert.That(value, Is.EqualTo(DeviceType.CurveX3_Basic));
                                 break;
                             default:
                                 throw new Exception("Unknown logger type");

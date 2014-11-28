@@ -57,15 +57,15 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
             }
         }
 
-        [TestCase(0, USBLogger.ProbeType.Temperature)]
-        [TestCase(1, USBLogger.ProbeType.Temperature)]
-        [TestCase(2, USBLogger.ProbeType.Temperature)]
-        [TestCase(3, USBLogger.ProbeType.Temperature)]
-        [TestCase(4, USBLogger.ProbeType.Temperature)]
-        [TestCase(5, USBLogger.ProbeType.Temperature)]
-        [TestCase(6, USBLogger.ProbeType.Temperature)]
-        [TestCase(7, USBLogger.ProbeType.Temperature)]
-        public void ReadTypeOfProbe(byte probeId, USBLogger.ProbeType probeType)
+        [TestCase(0, ProbeType.Temperature)]
+        [TestCase(1, ProbeType.Temperature)]
+        [TestCase(2, ProbeType.Temperature)]
+        [TestCase(3, ProbeType.Temperature)]
+        [TestCase(4, ProbeType.Temperature)]
+        [TestCase(5, ProbeType.Temperature)]
+        [TestCase(6, ProbeType.Temperature)]
+        [TestCase(7, ProbeType.Temperature)]
+        public void ReadTypeOfProbe(byte probeId, ProbeType probeType)
         {
             using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
             {

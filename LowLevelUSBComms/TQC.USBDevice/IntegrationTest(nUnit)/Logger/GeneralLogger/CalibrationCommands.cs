@@ -122,10 +122,10 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         }
         private void ReadTypeOfProbe(TQCUsbLogger logger, int probeId)
         {
-            USBLogger.ProbeType type = USBLogger.ProbeType.Temperature;
+            ProbeType type = ProbeType.Temperature;
             if (ProductId == USBLogger.USBProductId.Glossmeter)
             {
-                type = USBLogger.ProbeType.Gloss;
+                type = ProbeType.Gloss;
             }
             var value = logger.ProbeType(probeId);
             Assert.That(value, Is.EqualTo(type));
