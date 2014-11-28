@@ -15,7 +15,8 @@ namespace TQC.USBDevice.GradientOven
         IGROThermoCoupleBoard GetChildDevice(byte id);
         IEnumerable<byte> ThermocoupleBoardIDs { get;}
 
-        Percentage FanSpeed { get; set; }
+        Percentage ExternalFanSpeed { get; set; }
+        Percentage InternalFanSpeed { get; set; }
         Percentage Cooling { get; set; }
         PowerState Power { get; set; }
         ClampState Clamp { get; set; }

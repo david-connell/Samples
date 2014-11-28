@@ -80,14 +80,14 @@ namespace IntegrationTestNUnit.Logger.GRO
 
 
         [Test]
-        public void ReadFanSpeed()
+        public void ReadExternalFanSpeed()
         {
             using (var logger = new GROMainBoard())
             {
                 if (logger.Open(ProductId))
                 {
-                    var val = logger.FanSpeed;
-                    Console.WriteLine("FanSpeed = {0}", val);                    
+                    var val = logger.ExternalFanSpeed;
+                    Console.WriteLine("ExternalFanSpeed = {0}", val);                    
                 }
                 else
                 {
@@ -98,23 +98,23 @@ namespace IntegrationTestNUnit.Logger.GRO
 
 
         [Test]
-        public void SetFanSpeed()
+        public void SetExternalFanSpeed()
         {
             using (var logger = new GROMainBoard())
             {
                 if (logger.Open(ProductId))
                 {
-                    var val = logger.FanSpeed;
+                    var val = logger.ExternalFanSpeed;
                     Console.WriteLine("FanSpeed = {0}", val);
                     if (val.Value < 10)
                         val = new Percentage((byte) (val.Value+1));
                     else
                         val = new Percentage((byte)(val.Value - 1));
-                    Console.WriteLine("Set FanSpeed = {0}", val);
+                    Console.WriteLine("Set External FanSpeed = {0}", val);
                     
-                    logger.FanSpeed = val;
+                    logger.ExternalFanSpeed = val;
                     Thread.Sleep(100);
-                    Assert.That(logger.FanSpeed, Is.EqualTo(val));
+                    Assert.That(logger.ExternalFanSpeed, Is.EqualTo(val));
                 }
                 else
                 {
@@ -123,6 +123,51 @@ namespace IntegrationTestNUnit.Logger.GRO
             }
         }
 
+
+
+        [Test]
+        public void ReadInternalFanSpeed()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.InternalFanSpeed;
+                    Console.WriteLine("InternalFanSpeed = {0}", val);
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+
+        [Test]
+        public void SetInternalFanSpeed()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    var val = logger.InternalFanSpeed;
+                    Console.WriteLine("InternalFanSpeed = {0}", val);
+                    if (val.Value < 10)
+                        val = new Percentage((byte)(val.Value + 1));
+                    else
+                        val = new Percentage((byte)(val.Value - 1));
+                    Console.WriteLine("Set Internal FanSpeed = {0}", val);
+
+                    logger.InternalFanSpeed = val;
+                    Thread.Sleep(100);
+                    Assert.That(logger.ExternalFanSpeed, Is.EqualTo(val));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
         [Test]
         public void ReadCooling()
         {

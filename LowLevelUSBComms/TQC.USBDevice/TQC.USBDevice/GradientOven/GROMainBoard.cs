@@ -83,7 +83,7 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
-        public Percentage FanSpeed
+        public Percentage ExternalFanSpeed
         {
             get
             {
@@ -96,6 +96,23 @@ namespace TQC.USBDevice.GradientOven
 
                 request.AddRange(BitConverter.GetBytes((short)0));
                 request.Add(value.Value) ;
+                Request(Commands.GROSetCommand, request.ToArray());
+            }
+        }
+
+        public Percentage InternalFanSpeed
+        {
+            get
+            {
+                var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)8));
+                return new Percentage(response[0]);
+            }
+            set
+            {
+                List<byte> request = new List<byte>();
+
+                request.AddRange(BitConverter.GetBytes((short)8));
+                request.Add(value.Value);
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
