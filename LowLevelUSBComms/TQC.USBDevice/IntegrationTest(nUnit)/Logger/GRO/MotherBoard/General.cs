@@ -20,6 +20,30 @@ namespace IntegrationTestNUnit.Logger.GRO
             ProductId = USBLogger.USBProductId.GRADIENT_OVEN;
         }
 
+        [TestCase(1000)]
+        public void EricTest1(int numerOfAttempts)
+        {
+            float temperatureValue = 0.0f;
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.Open(ProductId))
+                {
+                    for (int loopCounter = 0; loopCounter < numerOfAttempts; loopCounter++)
+                    {
+                        short slotId = 0;
+                        
+                        var button = logger.Button;
+                        logger.SetTempSetting(slotId, temperatureValue);
+                        logger.GetTempSetting(slotId);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+
+        }
 
         [TestCase(1)]
         public void ReadProbeName(short id)

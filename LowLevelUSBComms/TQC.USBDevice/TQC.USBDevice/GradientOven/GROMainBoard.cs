@@ -100,6 +100,16 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
+        public byte Button
+        {
+            get
+            {
+                // @todo add try/catch
+                var response = Request(Commands.ReadCurrentProbeVals, BitConverter.GetBytes((short)0x30));
+                return (byte)response[2];
+            }
+        }
+
         public Percentage InternalFanSpeed
         {
             get
