@@ -203,7 +203,7 @@ namespace TQC.USBDevice
                     return null;
             }
         }
-        const int MAX_RETRY_ATTEMPTS = 20;
+        const int MAX_RETRY_ATTEMPTS = 5;
         internal byte[] Request(Commands command, byte[] request, byte conversationId = 0)
         {
             bool retry;
