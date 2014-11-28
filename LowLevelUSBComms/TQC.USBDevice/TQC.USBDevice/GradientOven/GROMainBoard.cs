@@ -13,8 +13,7 @@ namespace TQC.USBDevice.GradientOven
 
 
         public IGROThermoCoupleBoard GetChildDevice(byte id)
-        {
-            IGROThermoCoupleBoard result = null;
+        {            
             if (ThermocoupleBoardIDs.Contains(id))
             {
                 if (!m_ChildDevices.ContainsKey(id))
@@ -58,7 +57,7 @@ namespace TQC.USBDevice.GradientOven
             {
                 probeName = thermocoupleBoard.ProbeName(AbsoluteProbeIdToLocalProbeId((short)probeId));
             }
-            catch (Exception ex)
+            catch (Exception )
             {
             }
             if (string.IsNullOrEmpty(probeName))

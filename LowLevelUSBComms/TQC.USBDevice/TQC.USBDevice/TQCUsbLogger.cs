@@ -233,11 +233,8 @@ namespace TQC.USBDevice
         }
         
         public virtual ProbeType ProbeType(int probeId)
-        {
-            //get
-            {
-                return _ProbeType(0, probeId);
-            }
+        {            
+            return _ProbeType(0, probeId);
         }
         
         public DeviceType DeviceType
@@ -284,7 +281,7 @@ namespace TQC.USBDevice
         /// <summary>
         /// This is not supported by the GRO!
         /// </summary>
-        public new String CalibrationUserName
+        public String CalibrationUserName
         {
             get
             {
