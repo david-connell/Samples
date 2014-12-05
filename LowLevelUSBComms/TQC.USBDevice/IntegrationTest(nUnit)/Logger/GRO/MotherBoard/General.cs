@@ -109,6 +109,26 @@ namespace IntegrationTestNUnit.Logger.GRO
             }
         }
 
+        [Test]
+        public void ReadThermocoupleBoardIDs()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    var boards = logger.ThermocoupleBoardIDs;
+                    foreach (var board in boards)
+                    {
+                        Console.WriteLine("ThermocoupleBoardID {0}", board);
+                    }                    
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
         [TestCase(1)]
         public void ReadProbeType(short id)
         {

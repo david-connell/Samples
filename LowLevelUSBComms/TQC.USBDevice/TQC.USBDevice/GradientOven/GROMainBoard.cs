@@ -78,8 +78,18 @@ namespace TQC.USBDevice.GradientOven
         {
             get
             {
-                //ToDo request this information 
-                return new byte [] { 1, 2, 3, 4 };
+                var response = Request(Commands.ReadDeviceInfo, BitConverter.GetBytes((short)0) );
+                List<byte> data = new List<byte>();
+                if (response != null)
+                {                    
+                    const int startOffset = 6;
+                    for (int i = 0; i < (response.Length - startOffset); i++)
+                    {                        
+                        data.Add(response[startOffset + i]);
+                    }
+                }
+                return data;
+                //return new byte [] { 1, 2, 3, 4 };
             }
         }
 
