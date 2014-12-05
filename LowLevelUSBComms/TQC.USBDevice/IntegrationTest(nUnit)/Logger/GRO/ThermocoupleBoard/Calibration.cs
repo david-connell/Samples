@@ -81,7 +81,7 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     int maxProbes = logger.NumberOfProbes;
                     for (int probeId = 0; probeId < maxProbes; probeId++)
@@ -109,7 +109,7 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     int maxProbes = logger.NumberOfProbes;
                     for (int probeId = 0; probeId < maxProbes; probeId++)

@@ -100,13 +100,28 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
-        public byte Button
+        public ButtonStatus Button
         {
             get
             {
-                // @todo add try/catch
+                ButtonStatus button = ButtonStatus.NothingPressed;
                 var response = Request(Commands.ReadCurrentProbeVals, BitConverter.GetBytes((short)0x30));
-                return (byte)response[2];
+                byte buttonStatus = (byte)response[2];
+
+                if (buttonStatus != 0)
+                {
+                    if ((buttonStatus & (0x20)) == 0)
+                    {
+                        button |= ButtonStatus.OKPressed;
+                    }
+                    if ((buttonStatus & (0x40)) == 0)
+                    {
+                        button |= ButtonStatus.CancelPressed;
+                    }
+                }
+                return button;
+
+
             }
         }
 

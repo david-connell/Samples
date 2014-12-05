@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeviceResponseUnexpectedException.cs" />
+    <Compile Include="GradientOven\ButtonStatus.cs" />
     <Compile Include="GradientOven\CarrierPosition.cs" />
     <Compile Include="GradientOven\ClampState.cs" />
     <Compile Include="GradientOven\LiftState.cs" />

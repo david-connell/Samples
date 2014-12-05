@@ -17,7 +17,7 @@ namespace IntegrationTestProject1
         {
             using (var logger = new USBLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
                     Console.WriteLine("Version: '{0}'", logger.Version);
@@ -36,7 +36,7 @@ namespace IntegrationTestProject1
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var thermocoupleBoard = logger.GetChildDevice(1);
                     var vals = thermocoupleBoard.ProbeValues;
@@ -60,7 +60,7 @@ namespace IntegrationTestProject1
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     string serialNumber = logger.LoggerSerialNumber;
                     int serialNumberAsInt = int.Parse(serialNumber);
@@ -81,7 +81,7 @@ namespace IntegrationTestProject1
         {
             using (var logger = new USBLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     string calibrationCompany = logger.CalibrationCompany;
 
@@ -105,7 +105,7 @@ namespace IntegrationTestProject1
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var deviceName = logger.DeviceName;                    
                     Assert.IsFalse(String.IsNullOrEmpty(deviceName));
@@ -124,7 +124,7 @@ namespace IntegrationTestProject1
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {                    
                     Assert.IsTrue(logger.NumberOfProbes == 0);                    
                     logger.Close();
@@ -141,7 +141,7 @@ namespace IntegrationTestProject1
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     Assert.IsTrue(logger.CanOffload);
                     Assert.IsTrue(logger.CanSendSetup);

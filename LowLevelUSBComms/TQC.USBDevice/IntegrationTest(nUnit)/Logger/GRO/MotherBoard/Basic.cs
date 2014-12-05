@@ -13,7 +13,7 @@ namespace IntegrationTestNUnit.Logger.GRO.MotherBoard
     class Basic : BasicCommands
     {
         public Basic()
-            : base(USBLogger.USBProductId.Glossmeter)
+            : base(USBLogger.USBProductId.GRADIENT_OVEN)
         {
         }
     }
@@ -22,7 +22,7 @@ namespace IntegrationTestNUnit.Logger.GRO.MotherBoard
     class Calibration : CalibrationCommands
     {
         public Calibration()
-            : base(USBLogger.USBProductId.Glossmeter)
+            : base(USBLogger.USBProductId.GRADIENT_OVEN)
         {
         }
     }
@@ -32,7 +32,7 @@ namespace IntegrationTestNUnit.Logger.GRO.MotherBoard
     class ReadValues : ReadValuesCommands
     {
         public ReadValues()
-            : base(USBLogger.USBProductId.Glossmeter)
+            : base(USBLogger.USBProductId.GRADIENT_OVEN)
         {
         }
     }

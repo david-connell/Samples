@@ -26,7 +26,7 @@ namespace IntegrationTestNUnit.Logger.GRO
             float temperatureValue = 0.0f;
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     for (int loopCounter = 0; loopCounter < numerOfAttempts; loopCounter++)
                     {
@@ -44,13 +44,59 @@ namespace IntegrationTestNUnit.Logger.GRO
             }
 
         }
+        [TestCase(ButtonStatus.OKPressed, "Press the OK Button")]
+        [TestCase(ButtonStatus.CancelPressed, "Press the Cancel Button")]
+        public void CheckOKButton(ButtonStatus buttonToCheck, string outputMessage)
+        {
+            using (var logger = new GROMainBoard())
+            {
+
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    int state = 0;
+                    int attempt = 0;
+                    while (state != -1)
+                    {
+                        var val = logger.Button;
+                        Console.WriteLine("Button {0} ", val);
+                        if (state == 0) //Look for No Button Pressed...
+                        {
+                            Assert.That(val, Is.EqualTo(ButtonStatus.NothingPressed));
+                            state = 1;
+                            Console.WriteLine(outputMessage);                            
+                        }
+                        else if (state == 1) //Now see if the button is pressed!
+                        {
+                            if ((val & buttonToCheck) == buttonToCheck)
+                            {
+                                state = -1;
+                            }
+                            else
+                            {
+                                attempt++;
+                                if (attempt > 50)   //50 attempts at 100ms = 5secs long test :(
+                                {
+                                    throw new Exception(string.Format("Failed to read the {0}", buttonToCheck));
+                                }
+                                Thread.Sleep(100);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+
+        }
 
         [TestCase(1)]
         public void ReadProbeName(short id)
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.ProbeName(id);
                     Console.WriteLine("ProbeName {0} = {1}", id, val);
@@ -68,7 +114,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.ProbeType(id);
                     Console.WriteLine("ProbeType {0} = {1}", id, val);
@@ -86,7 +132,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var channels = logger.InternalChannels();
                     int id = 1;
@@ -108,7 +154,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.ExternalFanSpeed;
                     Console.WriteLine("ExternalFanSpeed = {0}", val);                    
@@ -126,7 +172,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.ExternalFanSpeed;
                     Console.WriteLine("FanSpeed = {0}", val);
@@ -154,7 +200,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.InternalFanSpeed;
                     Console.WriteLine("InternalFanSpeed = {0}", val);
@@ -172,7 +218,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.InternalFanSpeed;
                     Console.WriteLine("InternalFanSpeed = {0}", val);
@@ -197,7 +243,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.Cooling;
                     Console.WriteLine("Cooling = {0}", val);
@@ -214,7 +260,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.Cooling;
                     Console.WriteLine("Cooling = {0}", val);
@@ -241,7 +287,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.Power;
                     Console.WriteLine("Power = {0}", val);
@@ -259,7 +305,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.Power;
                     Console.WriteLine("Power = {0}", val);
@@ -279,7 +325,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.Clamp;
                     Console.WriteLine("Clamp = {0}", val);
@@ -296,7 +342,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.Clamp;
                     Console.WriteLine("Clamp = {0}", val);
@@ -318,7 +364,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.CarrierPosition;
                     Console.WriteLine("CarrierPosition = {0}", val);
@@ -335,7 +381,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.CarrierPosition;
                     Console.WriteLine("CarrierPosition = {0}", val);
@@ -361,7 +407,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.CarrierSpeed;
                     Console.WriteLine("CarrierSpeed = {0}", val);
@@ -378,7 +424,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.CarrierSpeed;
                     Console.WriteLine("CarrierSpeed = {0}", val);
@@ -403,7 +449,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.Lift;
                     Console.WriteLine("Lift = {0}", val);
@@ -421,7 +467,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.Lift;
                     Console.WriteLine("Lift = {0}", val);
@@ -443,7 +489,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         {
             using (var logger = new GROMainBoard())
             {
-                if (logger.Open(ProductId))
+                if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var val = logger.GetTempSetting(id);
                     Console.WriteLine("GetTempSetting {0} = {1}", id, val);

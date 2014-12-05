@@ -14,7 +14,7 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
         byte m_ThermocoupleBoard;
         public ThermocoupleBoard(USBLogger.USBProductId productId, byte thermocoupleBoard)
         {
-            m_Logger.Open(productId);
+            m_Logger.OpenWithMinumumRequests(productId);
             m_ThermocoupleBoard = thermocoupleBoard;
         }
         public void Dispose()
