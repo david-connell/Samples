@@ -9,13 +9,16 @@ using TQC.USBDevice.GradientOven;
 
 namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
 {
-    [TestFixture((byte)1)]
+    [TestFixture("Theromcouple board 1", (byte)1)]
+    [TestFixture("Theromcouple board 2", (byte)2)]
+    [TestFixture("Theromcouple board 3", (byte)3)]
+    [TestFixture("Theromcouple board 4", (byte)4)]
     class Calibration
     {
         USBLogger.USBProductId ProductId { get; set; }
         byte ThermocoupleBoard { get; set; }
 
-        public Calibration(byte thermocoupleBoard)
+        public Calibration(string nameOfBoard, byte thermocoupleBoard)
         {
             ProductId = USBLogger.USBProductId.GRADIENT_OVEN;
             ThermocoupleBoard = thermocoupleBoard;
