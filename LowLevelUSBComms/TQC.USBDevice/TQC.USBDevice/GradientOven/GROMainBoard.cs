@@ -78,7 +78,7 @@ namespace TQC.USBDevice.GradientOven
         {
             get
             {
-                var response = Request(Commands.ReadDeviceInfo, BitConverter.GetBytes((short)0) );
+                var response = Request(Commands.ReadDeviceInfo, BitConverter.GetBytes((short)16) );
                 List<byte> data = new List<byte>();
                 if (response != null)
                 {                    
