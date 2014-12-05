@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace TQC.USBDevice
 {
+    public enum StateOfLogger : byte
+    {
+        Idle = 0,
+        Logging=1,
+        Calibration=3,
+    }
     //Extend here with request responses that are not covered by the standard COM calls.
     public class TQCUsbLogger : USBLogger, ISimpleTQCDevice
     {
@@ -398,6 +404,14 @@ namespace TQC.USBDevice
                 }
             }
             return data;
+        }
+
+        public StateOfLogger StateOfLogger
+        {
+            get
+            {
+                return (StateOfLogger) GetInt8(0, Commands.ReadDeviceInfo, 12);
+            }
         }
 
 

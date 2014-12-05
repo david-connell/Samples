@@ -303,6 +303,24 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                     }
                 }
             }
+
+
+            [Test]
+            public void StateOfLogger()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {
+                        Console.WriteLine("Logger = {0}", logger.StateOfLogger);
+                        logger.Close();
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
         }
     }
 

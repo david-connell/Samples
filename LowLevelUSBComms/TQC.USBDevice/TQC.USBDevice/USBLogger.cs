@@ -308,6 +308,7 @@ namespace TQC.USBDevice
             }
         }
 
+
         public string CalibrationUser
         {
             get
