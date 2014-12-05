@@ -321,12 +321,17 @@ namespace TQC.USBDevice
             for (int setId = 1; setId <= maxNumberOfSets; setId++)
             {
                 var result = GetProbeValues(deviceId, 0x06, (byte)setId);
-                const int lengthOfData = sizeof(float);
-                const int startOffset = 6;
-                for (int i = 0; i < (result.Length-startOffset) / lengthOfData; i++)
+                
+                if (result != null)
                 {
-                    double value = BitConverter.ToSingle(result, startOffset + i * lengthOfData);
-                    data.Add(value);
+                    const int lengthOfData = sizeof(float);
+                    const int startOffset = 6;
+
+                    for (int i = 0; i < (result.Length - startOffset) / lengthOfData; i++)
+                    {
+                        double value = BitConverter.ToSingle(result, startOffset + i * lengthOfData);
+                        data.Add(value);
+                    }
                 }
             }
             return data;                        
@@ -339,7 +344,7 @@ namespace TQC.USBDevice
 
             var response = GetProbeValues(0, 0x30, 0);
 
-            if (response.Length == 7)
+            if (response != null && response.Length == 7)
             {
                 buttonStatus = response[2];
                 status = BitConverter.ToInt32(response, 3);
@@ -374,15 +379,22 @@ namespace TQC.USBDevice
                     case DeviceType.SoloGlossmeter:
                         mode = 0x01;
                         break;
+                    case USBDevice.DeviceType.ThermocoupleSimulator:
+                        throw new NotSupportedException("Thermocouple simultator cannot read temperatures");
+                        break;
 
                 }
                 var result = GetProbeValues(deviceId, mode, (byte)setId);
-                const int lengthOfData = 2 ;
-                const int startOffset = 6;
-                for (int i = 0; i < (result.Length-startOffset) / lengthOfData; i++)
+                if (result != null)
                 {
-                    Int16 value = BitConverter.ToInt16(result, startOffset + i * lengthOfData);                    
-                    data.Add((double)value/10.0);
+                    const int lengthOfData = 2;
+                    const int startOffset = 6;
+
+                    for (int i = 0; i < (result.Length - startOffset) / lengthOfData; i++)
+                    {
+                        Int16 value = BitConverter.ToInt16(result, startOffset + i * lengthOfData);
+                        data.Add((double)value / 10.0);
+                    }
                 }
             }
             return data;
