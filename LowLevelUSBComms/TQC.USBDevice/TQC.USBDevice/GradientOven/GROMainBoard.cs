@@ -78,18 +78,19 @@ namespace TQC.USBDevice.GradientOven
         {
             get
             {
-                var response = Request(Commands.ReadDeviceInfo, BitConverter.GetBytes((short)16) );
-                List<byte> data = new List<byte>();
-                if (response != null)
-                {                    
-                    const int startOffset = 6;
-                    for (int i = 0; i < (response.Length - startOffset); i++)
-                    {                        
-                        data.Add(response[startOffset + i]);
-                    }
-                }
-                return data;
-                //return new byte [] { 1, 2, 3, 4 };
+                //The logger does not support finding out this information! 
+                //var response = Request(Commands.ReadDeviceInfo, BitConverter.GetBytes((short)16));
+                //List<byte> data = new List<byte>();
+                //if (response != null)
+                //{
+                //    const int startOffset = 6;
+                //    for (int i = 0; i < (response.Length - startOffset); i++)
+                //    {
+                //        data.Add(response[startOffset + i]);
+                //    }
+                //}
+                //return data;
+                return new byte [] { 1, 2, 3, 4 };
             }
         }
 
@@ -118,15 +119,19 @@ namespace TQC.USBDevice.GradientOven
                 var response = Request(Commands.ReadCurrentProbeVals, BitConverter.GetBytes((short)0x30));
                 byte buttonStatus = (byte)response[2];
 
-                if (buttonStatus != 0)
+                //if (buttonStatus != 0)
                 {
+                    if ((buttonStatus & (0x10)) == 0)
+                    {
+                        button |= ButtonStatus.YellowPressed;
+                    }
                     if ((buttonStatus & (0x20)) == 0)
                     {
-                        button |= ButtonStatus.OKPressed;
+                        button |= ButtonStatus.GreenPressed;
                     }
                     if ((buttonStatus & (0x40)) == 0)
                     {
-                        button |= ButtonStatus.CancelPressed;
+                        button |= ButtonStatus.RedPressed;
                     }
                 }
                 return button;
