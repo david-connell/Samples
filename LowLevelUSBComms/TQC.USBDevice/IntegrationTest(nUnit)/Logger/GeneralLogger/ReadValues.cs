@@ -8,9 +8,6 @@ using TQC.USBDevice;
 
 namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
-    //[TestFixture(USBLogger.USBProductId.Glossmeter)]
-    //[TestFixture(USBLogger.USBProductId.GRADIENT_OVEN)]
-    //[TestFixture(USBLogger.USBProductId.USB_CURVEX_3a)]
     abstract class ReadValuesCommands
     {
         USBLogger.USBProductId ProductId;
@@ -31,9 +28,16 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                     
                     int id = 1;
                     foreach (var value in probeValues)
-                    {
-                        Assert.That(value, Is.GreaterThanOrEqualTo( 0) );
+                    {                        
                         Console.WriteLine("Channel {0} value = {1}", id++, value);
+                    }
+                    id = 1;
+                    foreach (var value in probeValues)
+                    {
+
+                        Assert.That(value, Is.GreaterThanOrEqualTo(-100), "Probe {0} is < -100", id);
+                        Assert.That(value, Is.LessThanOrEqualTo(400), "Probe {0} is > 400", id);
+                        id++;
                     }
                     Assert.That(probeValues.Count(), Is.EqualTo(logger.NumberOfProbes));
                 }

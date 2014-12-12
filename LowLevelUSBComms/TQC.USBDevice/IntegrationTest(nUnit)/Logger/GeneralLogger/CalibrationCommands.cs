@@ -25,7 +25,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             using (var logger = new TQCUsbLogger())
             {
-                if (logger.OpenWithMinumumRequests(ProductId))
+                if (logger.Open(ProductId))
                 {
                     var value = logger.CalibrationDate;
                     Assert.That(value, Is.GreaterThan(new DateTime(2000, 1, 1)));
@@ -98,9 +98,12 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         private void ReadCalibrationDetails(TQCUsbLogger logger, int probeId)
         {
             var value = logger.CalibrationDetails(probeId);
-            Assert.That(value.C, Is.Not.EqualTo(0));
-            Assert.That(value.M, Is.Not.EqualTo(0));
-            Console.WriteLine("Probe {0} is {1}", probeId+1, value);
+            Console.WriteLine("Probe {0} is '{1}'", probeId + 1, value);
+            Assert.That(Math.Abs(value.C), Is.LessThan(2.0));
+            Assert.That(value.M, Is.Not.EqualTo(0.0));
+            Assert.That(Math.Abs(value.M), Is.LessThan(2.0));
+            Assert.That(Math.Abs(value.M), Is.GreaterThan(0.5));
+            
         }
 
         [Test]
@@ -129,7 +132,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             }
             var value = logger.ProbeType(probeId);
             Assert.That(value, Is.EqualTo(type));
-            Console.WriteLine("Probe {0} is {1}", probeId + 1, value);
+            Console.WriteLine("Type of Probe {0} = {1}", probeId + 1, value);
         }
 
         [Test]
@@ -155,7 +158,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             var value = logger.ProbeName(probeId);
             Assert.That(value, Is.Not.Null);
             Assert.That(value, Is.Not.EqualTo(""));
-            Console.WriteLine("Probe {0} is{1}'", probeId + 1, value);
+            Console.WriteLine("Probe {0} Name is '{1}'", probeId + 1, value);
         }
     }
 }

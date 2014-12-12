@@ -236,13 +236,14 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new USBLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
+                    if (logger.Open(ProductId))
                     {
                         string calibrationCompany = logger.CalibrationCompany;
 
 
                         var response = logger.Request(TQC.USBDevice.USBLogger.Commands.ReadCalibrationDetails, BitConverter.GetBytes((short)1));
-                        string calibrationCompanyRaw = System.Text.Encoding.Default.GetString(response).TrimEnd('\0');
+                        string calibrationCompanyRaw = System.Text.Encoding.Default.GetString(response).Split('\0')[0];
+                        
 
 
                         Assert.AreEqual(calibrationCompany, calibrationCompanyRaw);
