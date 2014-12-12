@@ -17,19 +17,51 @@ namespace TQC.USBDevice
     {
         Dictionary<byte, int> ProbesPerDevice = new Dictionary<byte, int>();
 
-        private int GetInt8(byte deviceId, Commands command, int commandId)
+        private string CommandDescription(Commands command, int commandId)
         {
-            return GetResponse(deviceId, command, commandId)[0];
+            return string.Format("{0} sub command {1}", command.ToString(), commandId);
+        }
+        private int GetInt8(byte deviceId, Commands command, int commandId)
+        {                            
+            var response = GetResponse(deviceId, command, commandId);
+            if (response == null)
+            {
+                throw new NoDataReceivedException(CommandDescription(command, commandId));
+            }
+            if (response.Length < sizeof(byte))
+            {
+                throw new TooLittleDataReceivedException(CommandDescription(command, commandId), response.Length, sizeof(byte));
+            }
+            return response[0];
         }
 
         private int GetInt32(byte deviceId, Commands command, int commandId)
         {
-            return BitConverter.ToInt32(GetResponse(deviceId, command, commandId), 0);
+            var response = GetResponse(deviceId, command, commandId);
+            if (response == null)
+            {
+                throw new NoDataReceivedException(CommandDescription(command, commandId));
+            }
+            if (response.Length < sizeof(Int32))
+            {
+                throw new TooLittleDataReceivedException(CommandDescription(command, commandId), response.Length, sizeof(Int32));
+            }
+            return BitConverter.ToInt32(response, 0);
         }
 
         private Int16 GetInt16(byte deviceId, Commands command, int commandId)
         {
-            return BitConverter.ToInt16(GetResponse(deviceId, command, commandId), 0);
+            var response = GetResponse(deviceId, command, commandId);
+            if (response == null)
+            {
+                throw new NoDataReceivedException(CommandDescription(command, commandId));
+            }
+            if (response.Length < sizeof(Int16))
+            {
+                throw new TooLittleDataReceivedException(CommandDescription(command, commandId), response.Length, sizeof(Int16));
+            }
+
+            return BitConverter.ToInt16(response, 0);
         }
 
 
@@ -47,6 +79,11 @@ namespace TQC.USBDevice
             request.Add(mode);
             request.Add(setid);
             var response = Request(Commands.ReadCurrentProbeVals, request.ToArray(), deviceId);
+
+            if (response == null)
+            {
+                throw new NoDataReceivedException(string.Format("GetProbeValues {0} {1} {2}", deviceId, mode, setid));
+            }
             return response;
         }
 
@@ -71,6 +108,10 @@ namespace TQC.USBDevice
         internal Version _SoftwareVersion(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 1);
+            if (result.Length < 4)
+            {
+                throw new TooLittleDataReceivedException("Read Software Version", result.Length, 4);
+            }
             return new Version(result[0], result[1], result[2], result[3]);
         }
 
@@ -87,6 +128,11 @@ namespace TQC.USBDevice
         internal Version _HardwareVersion(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 2);
+            if (result.Length < 4)
+            {
+                throw new TooLittleDataReceivedException("Read Hardware Version", result.Length, 4);
+            }
+
             return new Version(result[0], result[1], result[2], result[3]);
         }
 
@@ -102,6 +148,11 @@ namespace TQC.USBDevice
         internal Version _ProtocolVersion(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 100);
+            if (result.Length < 2)
+            {
+                throw new TooLittleDataReceivedException("Read Protocol Version", result.Length, 2);
+            }
+
             return new Version(result[0], result[1]);
         }
 
@@ -137,11 +188,16 @@ namespace TQC.USBDevice
         internal DateTime _ManufactureDate(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 5);
-            return ResultToDateTime(result, 0);            
+            return ResultToDateTime("Read Manufacturing Date", result, 0);            
         }
 
-        private static DateTime ResultToDateTime(byte[] result, int offset)
+        private static DateTime ResultToDateTime(string description, byte[] result, int offset)
         {
+            if (result.Length < offset+sizeof(UInt32) )
+            {
+                throw new TooLittleDataReceivedException(description, result.Length, offset + sizeof(UInt32));
+            }
+
             var unixTimeStamp = BitConverter.ToInt32(result, offset);
 
             DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
@@ -189,6 +245,14 @@ namespace TQC.USBDevice
             if (probeId >= 0 && probeId < _NumberOfProbes(deviceId))
             {
                 var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 20 + probeId);
+                if (result == null)
+                {
+                    throw new NoDataReceivedException("getCalibration");
+                }
+                if (result.Length < sizeof(Single)*2)
+                {
+                    throw new TooLittleDataReceivedException("getCalibration", result.Length, sizeof(Single) * 2);
+                }
 
                 return new LinearCalibrationDetails(BitConverter.ToSingle(result, 0), BitConverter.ToSingle(result,4));
             }
@@ -230,6 +294,14 @@ namespace TQC.USBDevice
             if (probeId >= 0 && probeId < _NumberOfProbes(deviceId))
             {
                 var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 100 + probeId);
+                if (result == null)
+                {
+                    throw new NoDataReceivedException("_ProbeType");
+                }
+                if (result.Length < sizeof(byte) )
+                {
+                    throw new TooLittleDataReceivedException("_ProbeType", result.Length, sizeof(byte) );
+                }
                 return (ProbeType)result[0];
             }
             else
@@ -265,7 +337,7 @@ namespace TQC.USBDevice
         internal DateTime _Calibration(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 0);
-            return ResultToDateTime(result, 0);
+            return ResultToDateTime("Calibration Date", result, 0);
         }
 
         /// <summary>
@@ -349,8 +421,15 @@ namespace TQC.USBDevice
             status = 0;
 
             var response = GetProbeValues(0, 0x30, 0);
-
-            if (response != null && response.Length == 7)
+            if (response == null)
+            {
+                throw new NoDataReceivedException("UserInterfaceStatus");
+            }
+            if (response.Length < 7)
+            {
+                throw new TooLittleDataReceivedException("UserInterfaceStatus", response.Length, 7);
+            }
+            //if (response != null && response.Length == 7)
             {
                 buttonStatus = response[2];
                 status = BitConverter.ToInt32(response, 3);

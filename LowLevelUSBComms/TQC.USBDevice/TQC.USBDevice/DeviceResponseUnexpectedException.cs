@@ -5,8 +5,56 @@ using System.Text;
 
 namespace TQC.USBDevice
 {
+
     [Serializable]
-    public class DeviceResponseUnexpectedException : Exception
+    public class DeviceResponseException : Exception
+    {
+        public string RequestDescription { get; set; }
+        public DeviceResponseException()
+            : base(string.Format("Logger Response not valid"))
+        {
+            
+        }
+        public DeviceResponseException(string message) : base(message) { }
+        public DeviceResponseException(string requestDescription, string message) : base(string.Format("{0}.{1}", requestDescription, message) )
+        {
+            RequestDescription = requestDescription;
+        }
+        public DeviceResponseException(string message, Exception inner) : base(message, inner) { }
+        protected DeviceResponseException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
+    }
+
+    [Serializable]
+    public class NoDataReceivedException : DeviceResponseException
+    {
+        public NoDataReceivedException(string requestDescription)
+            : base(requestDescription, string.Format("Reponse from logger was empty."))
+        {
+            
+        }
+    }
+
+    [Serializable]
+    public class TooLittleDataReceivedException : DeviceResponseException
+    {
+        public int Length { get; set; }
+        public int Expected {get; set;}
+        public TooLittleDataReceivedException(string requestDescription, int length, int expected)
+            : base(requestDescription, string.Format("Buffer recieved was too short. Expected {0} bytes but recieved {1}.", expected, length))
+        {
+            Length = length;
+            Expected = expected;
+        }
+    }
+    
+
+    [Serializable]
+    public class DeviceResponseUnexpectedException : DeviceResponseException
     {
         public USBLogger.USBCommandResponseCode USBCommandResponseCode { get; private set; }
         public DeviceResponseUnexpectedException(USBLogger.USBCommandResponseCode code) : base(string.Format("Logger unexpected returned back {0}", code.ToString()) )

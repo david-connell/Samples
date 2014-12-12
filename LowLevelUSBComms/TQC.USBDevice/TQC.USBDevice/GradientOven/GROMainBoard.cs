@@ -99,12 +99,19 @@ namespace TQC.USBDevice.GradientOven
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)0 ))  ;
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getExternalFanSpeed");
+                }
+                if (response.Length < sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getExternalFanSpeed", response.Length, sizeof(byte));
+                }
                 return new Percentage(response[0]);
             }
             set
             {
                 List<byte> request = new List<byte>();
-
                 request.AddRange(BitConverter.GetBytes((short)0));
                 request.Add(value.Value) ;
                 Request(Commands.GROSetCommand, request.ToArray());
@@ -117,6 +124,15 @@ namespace TQC.USBDevice.GradientOven
             {
                 ButtonStatus button = ButtonStatus.NothingPressed;
                 var response = Request(Commands.ReadCurrentProbeVals, BitConverter.GetBytes((short)0x30));
+
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getButton");
+                }
+                if (response.Length < sizeof(UInt16) + sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getButton", response.Length, sizeof(UInt16)+sizeof(byte));
+                }
                 byte buttonStatus = (byte)response[2];
 
                 //if (buttonStatus != 0)
@@ -145,6 +161,14 @@ namespace TQC.USBDevice.GradientOven
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)8));
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getInternalFanSpeed");
+                }
+                if (response.Length < sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getInternalFanSpeed", response.Length, sizeof(byte));
+                }
                 return new Percentage(response[0]);
             }
             set
@@ -162,6 +186,14 @@ namespace TQC.USBDevice.GradientOven
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)1));
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getCooling");
+                }
+                if (response.Length < sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getCooling", response.Length, sizeof(byte));
+                }
                 return new Percentage(response[0]);
             }
             set
@@ -181,6 +213,14 @@ namespace TQC.USBDevice.GradientOven
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)2));
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getPower");
+                }
+                if (response.Length < sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getPower", response.Length, sizeof(byte));
+                }
                 return (PowerState)response[0];
             }
             set
@@ -201,6 +241,14 @@ namespace TQC.USBDevice.GradientOven
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)7));
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getLift");
+                }
+                if (response.Length < sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getLift", response.Length, sizeof(byte));
+                }
                 return (LiftState)response[0];
             }
             set
@@ -221,6 +269,14 @@ namespace TQC.USBDevice.GradientOven
             get
             {
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)4));
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getClamp");
+                }
+                if (response.Length < sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getClamp", response.Length, sizeof(byte));
+                }
                 return (ClampState) response[0];
             }
             set
@@ -247,6 +303,15 @@ namespace TQC.USBDevice.GradientOven
             {
                 List<byte> request = new List<byte>();
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)5));
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getCarrierPosition");
+                }
+                if (response.Length < sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getCarrierPosition", response.Length, sizeof(byte));
+                }
+
                 return new CarrierPosition(response[0]);
             }
             set
@@ -269,6 +334,14 @@ namespace TQC.USBDevice.GradientOven
             {
                 List<byte> request = new List<byte>();
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)6));
+                if (response == null)
+                {
+                    throw new NoDataReceivedException("getCarrierSpeed");
+                }
+                if (response.Length < sizeof(byte))
+                {
+                    throw new TooLittleDataReceivedException("getCarrierSpeed", response.Length, sizeof(byte));
+                }
                 return new Speed(response[0]);
             }
             set
@@ -292,7 +365,20 @@ namespace TQC.USBDevice.GradientOven
                 throw new ArgumentOutOfRangeException("fanId", "Valid fans 0->32");
             }
             byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)(100 + fanId)));
+            if (response == null)
+            {
+                throw new NoDataReceivedException(GetFanSettingsMethodDescription(fanId));
+            }
+            if (response.Length < sizeof(byte))
+            {
+                throw new TooLittleDataReceivedException(GetFanSettingsMethodDescription(fanId), response.Length, sizeof(byte));
+            }
             return new Percentage(response[0]);
+        }
+
+        private string GetFanSettingsMethodDescription(short fanId)
+        {
+            return string.Format("Get Fan Setting {0}", fanId);
         }
 
         /// <summary>
@@ -325,9 +411,13 @@ namespace TQC.USBDevice.GradientOven
             {
                 for (int index = 0; index < (response.Length - minBufLen) / 2; index++)
                 {
-                    var value = BitConverter.ToUInt16(response, minBufLen + index *2 );
+                    var value = BitConverter.ToUInt16(response, minBufLen + index * 2);
                     values.Add(value);
-                }                               
+                }
+            }
+            else
+            {
+                throw new TooLittleDataReceivedException("Read Internal Channels", response.Length, minBufLen);
             }
             return values;
         }
@@ -338,8 +428,23 @@ namespace TQC.USBDevice.GradientOven
             {
                 throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
             }
+            
             byte[] response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)(200 + AbsoluteFanIdToLocalFanId(slotId))), AbsoluteFanIdToThermcoupleBoardID(slotId));
+
+            if (response == null)
+            {
+                throw new NoDataReceivedException(GetTempSettingsMethodDescription(slotId));
+            }
+            if (response.Length < sizeof(UInt16))
+            {
+                throw new TooLittleDataReceivedException(GetTempSettingsMethodDescription(slotId), response.Length, sizeof(UInt16));
+            }
             return BitConverter.ToUInt16(response, 0)/ 10.0f ;
+        }
+
+        private string GetTempSettingsMethodDescription(short slotId)
+        {
+            return string.Format("Get Temp Setting {0}. #{1}.{2}", slotId, AbsoluteFanIdToLocalFanId(slotId), AbsoluteFanIdToThermcoupleBoardID(slotId));            
         }
 
         public void SetTempSetting(short channelId, float  temperatureSettingInDegreesC)
