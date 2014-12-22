@@ -28,7 +28,7 @@ namespace TQC.USBDevice
     }
     public class USBLogger : IDisposable
     {
-        
+        int m_Handle;
 
         public enum USBProductId
         {
@@ -71,24 +71,29 @@ namespace TQC.USBDevice
         {
             return Open(id, true);
         }
+
         public bool Open(USBProductId id, bool minimumCommunications = false)
         {
-            int result = -1;
+            m_Handle = -1;
             try
             {
-                result = m_Logger.Open(minimumCommunications ? 2 : 0, 0, 0, null, (uint)id);
+                m_Handle = m_Logger.OpenAndReturnHandle(minimumCommunications ? 2 : 0, 0, 0, null, (uint)id);
+
+                //m_Logger.Open(minimumCommunications ? 2 : 0, 0, 0, null, (uint)id);
+                //m_Handle = 0;
                 ClearCachedData();
             }
             catch (COMException ex)
             {
                 Console.WriteLine("Failed to open logger {0} - '{1}'", id.ToString(), ex.Message);
             }
-            return result == 1;
+            return m_Handle >= 0;
         }
 
         public void Close()
         {
-            m_Logger.Close();
+            //m_Logger.Close();
+            m_Logger.CloseByHandle(m_Handle);
 
         }
 
@@ -216,7 +221,8 @@ namespace TQC.USBDevice
                 retry = false;
                 try
                 {
-                    return m_Logger.GenericCommand(conversationId, (byte)command, request) as byte [];
+                    return m_Logger.GenericCommandByHandle(m_Handle, conversationId, (byte)command, request) as byte[];
+                    //return m_Logger.GenericCommand(conversationId, (byte)command, request) as byte[];
                 }
                 catch (COMException ex)
                 {
@@ -248,7 +254,7 @@ namespace TQC.USBDevice
         {
             get
             {
-                return m_Logger.strVersion;
+                return m_Logger.strVersionByHandle(m_Handle);
             }
         }
 
@@ -256,7 +262,7 @@ namespace TQC.USBDevice
         {
             get
             {
-                return m_Logger.LoggerId;
+                return m_Logger.LoggerIdByHandle(m_Handle);
             }
         }
 
@@ -264,7 +270,7 @@ namespace TQC.USBDevice
         {
             get
             {
-                return LoggerTypeToDeviceType(m_Logger.LoggerType);
+                return LoggerTypeToDeviceType(m_Logger.LoggerTypeByHandle(m_Handle));
             }
         }
 
@@ -303,7 +309,7 @@ namespace TQC.USBDevice
             get
             {
                 object result = null;
-                m_Logger.GetCalibrationData(0, 0, ref result);
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 0, ref result);
                 return result as string;
             }
         }
@@ -314,7 +320,7 @@ namespace TQC.USBDevice
             get
             {
                 object result = null;
-                m_Logger.GetCalibrationData(0, 1, ref result);
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 1, ref result);
                 return result as string;
             }
         }
@@ -324,7 +330,7 @@ namespace TQC.USBDevice
             get
             {
                 object result = null;
-                m_Logger.GetCalibrationData(0, 2, ref result);
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 2, ref result);
                 return DateTime.FromOADate((double)result);
             }
         }

@@ -465,7 +465,7 @@ namespace TQC.USBDevice
                         break;
                     case USBDevice.DeviceType.ThermocoupleSimulator:
                         throw new NotSupportedException("Thermocouple simultator cannot read temperatures");
-                        break;
+                        //break;
 
                 }
                 var result = GetProbeValues(deviceId, mode, (byte)setId);

@@ -7,6 +7,10 @@ namespace TQC.USBDevice.ThermocoupleSimulator
 {
     public class ThermocoupleSimulator : TQCUsbLogger 
     {
+        public bool Open(bool minimumCommunications = false)
+        {
+            return Open(USBProductId.USB_THERMOCOUPLE_SIMULATOR, minimumCommunications);
+        }
 
         public double ColdJunctionTemperature
         {
