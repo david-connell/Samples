@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace TQC.USBDevice
 {
@@ -157,7 +157,7 @@ namespace TQC.USBDevice
 
         private static DeviceResponseUnexpectedException UsbErrorToException(COMException ex)
         {
-            switch (ex.HResult)
+            switch (ex.ErrorCode)
             {
                 case DISP_E_MEMBERNOTFOUND:
                     return new DeviceUnknownErrorException();
@@ -216,7 +216,7 @@ namespace TQC.USBDevice
                 retry = false;
                 try
                 {
-                    return m_Logger.GenericCommand(conversationId, (byte)command, request);
+                    return m_Logger.GenericCommand(conversationId, (byte)command, request) as byte [];
                 }
                 catch (COMException ex)
                 {

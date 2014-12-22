@@ -21,7 +21,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         public void ReadChannelValues()
         {
             using (var logger = new TQCUsbLogger())
-            {
+           { 
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     var probeValues = logger.ProbeValues;
