@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TQC.GOC.InterProcessCommunication.Installer;
 
@@ -55,6 +57,16 @@ namespace TQC.GOC.InterProcessCommunication
             return isRunning;
         }
 
+        private const int SW_SHOWNORMAL = 1;
+        private const int SW_SHOWMAXIMIZED = 3;
+        private const int SW_SHOWMINIMIZED = 2;
+        private const int SW_RESTORE = 9;
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+
+
         private static void RunFirstInstalledProgram(Guid upgradeInstallCode, string programName)
         {
             var idealFinishInstallations = InstallerInformation.GetProducts(upgradeInstallCode);
@@ -65,7 +77,19 @@ namespace TQC.GOC.InterProcessCommunication
                     Process process = new Process();
                     process.StartInfo = new ProcessStartInfo();
                     process.StartInfo.FileName = Path.Combine(idealFinishInstallation.InstalledPath, programName);
-                    process.Start();
+                    if (process.Start())
+                    {
+                        while (process.MainWindowHandle == IntPtr.Zero && !process.HasExited)
+                        {
+                            Thread.Sleep(100);
+                        }
+                        if (process.MainWindowHandle != IntPtr.Zero)
+                        {
+                            Thread.Sleep(1000);
+                            ShowWindow(process.MainWindowHandle, SW_SHOWMINIMIZED);
+                        }
+                    }
+                    
                     break;
                 }
             }
