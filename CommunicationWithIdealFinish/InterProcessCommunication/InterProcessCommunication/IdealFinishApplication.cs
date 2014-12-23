@@ -19,7 +19,9 @@ namespace TQC.GOC.InterProcessCommunication
             string programName = "TQC.IdealFinish.Analysis.exe";
             if (!IsProgramRunning(programName))
             {
-                RunFirstInstalledProgram(new Guid("{C97015C6-5C71-47DA-B8EB-418115005B5D}"), programName);
+                Thread myNewThread = new Thread(() => RunFirstInstalledProgram(new Guid("{C97015C6-5C71-47DA-B8EB-418115005B5D}"), programName));
+                myNewThread.Start();
+                
             }
         }
 
