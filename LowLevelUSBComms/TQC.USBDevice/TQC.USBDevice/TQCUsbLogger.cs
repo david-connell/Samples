@@ -228,7 +228,14 @@ namespace TQC.USBDevice
                 return _NumberOfProbes(0);
             }
         }
-        
+        public virtual Int32 NumberOfBatches
+        {
+            get
+            {
+                var result = GetResponse(0, Commands.ReadDeviceInfo, 7);
+                return result[0];
+            }
+        }
 
         internal Int32 _NumberOfProbes(byte deviceId)
         {

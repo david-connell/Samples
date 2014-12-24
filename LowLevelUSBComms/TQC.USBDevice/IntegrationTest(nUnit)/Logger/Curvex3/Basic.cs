@@ -16,6 +16,8 @@ namespace IntegrationTestNUnit.Logger.Curvex3
             : base(USBLogger.USBProductId.USB_CURVEX_3a)
         {
         }
+
+
     }
 
     [TestFixture]

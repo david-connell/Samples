@@ -287,6 +287,37 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 }
             }
 
+
+            [Test]
+            public void ReadNumberOfBatches()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {
+                        switch (ProductId)
+                        {
+                            case USBLogger.USBProductId.Glossmeter:
+                                Assert.That(logger.NumberOfBatches, Is.EqualTo(8));
+                                break;
+                            case USBLogger.USBProductId.GRADIENT_OVEN:
+                                Assert.That(logger.NumberOfBatches, Is.EqualTo(0));
+                                break;
+                            case USBLogger.USBProductId.USB_CURVEX_3a:
+                                Assert.That(logger.NumberOfBatches, Is.EqualTo(10));
+                                break;
+                            default:
+                                throw new Exception(string.Format("Logger {0} is currently not supported", ProductId));
+                        }
+                        logger.Close();
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
             [Test]
             public void CheckOffloafingAndSendingSetup()
             {
