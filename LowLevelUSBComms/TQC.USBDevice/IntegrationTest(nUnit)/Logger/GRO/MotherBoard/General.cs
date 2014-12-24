@@ -46,11 +46,11 @@ namespace IntegrationTestNUnit.Logger.GRO
         }
         [TestCase(ButtonStatus.OKPressed, "Press the OK Button")]
         [TestCase(ButtonStatus.CancelPressed, "Press the Cancel Button")]
-        public void CheckOKButton(ButtonStatus buttonToCheck, string outputMessage)
+        public void CheckButton(ButtonStatus buttonToCheck, string outputMessage)
         {
             using (var logger = new GROMainBoard())
             {
-
+                Console.WriteLine("Test '{0}' ", outputMessage);
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     int state = 0;
@@ -58,9 +58,11 @@ namespace IntegrationTestNUnit.Logger.GRO
                     while (state != -1)
                     {
                         var val = logger.Button;
-                        Console.WriteLine("Button {0} ", val);
+                        Console.WriteLine("Button = '{0}' ", val);
+
                         if (state == 0) //Look for No Button Pressed...
                         {
+                            Console.WriteLine("Make sure that no button is pressed!");
                             Assert.That(val, Is.EqualTo(ButtonStatus.NothingPressed));
                             state = 1;
                             Console.WriteLine(outputMessage);                            
