@@ -158,7 +158,7 @@ namespace TQC.USBDevice
         internal string _DeviceName(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 3);
-            return Encoding.UTF8.GetString(result, 0, result.Length);            
+            return DecodeString(result);
         }
 
         public string DeviceName
@@ -172,7 +172,13 @@ namespace TQC.USBDevice
         internal string _ManufactureName(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 4);
-            return Encoding.UTF8.GetString(result, 0, result.Length);
+            return DecodeString(result);
+            
+        }
+
+        private static string DecodeString(byte[] result)
+        {
+            return Encoding.UTF8.GetString(result, 0, result.Length).Replace('\0', ' ').Replace('�', ' ').Trim();
         }
 
         public string ManufactureName
@@ -278,11 +284,9 @@ namespace TQC.USBDevice
             if (probeId >= 0 && probeId < _NumberOfProbes(deviceId))
             {
                 var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 200 + probeId);
-                var probeName =  result == null ? "***" : Encoding.UTF8.GetString(result, 0, result.Length);
-
-                probeName = probeName.Replace('\0', ' ');
-                
-                return probeName.TrimEnd();
+                var probeName =  result == null ? "***" : DecodeString(result);
+                                
+                return probeName;
             }
             else
             {
@@ -360,7 +364,7 @@ namespace TQC.USBDevice
         internal String _CalibrationCompany(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 1);
-            return result == null ? "" : Encoding.UTF8.GetString(result, 0, result.Length);
+            return result == null ? "" : DecodeString(result);
         }
         /// <summary>
         /// This is not supported by the GRO!
@@ -377,7 +381,7 @@ namespace TQC.USBDevice
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 2);
 
-            return result == null ? "": Encoding.UTF8.GetString(result, 0, result.Length);
+            return result == null ? "": DecodeString(result);
         }
 
         internal DeviceType _DeviceType(byte deviceId)

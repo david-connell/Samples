@@ -101,6 +101,22 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                     }
                 }
             }
+            [Test]
+            public void ReadManufactureName()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {
+                        var value = logger.ManufactureName;                        
+                        Console.WriteLine("Manufacture Name= '{0}'", value);
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
 
             [Test]
             public void ReadHardwareVersion()
@@ -139,24 +155,6 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 }
             }
 
-            [Test]
-            public void ReadManufactureName()
-            {
-                using (var logger = new TQCUsbLogger())
-                {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        var value = logger.ManufactureName;
-                        Assert.That(value, Is.Not.Null);
-                        Assert.That(value, Is.Not.EqualTo(""));
-                        Console.WriteLine(value);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
-                }
-            }
 
             [Test]
             public void ReadManufactureDate()
