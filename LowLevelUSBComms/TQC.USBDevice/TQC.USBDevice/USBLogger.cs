@@ -67,6 +67,39 @@ namespace TQC.USBDevice
 
         }
 
+        public bool DebugOutputEnabled
+        {
+            get
+            {
+                object result = null;
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70201, ref result);
+                string val = result as string;
+                switch (val)
+                {
+                    case "TRUE":
+                        return true;
+                    case "FALSE":
+                        return false;
+                    default:
+                        throw new Exception("Not valid response");
+                }                
+            }
+            set
+            {
+                object result = null;
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, value ? 70203 : 70202, ref result);
+            }
+        }
+        public string GetDebugOutputFromPreviousCommand
+        {
+            get
+            {
+                object result = null;
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70200, ref result);
+                return result as string;
+            }
+        }
+
         public bool OpenWithMinumumRequests(USBProductId id)
         {
             return Open(id, true);
@@ -78,9 +111,6 @@ namespace TQC.USBDevice
             try
             {
                 m_Handle = m_Logger.OpenAndReturnHandle(minimumCommunications ? 2 : 0, 0, 0, null, (uint)id);
-
-                //m_Logger.Open(minimumCommunications ? 2 : 0, 0, 0, null, (uint)id);
-                //m_Handle = 0;
                 ClearCachedData();
             }
             catch (COMException ex)
@@ -90,9 +120,20 @@ namespace TQC.USBDevice
             return m_Handle >= 0;
         }
 
-        public void Close()
+        public bool CanLoggerBeConfigured
         {
-            //m_Logger.Close();
+            get
+            {
+                if (Environment.UserName == "Windows7" || (Environment.UserDomainName == "tqc.eu"))
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public void Close()
+        {            
             m_Logger.CloseByHandle(m_Handle);
 
         }
@@ -221,8 +262,7 @@ namespace TQC.USBDevice
                 retry = false;
                 try
                 {
-                    return m_Logger.GenericCommandByHandle(m_Handle, conversationId, (byte)command, request) as byte[];
-                    //return m_Logger.GenericCommand(conversationId, (byte)command, request) as byte[];
+                    return m_Logger.GenericCommandByHandle(m_Handle, conversationId, (byte)command, request) as byte[];                    
                 }
                 catch (COMException ex)
                 {

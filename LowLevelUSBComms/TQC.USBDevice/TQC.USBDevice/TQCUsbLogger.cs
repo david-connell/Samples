@@ -15,7 +15,7 @@ namespace TQC.USBDevice
     public class TQCUsbLogger : USBLogger, ISimpleTQCDevice
     {
         Dictionary<byte, int> ProbesPerDevice = new Dictionary<byte, int>();
-
+        
         private string CommandDescription(Commands command, int commandId)
         {
             return string.Format("{0} sub command {1}", command.ToString(), commandId);
@@ -72,6 +72,16 @@ namespace TQC.USBDevice
             return response;
         }
 
+        private byte[] GetResponse(byte deviceId, Commands command, int commandId, List<byte> request)
+        {
+            List<byte> requestFull = new List<byte>();
+            requestFull.AddRange(BitConverter.GetBytes((short)commandId));
+            requestFull.AddRange(request);
+            var response = Request(command, requestFull.ToArray(), deviceId);
+            return response;
+        }
+
+
         protected byte[] GetProbeValues(byte deviceId, byte mode, byte setid)
         {
             List<byte> request = new List<byte>();
@@ -97,12 +107,47 @@ namespace TQC.USBDevice
             {
                 return _SerialNumber(0);
             }
+            set
+            {                                
+                _SetSerialNumber(0, value);
+            }
         }
 
         internal Int32 _SerialNumber(byte deviceId)
         {
             return GetInt32(deviceId, Commands.ReadDeviceInfo, 0);
         }
+
+        internal void SetReadDeviceInfo(byte deviceId, int enumerationId, string value, int maxLength)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                List<byte> request = new List<byte>();
+                string result = value;
+                if (value.Length > maxLength)
+                    result = value.Substring(0, maxLength);
+                //request.AddRange(BitConverter.GetBytes((byte)value.Length));
+                request.AddRange(System.Text.ASCIIEncoding.Default.GetBytes(result));
+                for (int counter = result.Length; counter < maxLength; counter++)
+                    request.Add(0);
+                GetResponse(deviceId, Commands.WriteDeviceInfo, enumerationId, request);
+            }
+        }
+
+        internal void _SetSerialNumber(byte deviceId, Int32 serialNumber)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                List<byte> request = new List<byte>();
+                request.AddRange(BitConverter.GetBytes(serialNumber));
+                var result = GetResponse(deviceId, Commands.WriteDeviceInfo, 0, request);
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Cannot set serial number");
+            }
+        }
+
 
         internal Version _SoftwareVersion(byte deviceId)
         {
@@ -111,7 +156,7 @@ namespace TQC.USBDevice
             {
                 throw new TooLittleDataReceivedException("Read Software Version", result.Length, 4);
             }
-            return new Version(result[0], result[1], result[2], result[3]);
+            return new Version(result[3], result[2], result[1], result[0]);
         }
 
         
@@ -132,7 +177,7 @@ namespace TQC.USBDevice
                 throw new TooLittleDataReceivedException("Read Hardware Version", result.Length, 4);
             }
 
-            return new Version(result[0], result[1], result[2], result[3]);
+            return new Version(result[3], result[2], result[1], result[0]);
         }
 
 
@@ -155,10 +200,15 @@ namespace TQC.USBDevice
             return new Version(result[0], result[1]);
         }
 
+        internal string GetReadDeviceInfoAsString(byte deviceId, int enumerationId)
+        {
+            var result = GetResponse(deviceId, Commands.ReadDeviceInfo, enumerationId);
+            return DecodeString(result);
+        }
+
         internal string _DeviceName(byte deviceId)
         {
-            var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 3);
-            return DecodeString(result);
+            return GetReadDeviceInfoAsString(deviceId, 3);
         }
 
         public string DeviceName
@@ -171,9 +221,7 @@ namespace TQC.USBDevice
 
         internal string _ManufactureName(byte deviceId)
         {
-            var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 4);
-            return DecodeString(result);
-            
+            return GetReadDeviceInfoAsString(deviceId, 4);            
         }
 
         private static string DecodeString(byte[] result)

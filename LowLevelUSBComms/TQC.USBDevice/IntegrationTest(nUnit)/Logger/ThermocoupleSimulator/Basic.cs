@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using IntegrationTestNUnit.Logger.GeneralLogger;
 using NUnit.Framework;
 using TQC.USBDevice;
@@ -78,7 +79,64 @@ namespace IntegrationTestNUnit.Logger.ThermocoupleSimulator
                     throw new Exception("Failed to connect to logger " + ProductId.ToString());
                 }
             }
+        }
 
+        [TestCase(1933)]
+        public void SetSerialNumber(int serialNumber)
+        {
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+
+                    logger.SerialNumber = serialNumber;
+                    Assert.That(logger.SerialNumber, Is.EqualTo(serialNumber));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+
+        }
+
+        [TestCase("This is a certificate")]
+        public void SetCalibrationCertificate(string certificate)
+        {
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+
+                    logger.CalibrationCertificate = certificate;
+                    Assert.That(logger.CalibrationCertificate, Is.EqualTo(certificate));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+
+        }
+
+        [Test]
+        public void EnterBootloader()
+        {
+            if (MessageBox.Show("Are you sure you want to enter bootloader?", "Bootloader", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+                {
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {
+
+                        logger.EnterBootloaderMode();
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
         }
     }
 

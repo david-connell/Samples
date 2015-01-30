@@ -32,6 +32,18 @@ namespace TQC.USBDevice.ThermocoupleSimulator
             }
         }
 
+        public string CalibrationCertificate
+        {
+            get
+            {
+                return GetReadDeviceInfoAsString(0, 200);
+            }
+            set
+            {
+                SetReadDeviceInfo(0, 200, value, 40);
+            }
+        }
+
         public void SetTemperatureOutput(double temperature)
         {                        
             List<byte> request = new List<byte>();
@@ -40,6 +52,13 @@ namespace TQC.USBDevice.ThermocoupleSimulator
             request.AddRange(System.BitConverter.GetBytes((float)temperature));
             var response = Request(Commands.WriteDeviceInfo, request.ToArray());
             return;            
+        }
+
+        public void EnterBootloaderMode()
+        {
+            List<byte> request = new List<byte>();
+            var response = Request((Commands)0x40, request.ToArray());
+            return;
         }
 
 

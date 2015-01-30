@@ -68,11 +68,15 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
+                    if (logger.Open(ProductId)) //Need more that basic
                     {
                         string serialNumber = logger.LoggerSerialNumber;
-                        int serialNumberAsInt = int.Parse(serialNumber);
                         int serialNumberViaCommand = logger.SerialNumber;
+
+
+                        Console.WriteLine("Serial Number: '{0}' {1}", serialNumber, serialNumberViaCommand);
+                        int serialNumberAsInt = int.Parse(serialNumber);
+                        
                         Assert.AreEqual(serialNumberAsInt, serialNumberViaCommand);
 
                         logger.Close();
@@ -91,7 +95,11 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 {
                     if (logger.OpenWithMinumumRequests(ProductId))
                     {
+                        logger.DebugOutputEnabled = true;
                         var value = logger.SoftwareVersion;
+                        Console.WriteLine("Debug = {0}", logger.DebugOutputEnabled);
+                        Console.WriteLine(logger.GetDebugOutputFromPreviousCommand);
+                        logger.DebugOutputEnabled = false;
                         Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
                         Console.WriteLine(value);
                     }
