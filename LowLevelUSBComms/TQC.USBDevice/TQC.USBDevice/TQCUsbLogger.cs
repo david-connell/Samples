@@ -20,6 +20,8 @@ namespace TQC.USBDevice
         {
             return string.Format("{0} sub command {1}", command.ToString(), commandId);
         }
+
+
         private int GetInt8(byte deviceId, Commands command, int commandId)
         {                            
             var response = GetResponse(deviceId, command, commandId);
@@ -602,5 +604,15 @@ namespace TQC.USBDevice
             }
             return false;
         }
+
+        public void EnterBootloaderMode()
+        {
+            List<byte> request = new List<byte>();
+            request.Add(0xFF);
+            request.Add(0xFF);
+            var response = Request((Commands)0x40, request.ToArray());
+            return;
+        }
+
     }
 }

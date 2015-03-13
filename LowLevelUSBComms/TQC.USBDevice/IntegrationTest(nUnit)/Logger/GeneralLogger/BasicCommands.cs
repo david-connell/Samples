@@ -359,6 +359,30 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                     }
                 }
             }
+
+        
+
+        [Test]
+        public void EnterBootloaderDirect()
+        {
+            //if (MessageBox.Show("Are you sure you want to enter bootloader?", "Bootloader", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {
+
+                        logger.EnterBootloaderMode();
+                        Console.WriteLine("***BOOTLOADER Mode****");
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
         }
     }
+}
+
 

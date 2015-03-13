@@ -54,12 +54,6 @@ namespace TQC.USBDevice.ThermocoupleSimulator
             return;            
         }
 
-        public void EnterBootloaderMode()
-        {
-            List<byte> request = new List<byte>();
-            var response = Request((Commands)0x40, request.ToArray());
-            return;
-        }
 
 
     }
