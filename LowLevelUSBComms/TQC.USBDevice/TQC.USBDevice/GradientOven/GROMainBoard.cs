@@ -122,6 +122,15 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
+        public MainBoardStatus Status
+        {
+            get
+            {                
+                return (MainBoardStatus)_GetStatus(0);
+            }
+
+        }
+
         public ButtonStatus Button
         {
             get

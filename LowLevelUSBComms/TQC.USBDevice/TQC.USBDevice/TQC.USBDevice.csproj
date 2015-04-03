@@ -51,6 +51,8 @@
     <Compile Include="GradientOven\ButtonStatus.cs" />
     <Compile Include="GradientOven\CarrierPosition.cs" />
     <Compile Include="GradientOven\ClampState.cs" />
+    <Compile Include="GradientOven\ThermocoupleBoardStatus.cs" />
+    <Compile Include="GradientOven\MainBoardStatus.cs" />
     <Compile Include="GradientOven\LiftState.cs" />
     <Compile Include="GradientOven\Percentage.cs" />
     <Compile Include="GradientOven\PowerState.cs" />

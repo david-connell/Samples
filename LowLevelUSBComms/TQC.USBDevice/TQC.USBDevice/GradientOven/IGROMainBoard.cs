@@ -8,6 +8,7 @@ namespace TQC.USBDevice.GradientOven
 {
     public interface IGROThermoCoupleBoard : ISimpleTQCDevice
     {
+        ThermcoupleBoardStatus Status { get; }
     }
 
     public interface IGROMainBoard : ICoreCommands
@@ -20,6 +21,7 @@ namespace TQC.USBDevice.GradientOven
         Percentage Cooling { get; set; }
         PowerState Power { get; set; }
         ClampState Clamp { get; set; }
+        MainBoardStatus Status { get; }
 
         CarrierPosition CarrierPosition { get; set; }
         Percentage GetFanSetting(short fanId);

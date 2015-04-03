@@ -78,7 +78,10 @@ namespace TQC.USBDevice
         {
             List<byte> requestFull = new List<byte>();
             requestFull.AddRange(BitConverter.GetBytes((short)commandId));
-            requestFull.AddRange(request);
+            if (request != null)
+            {
+                requestFull.AddRange(request);
+            }
             var response = Request(command, requestFull.ToArray(), deviceId);
             return response;
         }
@@ -114,6 +117,22 @@ namespace TQC.USBDevice
                 _SetSerialNumber(0, value);
             }
         }
+
+        internal UInt32 _GetStatus(byte deviceId)
+        {
+            var response = GetResponse(deviceId, Commands.GROReadCommand, 0x09);
+            if (response == null)
+            {
+                throw new NoDataReceivedException("getHarwareStatus");
+            }
+            if (response.Length < sizeof(UInt32))
+            {
+                throw new TooLittleDataReceivedException("getHarwareStatus", response.Length, sizeof(UInt32));
+            }
+            UInt32 status = BitConverter.ToUInt32(response, 0);
+            return status;
+        }
+
 
         internal Int32 _SerialNumber(byte deviceId)
         {

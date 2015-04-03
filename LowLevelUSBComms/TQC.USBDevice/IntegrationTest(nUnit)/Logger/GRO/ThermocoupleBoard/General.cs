@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice;
+using TQC.USBDevice.GradientOven;
 
 namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
 {
@@ -124,6 +125,15 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
             }
         }
 
+        [Test]
+        public void Status()
+        {
+            using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                Console.WriteLine("Status = '{0}'", thermocoupleBoard.Board.Status);
+                Assert.That(thermocoupleBoard.Board.Status, Is.EqualTo(ThermcoupleBoardStatus.OK));
+            }
+        }
 
 
     }

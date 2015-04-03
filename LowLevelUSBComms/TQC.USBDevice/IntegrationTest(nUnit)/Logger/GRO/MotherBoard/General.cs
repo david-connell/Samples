@@ -42,8 +42,8 @@ namespace IntegrationTestNUnit.Logger.GRO
                     throw new Exception("Failed to connect to logger " + ProductId.ToString());
                 }
             }
-
         }
+
         [TestCase(ButtonStatus.OKPressed, "Press the OK Button")]
         [TestCase(ButtonStatus.CancelPressed, "Press the Cancel Button")]
         public void CheckButton(ButtonStatus buttonToCheck, string outputMessage)
@@ -528,6 +528,24 @@ namespace IntegrationTestNUnit.Logger.GRO
                 }
             }
         }
+
+        [Test]
+        public void Status()
+        {
+            using (var logger = new GROMainBoard())
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    Console.WriteLine("Status = '{0}'", logger.Status);
+                    Assert.That(logger.Status, Is.EqualTo(MainBoardStatus.OK));
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
 
     }
 }
