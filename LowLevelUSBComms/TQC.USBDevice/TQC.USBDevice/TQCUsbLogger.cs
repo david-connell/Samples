@@ -118,7 +118,35 @@ namespace TQC.USBDevice
             }
         }
 
-        internal UInt32 _GetStatus(byte deviceId)
+        public class BoardStatus
+        {
+            private readonly IList<byte> m_AdditionalVals = new List<byte>();
+
+            public UInt32 Status { get; private set;}
+            public byte AdditionalVal { get; internal set; }
+            public byte AdditionalValOne { get; internal set; }
+
+            private byte[] AdditionalVals
+            {
+                get  { return m_AdditionalVals.ToArray(); }
+            }
+
+            internal BoardStatus(UInt32 status, byte[] data, int offset)
+            {
+                Status = status;
+                for (; offset < data.Length; offset++)
+                {
+                    m_AdditionalVals.Add(data[offset]);
+                    switch(m_AdditionalVals.Count)
+                    {
+                        case 1: AdditionalVal = m_AdditionalVals[0]; break;
+                        case 2: AdditionalValOne = m_AdditionalVals[1]; break;
+
+                    }
+                }
+            }
+        }
+        internal BoardStatus _GetStatus(byte deviceId)
         {
             var response = GetResponse(deviceId, Commands.GROReadCommand, 0x09);
             if (response == null)
@@ -130,7 +158,7 @@ namespace TQC.USBDevice
                 throw new TooLittleDataReceivedException("getHarwareStatus", response.Length, sizeof(UInt32));
             }
             UInt32 status = BitConverter.ToUInt32(response, 0);
-            return status;
+            return new BoardStatus(status, response, 4);
         }
 
 

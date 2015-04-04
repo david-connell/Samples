@@ -147,9 +147,10 @@ namespace TQC.USBDevice.GradientOven
 
         public ThermcoupleBoardStatus Status
         {
-            get {
-
-                return (ThermcoupleBoardStatus)ParentDevice._GetStatus(ChildDeviceID);
+            get 
+            {
+                var value = new ThermcoupleBoardStatus(ParentDevice._GetStatus(ChildDeviceID));
+                return value;
             }
         }
 

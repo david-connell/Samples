@@ -131,7 +131,9 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
             using (var thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
             {
                 Console.WriteLine("Status = '{0}'", thermocoupleBoard.Board.Status);
-                Assert.That(thermocoupleBoard.Board.Status, Is.EqualTo(ThermcoupleBoardStatus.OK));
+                Assert.That(thermocoupleBoard.Board.Status.ThermcoupleBoardStatusValue, Is.EqualTo(ThermcoupleBoardStatusValue.OK));
+                Assert.That(thermocoupleBoard.Board.Status.SensorOverTempFlag, Is.EqualTo((byte)0));
+                Assert.That(thermocoupleBoard.Board.Status.SensorDisconnected, Is.EqualTo((byte)0));
             }
         }
 
