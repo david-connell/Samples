@@ -67,7 +67,90 @@ namespace TQC.USBDevice
 
         }
 
-        public bool DebugOutputEnabled
+        /// <summary>
+        /// Get or sets the number of days that the debug output is stored for.
+        /// The default is 2 days. 
+        /// </summary>
+        public int DebugPurgePolicy
+        {
+            get
+            {
+                int resultVal = -1;
+                object result = null;
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70205, ref result);
+                string val = result as string;
+                int.TryParse(val, out resultVal);
+                return resultVal;
+            }
+            set
+            {
+                object result = value.ToString();
+                m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 70205, ref result);
+
+            }
+        }
+
+        /// <summary>
+        /// gets/sets the base of file name that the debug information is stored in.
+        /// </summary>
+        public string DebugFileNameBase
+        {
+            get
+            {
+                object result = null;
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70204, ref result);
+                string val = result as string;
+                return val;
+            }
+            set
+            {
+                object result = value;
+                m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 70204, ref result);                                
+            }
+        }
+
+        /// <summary>
+        /// gets the file name that the debug information is stored in.
+        /// </summary>
+        public string DebugFileName
+        {
+            get
+            {
+                object result = null;
+                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70206, ref result);
+                string val = result as string;
+                return val;
+            }
+        }
+
+        /// <summary>
+        /// Opens the debug file 
+        /// Nb. the logger needs to be connected and open.
+        /// </summary>
+        /// <param name="fileName">The base name of the file. If no file is given then the default is used</param>
+        /// <returns>If the debug file is open (true => open)</returns>
+        public bool DebugOpen(string fileNameRoot = null)
+        {
+            IsDebugOutputOpen = false;
+            if (!String.IsNullOrEmpty(fileNameRoot))
+            {
+                DebugFileNameBase = fileNameRoot;
+            }
+            IsDebugOutputOpen = true;
+            return IsDebugOutputOpen;
+        }
+
+        /// <summary>
+        /// Closes the debug file.
+        /// </summary>
+        /// <returns>if the debug file is open or closed (false => Closed)</returns>
+        public bool DebugClose()
+        {
+            IsDebugOutputOpen = false;
+            return IsDebugOutputOpen;
+        }
+
+        public bool IsDebugOutputOpen
         {
             get
             {
@@ -84,13 +167,14 @@ namespace TQC.USBDevice
                         throw new Exception("Not valid response");
                 }                
             }
-            set
+            private set
             {
                 object result = null;
                 m_Logger.GetCalibrationDataByHandle(m_Handle, 0, value ? 70203 : 70202, ref result);
             }
         }
-        public string GetDebugOutputFromPreviousCommand
+
+        public string DebugOutputFromPreviousCommand
         {
             get
             {

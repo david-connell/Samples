@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -88,6 +89,90 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 }
             }
 
+
+            [Test]
+            public void EnableDebuging()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    logger.DebugOpen();
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {                        
+                        Console.WriteLine(logger.DebugOutputFromPreviousCommand);
+                        logger.DebugClose();
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                    }
+                }
+            }
+
+            [TestCase(0)]
+            [TestCase(1)]
+            [TestCase(2)]
+            public void DebugingPurging(int numberOfDays)
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    Console.WriteLine(logger.DebugPurgePolicy) ;
+                    logger.DebugPurgePolicy = numberOfDays;
+                    Assert.That(logger.DebugPurgePolicy, Is.EqualTo(numberOfDays));
+                }
+            }
+
+            [Test]
+            public void DebugingFile()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {
+                        Console.WriteLine(logger.DebugFileNameBase);
+                    }
+                }
+            }
+
+
+            [TestCase(@"C:\Debug\myfile.txt")]
+            public void DebugingFileBase(string fileName)
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {
+                        logger.DebugClose();
+                        logger.DebugFileNameBase = fileName;
+                        Console.WriteLine(logger.DebugFileNameBase);
+                        Assert.That(logger.DebugFileNameBase, Is.EqualTo(fileName));
+                        logger.DebugOpen();
+                    }
+                }
+            }
+
+            [Test]
+            public void DebugingFileNameFollowsTheBase()
+            {
+                using (var logger = new TQCUsbLogger())
+                {
+                    string fileName  = string.Format(@"C:\Debug\{0}", Guid.NewGuid().ToString("D"));
+                    if (logger.OpenWithMinumumRequests(ProductId))
+                    {
+                        logger.DebugOpen(fileName);
+                        
+                        Console.WriteLine(logger.DebugFileNameBase);
+                        Assert.That(logger.DebugFileNameBase, Is.EqualTo(fileName));
+                        Assert.That(logger.DebugFileName.Substring(0, fileName.Length), Is.EqualTo(fileName));
+                        logger.DebugClose();
+                        var contents = File.ReadAllLines(logger.DebugFileName);
+                        Assert.That(contents.Any(), Is.EqualTo(true));
+                        Console.WriteLine("File {0}", logger.DebugFileName);
+                        Console.WriteLine(String.Join("\r\n", contents));
+                    }
+                }
+            }
+
+
             [Test]
             public void ReadSoftwareVersion()
             {
@@ -95,11 +180,11 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 {
                     if (logger.OpenWithMinumumRequests(ProductId))
                     {
-                        logger.DebugOutputEnabled = true;
+                        logger.DebugOpen();
                         var value = logger.SoftwareVersion;
-                        Console.WriteLine("Debug = {0}", logger.DebugOutputEnabled);
-                        Console.WriteLine(logger.GetDebugOutputFromPreviousCommand);
-                        logger.DebugOutputEnabled = false;
+                        Console.WriteLine("Debug = {0}", logger.IsDebugOutputOpen);
+                        Console.WriteLine(logger.DebugOutputFromPreviousCommand);
+                        logger.DebugClose() ;
                         Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
                         Console.WriteLine(value);
                     }
@@ -109,6 +194,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                     }
                 }
             }
+
             [Test]
             public void ReadManufactureName()
             {
