@@ -132,8 +132,8 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
             {
                 Console.WriteLine("Status = '{0}'", thermocoupleBoard.Board.Status);
                 Assert.That(thermocoupleBoard.Board.Status.ThermcoupleBoardStatusValue, Is.EqualTo(ThermcoupleBoardStatusValue.OK));
-                Assert.That(thermocoupleBoard.Board.Status.SensorOverTempFlag, Is.EqualTo((byte)0));
-                Assert.That(thermocoupleBoard.Board.Status.SensorDisconnected, Is.EqualTo((byte)0));
+                Assert.That(thermocoupleBoard.Board.Status.SensorOverTempBitfield, Is.EqualTo((byte)0));
+                Assert.That(thermocoupleBoard.Board.Status.SensorDisconnectedBitfield, Is.EqualTo((byte)0));
             }
         }
 

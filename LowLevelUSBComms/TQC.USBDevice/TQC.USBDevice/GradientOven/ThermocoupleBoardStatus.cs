@@ -27,9 +27,9 @@ namespace TQC.USBDevice.GradientOven
 
         public override string ToString()
         {
-            return string.Format("{0} Over temp {1}  Disconected {2}", ThermcoupleBoardStatusValue, SensorOverTempFlag.ToString("X2"), SensorDisconnected.ToString("X2"));
+            return string.Format("{0} Over temp {1}  Disconected {2}", ThermcoupleBoardStatusValue, SensorOverTempBitfield.ToString("X2"), SensorDisconnectedBitfield.ToString("X2"));
         }
-        public byte SensorOverTempFlag
+        public byte SensorOverTempBitfield
         {
             get
             {
@@ -37,7 +37,7 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
-        public byte SensorDisconnected
+        public byte SensorDisconnectedBitfield
         {
             get
             {
@@ -52,7 +52,7 @@ namespace TQC.USBDevice.GradientOven
                 throw new DataOutOfRangeException();
             }
             byte bitToCheck = (byte)(1 << sensorId);
-            var overTemp = (bitToCheck & SensorOverTempFlag) == bitToCheck;
+            var overTemp = (bitToCheck & SensorOverTempBitfield) == bitToCheck;
             return overTemp;
         }
 
@@ -63,7 +63,7 @@ namespace TQC.USBDevice.GradientOven
                 throw new DataOutOfRangeException();
             }
             byte bitToCheck = (byte)(1 << sensorId);
-            var value = (bitToCheck & SensorDisconnected) == bitToCheck;
+            var value = (bitToCheck & SensorDisconnectedBitfield) == bitToCheck;
             return value;
         }
     }
