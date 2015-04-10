@@ -19,6 +19,17 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             }
 
             [Test]
+            public void TestVersioning()
+            {
+                using (var logger = new USBLogger())
+                {
+                    var version = logger.COMObjectVersion;
+                    Assert.That(version, Is.GreaterThan(new Version(1, 0)));
+                    Console.WriteLine("Version = {0}", version);
+                }
+            }
+
+            [Test]
             public void TestConnectivity()
             {
                 using (var logger = new USBLogger())

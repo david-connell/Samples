@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -42,9 +45,16 @@ namespace TQC.USBDevice
         }
         private TQC.IF.USBLogger.USBGeneric m_Logger;
 
+        const string c_COMObjectFileName = "USBGenericLogger.dll";
+
         internal USBLogger()
         {
             m_Logger = new IF.USBLogger.USBGeneric();
+            var compatibleVersion = new Version(6, 0, 49, 0);
+            if (COMObjectVersion < compatibleVersion)
+            {
+                throw new ApplicationException(string.Format("Underlying COM object {0} too old (Found Version {1}). Update Ideal Finish Analysis or Calibration software to {2}", c_COMObjectFileName, COMObjectVersion, compatibleVersion));
+            }
         }
 
         ~USBLogger()
@@ -457,6 +467,50 @@ namespace TQC.USBDevice
                 m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 2, ref result);
                 return DateTime.FromOADate((double)result);
             }
+        }
+
+        public Version DotNetDLLVersion
+        {
+            get
+            {
+                Version version = new System.Version();
+                var ass = Assembly.GetAssembly(typeof(IF.USBLogger.USBGeneric));
+                version = ass.GetName().Version;
+                
+                //foreach(var module in ass.GetLoadedModules(false))
+                //{
+                //    //Console.WriteLine("*** {0}", module.Name);
+                //    version = module.Assembly.GetName().Version;
+                //}
+                return version;
+                //m_Logger.
+            }
+        }
+
+        public Version COMObjectVersion
+        {
+            get
+            {
+                
+                var myProcess = Process.GetCurrentProcess();
+                foreach (ProcessModule processModule in myProcess.Modules)
+                {
+                    if (processModule.FileName.EndsWith(c_COMObjectFileName))
+                    {
+                        return FileVersionToVersion(processModule.FileVersionInfo);
+                    }
+                    
+                }
+                //Just incase somethings gone wrong!
+                FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Path.Combine(@"C:\Program Files (x86)\Common Files\Ideal Finish\", c_COMObjectFileName));
+                return FileVersionToVersion(myFileVersionInfo);
+
+            }
+        }
+
+        private static System.Version FileVersionToVersion(FileVersionInfo myFileVersionInfo)
+        {
+            return new Version(myFileVersionInfo.FileMajorPart, myFileVersionInfo.FileMinorPart, myFileVersionInfo.FileBuildPart, myFileVersionInfo.FilePrivatePart);
         }
     }
 }
