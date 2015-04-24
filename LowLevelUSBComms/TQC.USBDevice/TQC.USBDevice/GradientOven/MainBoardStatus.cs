@@ -9,9 +9,10 @@ namespace TQC.USBDevice.GradientOven
         OK = 0x00,
         PowersuplyOffBecauseEmergencyStop = 0x00000001,
         MotorClampIsBlocked     = 0x00000002,
-        MotorCarrierIsBlocked   = 0x00000004,
-        InternalFanIsBlocked    = 0x00000008,
-        ExternalFanIsBlocked    = 0x00000010,
-        OverTemperature         = 0x00000020,               
+        MotorLifterIsBlocked    = 0x00000004,
+        MotorCarrierIsBlocked   = 0x00000008,
+        InternalFanIsBlocked    = 0x00000010,
+        ExternalFanIsBlocked    = 0x00000020,
+        OverTemperature         = 0x00000040,               
     }
 }

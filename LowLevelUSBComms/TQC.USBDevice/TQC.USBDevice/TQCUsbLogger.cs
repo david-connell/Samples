@@ -123,26 +123,24 @@ namespace TQC.USBDevice
             private readonly IList<byte> m_AdditionalVals = new List<byte>();
 
             public UInt32 Status { get; private set;}
-            public byte AdditionalVal { get; internal set; }
-            public byte AdditionalValOne { get; internal set; }
 
-            private byte[] AdditionalVals
+
+
+            public byte AdditionalValues(int id)
             {
-                get  { return m_AdditionalVals.ToArray(); }
+                byte result = 0;
+                if (id >= 0 && id <= m_AdditionalVals.Count)
+                {
+                    result = m_AdditionalVals[id];
+                }
+                return result;
             }
-
             internal BoardStatus(UInt32 status, byte[] data, int offset)
             {
                 Status = status;
                 for (; offset < data.Length; offset++)
                 {
                     m_AdditionalVals.Add(data[offset]);
-                    switch(m_AdditionalVals.Count)
-                    {
-                        case 1: AdditionalVal = m_AdditionalVals[0]; break;
-                        case 2: AdditionalValOne = m_AdditionalVals[1]; break;
-
-                    }
                 }
             }
         }

@@ -21,8 +21,8 @@ namespace TQC.USBDevice.GradientOven
         public ThermcoupleBoardStatus(TQC.USBDevice.TQCUsbLogger.BoardStatus status)
         {
             ThermcoupleBoardStatusValue = (ThermcoupleBoardStatusValue)status.Status;
-            m_OverTempBySensor = status.AdditionalVal;
-            m_DisconnectedBySensor = status.AdditionalValOne;
+            m_OverTempBySensor = status.AdditionalValues(0);
+            m_DisconnectedBySensor = status.AdditionalValues(1);
         }
 
         public override string ToString()
