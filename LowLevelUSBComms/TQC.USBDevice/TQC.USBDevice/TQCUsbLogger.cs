@@ -113,8 +113,9 @@ namespace TQC.USBDevice
                 return _SerialNumber(0);
             }
             set
-            {                                
-                _SetSerialNumber(0, value);
+            {     
+                if (CanLoggerBeConfigured)           
+                    _SetSerialNumber(0, value);
             }
         }
 
@@ -181,6 +182,30 @@ namespace TQC.USBDevice
             }
         }
 
+        internal void SetReadDeviceInfo(byte deviceId, int enumerationId, Int32 value)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                List<byte> request = new List<byte>();                
+                request.AddRange(BitConverter.GetBytes(value));
+                GetResponse(deviceId, Commands.WriteDeviceInfo, enumerationId, request);
+            }
+        }
+
+        internal void SetReadDeviceInfo(byte deviceId, int enumerationId, Version version)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                List<byte> request = new List<byte>();                
+                request.Add((byte)version.Revision);
+                request.Add((byte)version.Build);
+                request.Add((byte)version.Minor);
+                request.Add((byte)version.Major);
+                //request.AddRange(BitConverter.GetBytes(version));
+                GetResponse(deviceId, Commands.WriteDeviceInfo, enumerationId, request);
+            }
+        }
+
         internal void _SetSerialNumber(byte deviceId, Int32 serialNumber)
         {
             if (CanLoggerBeConfigured)
@@ -214,6 +239,10 @@ namespace TQC.USBDevice
             {
                 return _HardwareVersion(0);
             }
+            set
+            {                
+                SetReadDeviceInfo(0, 2, value);
+            }
         }
 
         internal Version _HardwareVersion(byte deviceId)
@@ -223,9 +252,9 @@ namespace TQC.USBDevice
             {
                 throw new TooLittleDataReceivedException("Read Hardware Version", result.Length, 4);
             }
-
             return new Version(result[3], result[2], result[1], result[0]);
         }
+
 
 
         public Version ProtocolVersion
@@ -264,6 +293,10 @@ namespace TQC.USBDevice
             {
                 return _DeviceName(0);
             }
+            set
+            {
+                SetReadDeviceInfo(0, 3, value, 16);
+            }
         }
 
         internal string _ManufactureName(byte deviceId)
@@ -281,6 +314,10 @@ namespace TQC.USBDevice
             get
             {
                 return _ManufactureName(0);
+            }
+            set
+            {
+                SetReadDeviceInfo(0, 4, value, 16);
             }
         }
 
@@ -311,6 +348,14 @@ namespace TQC.USBDevice
             {
                 return _ManufactureDate(0);
             }
+            set
+            {
+                Int32 numberOfSecs;
+                DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                var span = value - dtDateTime;
+                numberOfSecs = (Int32) span.TotalSeconds;
+                SetReadDeviceInfo(0, 5, numberOfSecs);
+            }
         }
 
 
@@ -319,6 +364,10 @@ namespace TQC.USBDevice
             get
             {
                 return _SoftwareVersion(0);
+            }
+            set
+            {
+                SetReadDeviceInfo(0, 1, value);
             }
         }
 

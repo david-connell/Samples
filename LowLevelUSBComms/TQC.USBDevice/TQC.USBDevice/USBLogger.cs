@@ -446,6 +446,16 @@ namespace TQC.USBDevice
                 m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 0, ref result);
                 return result as string;
             }
+            set
+            {
+                if (CanLoggerBeConfigured)
+                {
+                    object result = value;
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 0, ref result);
+                }
+
+            }
+
         }
 
 
@@ -457,6 +467,16 @@ namespace TQC.USBDevice
                 m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 1, ref result);
                 return result as string;
             }
+            set
+            {
+                if (CanLoggerBeConfigured)
+                {
+                    object result = value;
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 1, ref result);
+                }
+
+            }
+
         }
 
         public DateTime CalibrationDate
@@ -466,6 +486,14 @@ namespace TQC.USBDevice
                 object result = null;
                 m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 2, ref result);
                 return DateTime.FromOADate((double)result);
+            }
+            set
+            {
+                if (CanLoggerBeConfigured)
+                {
+                    object result = value.ToOADate();
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 2, ref result);
+                }
             }
         }
 
