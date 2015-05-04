@@ -218,7 +218,7 @@ namespace TQC.USBDevice
         {
             get
             {
-                if (Environment.UserName == "Windows7" || (Environment.UserDomainName == "tqc.eu"))
+                if (Environment.UserName == "Windows7" || (Environment.UserDomainName.ToLower() == "tqc"))
                 {
                     return true;
                 }
