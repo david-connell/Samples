@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>TQC.IFA.PFSWrapper</id>
+    <version>$version$</version>
+    <authors>David Connell</authors>
+    <owners>TQC B.V.</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>.NET Wrapper for reading PFS Files</description>
+    <copyright>Copyright 2015</copyright>
+    <tags>TQC PFS File</tags>
+
+  </metadata>
+  <files>
+
+       <file src="..\Build\release\TQC.IdealFinish.PFS.dll" target="lib\net35\" />
+    <file src="..\Build\release\TQC.IdealFinish.PFSWrapper.dll" target="lib\net35\" />
+    <file src="..\Build\release\TQC.IdealFinish.PFSWrapper.pdb" target="lib\net35\" />
+      
+
+  </files>
+</package>
