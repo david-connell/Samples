@@ -81,6 +81,9 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="TQC.USBDevice.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -93,5 +96,8 @@
     <PreBuildEvent>
       "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\tlbimp.exe" "$(SolutionDir)ReferencedDLLs\TQC.USB.GenericLogger\USBGenericLogger.tlb" /out:$(TargetDir)TQC.IF.USBLogger.dll
     </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>$(SolutionDir)build.bat  $(SolutionDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>
