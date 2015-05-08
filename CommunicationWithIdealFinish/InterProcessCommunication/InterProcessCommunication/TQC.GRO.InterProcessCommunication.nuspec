@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>TQC.IFA.InterProcessCommunication</id>
+    <version>$version$</version>
+    <authors>David Connell</authors>
+    <owners>TQC B.V.</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Communication between the Gradient Oven and TQC Ideal Finish Analysis</description>
+    <copyright>Copyright 2015</copyright>
+    <tags>TQC USBDevice</tags>
+
+  </metadata>
+  <files>
+
+       <file src="bin\release\TQC.GOC.InterProcessCommunication.dll" target="lib\net35\" />
+      <file src="bin\release\TQC.GOC.InterProcessCommunication.pdb" target="lib\net35\" />
+
+  </files>
+</package>
