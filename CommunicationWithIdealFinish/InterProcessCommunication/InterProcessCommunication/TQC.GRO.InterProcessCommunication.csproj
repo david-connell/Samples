@@ -89,7 +89,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TQC.GRO.InterProcessCommunication.nuspec" />
+    <None Include="TQC.GRO.InterProcessCommunication.nuspec">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

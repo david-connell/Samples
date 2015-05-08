@@ -8,7 +8,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Communication between the Gradient Oven and TQC Ideal Finish Analysis</description>
     <copyright>Copyright 2015</copyright>
-    <tags>TQC USBDevice</tags>
+    <tags>TQC InterProcess Communication</tags>
 
   </metadata>
   <files>
