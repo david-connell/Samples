@@ -35,6 +35,7 @@
             this.m_Copyright = new System.Windows.Forms.Label();
             this.m_Version = new System.Windows.Forms.Label();
             this.m_OK = new System.Windows.Forms.Button();
+            this.m_VersionInfo = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
@@ -91,7 +92,7 @@
             // 
             this.m_OK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.m_OK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_OK.Location = new System.Drawing.Point(439, 180);
+            this.m_OK.Location = new System.Drawing.Point(439, 209);
             this.m_OK.Name = "m_OK";
             this.m_OK.Size = new System.Drawing.Size(75, 23);
             this.m_OK.TabIndex = 5;
@@ -99,11 +100,24 @@
             this.m_OK.UseVisualStyleBackColor = true;
             this.m_OK.Click += new System.EventHandler(this.m_OK_Click);
             // 
+            // m_VersionInfo
+            // 
+            this.m_VersionInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_VersionInfo.Location = new System.Drawing.Point(26, 136);
+            this.m_VersionInfo.Name = "m_VersionInfo";
+            this.m_VersionInfo.Size = new System.Drawing.Size(488, 70);
+            this.m_VersionInfo.TabIndex = 6;
+            this.m_VersionInfo.Text = "label1";
+            this.m_VersionInfo.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            // 
             // HelpAbout
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(526, 215);
+            this.ClientSize = new System.Drawing.Size(526, 244);
+            this.Controls.Add(this.m_VersionInfo);
             this.Controls.Add(this.m_OK);
             this.Controls.Add(this.m_Version);
             this.Controls.Add(this.m_Copyright);
@@ -133,5 +147,6 @@
         private System.Windows.Forms.Label m_Copyright;
         private System.Windows.Forms.Label m_Version;
         private System.Windows.Forms.Button m_OK;
+        private System.Windows.Forms.Label m_VersionInfo;
     }
 }
