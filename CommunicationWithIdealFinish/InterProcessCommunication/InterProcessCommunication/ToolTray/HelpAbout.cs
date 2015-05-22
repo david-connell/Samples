@@ -34,6 +34,7 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
             {                    
                 extraInformation.AppendLine();
             }
+            
             if (FormatAssemblyTitleAndVersion(extraInformation, "tqc.usbdevice.dll"))
             {
                 extraInformation.AppendLine();
