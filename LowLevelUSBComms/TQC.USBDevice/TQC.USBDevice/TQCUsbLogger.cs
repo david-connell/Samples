@@ -603,6 +603,8 @@ namespace TQC.USBDevice
             }
         }
 
+
+        
         internal IEnumerable<double> _ProbeValues(byte deviceId)
         {
             List<double> data = new List<double>();

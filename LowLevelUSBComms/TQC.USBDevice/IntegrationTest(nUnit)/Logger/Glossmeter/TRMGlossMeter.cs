@@ -93,6 +93,150 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         }
 
 
+        [TestCase(0)]
+        public void CheckCoefficients(int channelId)
+        {
+            using (var logger = OpenTmrLogger(false))
+            {
+
+                var coeffs = logger.get_CalibrationCoeffients(channelId);
+                //Assert.That(coeffs.Count, Is.EqualTo(5));
+                foreach (var coeff in coeffs)
+                {
+                    Console.WriteLine(coeff);
+                }
+                logger.Close();
+            }
+        }
+
+        [TestCase(0)]
+        public void CheckSettingCoefficients(int channelId)
+        {
+            using (var logger = OpenTmrLogger(false))
+            {
+
+                var coeffs = logger.get_CalibrationCoeffients(channelId);
+                foreach (var coeff in coeffs)
+                {
+                    Console.WriteLine("Read {0}", coeff);
+                }
+
+                //Assert.That(coeffs.Count, Is.EqualTo(5));
+                coeffs[1] += 0.1;
+                foreach (var coeff in coeffs)
+                {
+                    Console.WriteLine("Write {0}", coeff);
+                }
+
+                logger.set_CalibrationCoeffients(channelId, coeffs);
+                coeffs = logger.get_CalibrationCoeffients(channelId);
+                foreach (var coeff in coeffs)
+                {
+                    Console.WriteLine("Read {0}", coeff);
+                }
+                logger.Close();
+            }
+        }
+
+        [Test]
+        public void CheckInternalGloss()
+        {
+            using (var logger = OpenTmrLogger(false))
+            {
+
+                var result = logger.InternalGloss;
+
+                Assert.That(result.Count, Is.EqualTo(3));
+                foreach (var value in result)
+                {
+                    Console.WriteLine(value);
+                    Assert.That(value, Is.GreaterThan(50.0).And.LessThan(150));
+                }
+                
+                
+                logger.Close();
+            }
+        }
+
+        [Test]
+        public void CheckSettingOfInternalGloss()
+        {
+            using (var logger = OpenTmrLogger(false))
+            {
+
+                var result = logger.InternalGloss;
+
+
+                var vals = new List<double>();
+                vals.Add(100);
+                vals.Add(200);
+                vals.Add(300);
+                logger.InternalGloss = vals;
+
+                var temp = logger.InternalGloss;
+                for (int id = 0; id < 3; id++)
+                {
+                    Assert.That(temp[id], Is.EqualTo((id+1) * 100));
+                }
+                logger.InternalGloss = result;
+
+
+                logger.Close();
+            }
+        }
+
+        [Test]
+        public void TestScan()
+        {
+            TestButton(x => x.IsScanButtonPressed, "SCAN");
+        }
+
+        [Test]
+        public void TestOk()
+        {
+            TestButton(x => x.IsOKPressed, "OK");
+        }
+
+
+        [Test]
+        public void TestUp()
+        {
+            TestButton(x => x.IsUpPressed, "Up");
+        }
+
+        [Test]
+        public void TestDown()
+        {
+            TestButton(x => x.IsDownPressed, "Down");
+        }
+
+        [Test]
+        public void TestInCraddle()
+        {
+            TestButton(x => x.IsInCraddle, "Craddle");
+        }
+
+        public void TestButton(Func<TmrLogger, bool> buttonToPress, string nameOfButton)
+        {
+            using (var logger = OpenTmrLogger(false))
+            {
+                DateTime until = DateTime.Now.AddSeconds(10);
+                while (DateTime.Now < until)
+                {                    
+                    Assert.That(logger.ReadButtonStatus(), Is.EqualTo(true));
+                    Console.WriteLine("Looking for {0}", nameOfButton);
+                    if (buttonToPress(logger))
+                    {
+                        break;
+                    }
+                }
+                Assert.That(buttonToPress(logger), Is.EqualTo(true));
+
+                logger.Close();
+            }
+        }
+
+
 
     }
 
