@@ -29,47 +29,40 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 }
             }
 
+            protected virtual TQCUsbLogger OpenLogger(bool miniumum = true)
+            {
+                var logger = new TQCUsbLogger();
+                if (logger.Open(ProductId, miniumum))
+                {
+                    return logger;
+                }
+                throw new Exception("Failed to connect to logger " + ProductId.ToString());
+            }
             [Test]
             public void TestConnectivity()
             {
-                using (var logger = new USBLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
-                        Console.WriteLine("Version: '{0}'", logger.Version);                        
-                        logger.Close();
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
+                    Console.WriteLine("Version: '{0}'", logger.Version);                        
+                    logger.Close();
                 }
             }
 
             [Test]
             public void InvalidCommand()
             {
-                using (var logger = new USBLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
-                        Console.WriteLine("Version: '{0}'", logger.Version);
-                        //logger.Request(TQC.USBDevice.USBLogger.Commands.NotValidCommand, BitConverter.GetBytes((short)1));
-                        Assert.Throws(typeof(CommandNotSuportedException), 
-                            ()=>
-                                logger.Request(TQC.USBDevice.USBLogger.Commands.NotValidCommand, BitConverter.GetBytes((short)1))
-                                );
-	  
-
-                        
-                        logger.Close();
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
+                    Console.WriteLine("Version: '{0}'", logger.Version);
+                    //logger.Request(TQC.USBDevice.USBLogger.Commands.NotValidCommand, BitConverter.GetBytes((short)1));
+                    Assert.Throws(typeof(CommandNotSuportedException), 
+                        ()=>
+                            logger.Request(TQC.USBDevice.USBLogger.Commands.NotValidCommand, BitConverter.GetBytes((short)1))
+                            );
+	                          
+                        logger.Close();                    
                 }
             }
 
@@ -78,25 +71,18 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [Test]
             public void GetSerialNummberRawAndNormal()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger(false))
                 {
-                    if (logger.Open(ProductId)) //Need more that basic
-                    {
-                        string serialNumber = logger.LoggerSerialNumber;
-                        int serialNumberViaCommand = logger.SerialNumber;
+                    string serialNumber = logger.LoggerSerialNumber;
+                    int serialNumberViaCommand = logger.SerialNumber;
 
 
-                        Console.WriteLine("Serial Number: '{0}' {1}", serialNumber, serialNumberViaCommand);
-                        int serialNumberAsInt = int.Parse(serialNumber);
+                    Console.WriteLine("Serial Number: '{0}' {1}", serialNumber, serialNumberViaCommand);
+                    int serialNumberAsInt = int.Parse(serialNumber);
                         
-                        Assert.AreEqual(serialNumberAsInt, serialNumberViaCommand);
+                    Assert.AreEqual(serialNumberAsInt, serialNumberViaCommand);
 
-                        logger.Close();
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    logger.Close();
                 }
             }
 
@@ -134,13 +120,10 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
 
             [Test]
             public void DebugingFile()
-            {
-                using (var logger = new TQCUsbLogger())
+            {                
+                using (var logger = OpenLogger(false))
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        Console.WriteLine(logger.DebugFileNameBase);
-                    }
+                   Console.WriteLine(logger.DebugFileNameBase);                    
                 }
             }
 
@@ -148,27 +131,23 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [TestCase(@"C:\Debug\myfile.txt")]
             public void DebugingFileBase(string fileName)
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        logger.DebugClose();
-                        logger.DebugFileNameBase = fileName;
-                        Console.WriteLine(logger.DebugFileNameBase);
-                        Assert.That(logger.DebugFileNameBase, Is.EqualTo(fileName));
-                        logger.DebugOpen();
-                    }
+                    logger.DebugClose();
+                    logger.DebugFileNameBase = fileName;
+                    Console.WriteLine(logger.DebugFileNameBase);
+                    Assert.That(logger.DebugFileNameBase, Is.EqualTo(fileName));
+                    logger.DebugOpen();
                 }
             }
 
             [Test]
             public void DebugingFileNameFollowsTheBase()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
+                
                     string fileName  = string.Format(@"C:\Debug\{0}", Guid.NewGuid().ToString("D"));
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
                         logger.DebugOpen(fileName);
                         
                         Console.WriteLine(logger.DebugFileNameBase);
@@ -179,84 +158,55 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                         Assert.That(contents.Any(), Is.EqualTo(true));
                         Console.WriteLine("File {0}", logger.DebugFileName);
                         Console.WriteLine(String.Join("\r\n", contents));
-                    }
-                }
+                    }                
             }
 
 
             [Test]
             public void ReadSoftwareVersion()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
                         logger.DebugOpen();
                         var value = logger.SoftwareVersion;
                         Console.WriteLine("Debug = {0}", logger.IsDebugOutputOpen);
                         Console.WriteLine(logger.DebugOutputFromPreviousCommand);
                         logger.DebugClose() ;
                         Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
-                        Console.WriteLine(value);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                        Console.WriteLine(value);                    
                 }
             }
 
             [Test]
             public void ReadManufactureName()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        var value = logger.ManufactureName;                        
-                        Console.WriteLine("Manufacture Name= '{0}'", value);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    var value = logger.ManufactureName;                        
+                    Console.WriteLine("Manufacture Name= '{0}'", value);                    
                 }
             }
 
             [Test]
             public void ReadHardwareVersion()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        var value = logger.HardwareVersion;
-                        Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
-                        Console.WriteLine(value);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    var value = logger.HardwareVersion;
+                    Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
+                    Console.WriteLine(value);
                 }
             }
 
             [Test]
             public void ReadDeviceName()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        var value = logger.DeviceName;
-                        Assert.That(value, Is.Not.Null);
-                        Assert.That(value, Is.Not.EqualTo(""));
-                        Console.WriteLine(value);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    var value = logger.DeviceName;
+                    Assert.That(value, Is.Not.Null);
+                    Assert.That(value, Is.Not.EqualTo(""));
+                    Console.WriteLine(value);
                 }
             }
 
@@ -264,72 +214,53 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [Test]
             public void ReadManufactureDate()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        var value = logger.ManufactureDate;
-                        Assert.That(value, Is.GreaterThan(new DateTime(200, 1, 1)));
-                        Console.WriteLine(value);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    var value = logger.ManufactureDate;
+                    Assert.That(value, Is.GreaterThan(new DateTime(200, 1, 1)));
+                    Console.WriteLine(value);
                 }
             }
 
             [Test]
             public void ReadProtocolVersion()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        var value = logger.ProtocolVersion;
-                        Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
-                        Console.WriteLine(value);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    var value = logger.ProtocolVersion;
+                    Assert.That(value.Major, Is.GreaterThanOrEqualTo(0));
+                    Console.WriteLine(value);
                 }
             }
 
             [Test]
             public void ReadDeviceType()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
+                    var value = logger.DeviceType;
+                    switch (ProductId)
                     {
-                        var value = logger.DeviceType;
-                        switch (ProductId)
-                        {
-                            case USBLogger.USBProductId.Glossmeter:
-                                Assert.That(value, Is.EqualTo(DeviceType.PolyGlossmeter));
-                                break;
-                            case USBLogger.USBProductId.GRADIENT_OVEN:
-                                Assert.That(value, Is.EqualTo(DeviceType.GRO));
-                                break;
-                            case USBLogger.USBProductId.USB_CURVEX_3:
-                            case USBLogger.USBProductId.USB_CURVEX_3a:
-                                Assert.That(value, Is.EqualTo(DeviceType.CurveX3_Basic));
-                                break;
-                            case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR:
-                                Assert.That(value, Is.EqualTo(DeviceType.ThermocoupleSimulator));
-                                break;
-                            default:
-                                throw new Exception(string.Format("Unknown logger type {0} value {1}", ProductId, value));
-                        }
+                        case USBLogger.USBProductId.Glossmeter:
+                            Assert.That(value, Is.EqualTo(DeviceType.PolyGlossmeter)
+                                .Or.EqualTo(DeviceType.DuoGlossmeter)
+                                .Or.EqualTo(DeviceType.SoloGlossmeter));
+                            break;
+                        case USBLogger.USBProductId.GRADIENT_OVEN:
+                            Assert.That(value, Is.EqualTo(DeviceType.GRO));
+                            break;
+                        case USBLogger.USBProductId.USB_CURVEX_3:
+                        case USBLogger.USBProductId.USB_CURVEX_3a:
+                            Assert.That(value, Is.EqualTo(DeviceType.CurveX3_Basic));
+                            break;
+                        case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR:
+                            Assert.That(value, Is.EqualTo(DeviceType.ThermocoupleSimulator));
+                            break;
+                        default:
+                            throw new Exception(string.Format("Unknown logger type {0} value {1}", ProductId, value));
+                    }
                         
-                        Console.WriteLine(value);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    Console.WriteLine(value);
                 }
             }
 
@@ -337,56 +268,43 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [Test]
             public void GetCalibrationRawAndNormal()
             {
-                using (var logger = new USBLogger())
+                using (var logger = OpenLogger(false))
                 {
-                    if (logger.Open(ProductId))
-                    {
-                        string calibrationCompany = logger.CalibrationCompany;
+                    string calibrationCompany = logger.CalibrationCompany;
 
 
-                        var response = logger.Request(TQC.USBDevice.USBLogger.Commands.ReadCalibrationDetails, BitConverter.GetBytes((short)1));
-                        string calibrationCompanyRaw = System.Text.Encoding.Default.GetString(response).Split('\0')[0];
+                    var response = logger.Request(TQC.USBDevice.USBLogger.Commands.ReadCalibrationDetails, BitConverter.GetBytes((short)1));
+                    string calibrationCompanyRaw = System.Text.Encoding.Default.GetString(response).Split('\0')[0];
                         
 
 
-                        Assert.AreEqual(calibrationCompany, calibrationCompanyRaw);
+                    Assert.AreEqual(calibrationCompany, calibrationCompanyRaw);
 
-                        logger.Close();
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    logger.Close();
                 }
             }
 
             [Test]
             public void ReadNumberOfProbes()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
+
+                    switch (ProductId)
                     {
-                        switch(ProductId)
-                        {
-                            case USBLogger.USBProductId.Glossmeter:
-                                Assert.That(logger.NumberOfProbes, Is.EqualTo(3));
-                                break;
-                            case USBLogger.USBProductId.GRADIENT_OVEN:
-                                Assert.That(logger.NumberOfProbes, Is.EqualTo(0));
-                                break;
-                            case USBLogger.USBProductId.USB_CURVEX_3a:
-                                Assert.That(logger.NumberOfProbes, Is.EqualTo(4));
-                                break;
-                            default:
-                                throw new Exception(string.Format("Logger {0} is currently not supported", ProductId));
-                        }
-                        logger.Close();
+                        case USBLogger.USBProductId.Glossmeter:
+                            Assert.That(logger.NumberOfProbes, Is.EqualTo(3));
+                            break;
+                        case USBLogger.USBProductId.GRADIENT_OVEN:
+                            Assert.That(logger.NumberOfProbes, Is.EqualTo(0));
+                            break;
+                        case USBLogger.USBProductId.USB_CURVEX_3a:
+                            Assert.That(logger.NumberOfProbes, Is.EqualTo(4));
+                            break;
+                        default:
+                            throw new Exception(string.Format("Logger {0} is currently not supported", ProductId));
                     }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    logger.Close();
                 }
             }
 
@@ -394,48 +312,34 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [Test]
             public void ReadNumberOfBatches()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
+                    switch (ProductId)
                     {
-                        switch (ProductId)
-                        {
-                            case USBLogger.USBProductId.Glossmeter:
-                                Assert.That(logger.NumberOfBatches, Is.EqualTo(8));
-                                break;
-                            case USBLogger.USBProductId.GRADIENT_OVEN:
-                                Assert.That(logger.NumberOfBatches, Is.EqualTo(0));
-                                break;
-                            case USBLogger.USBProductId.USB_CURVEX_3a:
-                                Assert.That(logger.NumberOfBatches, Is.EqualTo(10));
-                                break;
-                            default:
-                                throw new Exception(string.Format("Logger {0} is currently not supported", ProductId));
-                        }
-                        logger.Close();
+                        case USBLogger.USBProductId.Glossmeter:
+                            Assert.That(logger.NumberOfBatches, Is.EqualTo(8));
+                            break;
+                        case USBLogger.USBProductId.GRADIENT_OVEN:
+                            Assert.That(logger.NumberOfBatches, Is.EqualTo(0));
+                            break;
+                        case USBLogger.USBProductId.USB_CURVEX_3a:
+                            Assert.That(logger.NumberOfBatches, Is.EqualTo(10));
+                            break;
+                        default:
+                            throw new Exception(string.Format("Logger {0} is currently not supported", ProductId));
                     }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    logger.Close();
                 }
             }
 
             [Test]
             public void CheckOffloafingAndSendingSetup()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        Assert.IsTrue(logger.CanOffload);
-                        Assert.IsTrue(logger.CanSendSetup);
-                        logger.Close();
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    Assert.IsTrue(logger.CanOffload);
+                    Assert.IsTrue(logger.CanSendSetup);
+                    logger.Close();
                 }
             }
 
@@ -443,39 +347,25 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [Test]
             public void StateOfLogger()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
-                        Console.WriteLine("Logger = {0}", logger.StateOfLogger);
-                        logger.Close();
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    Console.WriteLine("Logger = {0}", logger.StateOfLogger);
+                    logger.Close();
                 }
             }
 
         
 
-        [Test]
+        [Test, Ignore]
         public void EnterBootloaderDirect()
         {
             //if (MessageBox.Show("Are you sure you want to enter bootloader?", "Bootloader", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = OpenLogger())
                 {
-                    if (logger.OpenWithMinumumRequests(ProductId))
-                    {
 
-                        logger.EnterBootloaderMode();
-                        Console.WriteLine("***BOOTLOADER Mode****");
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
-                    }
+                    logger.EnterBootloaderMode();
+                    Console.WriteLine("***BOOTLOADER Mode****");
                 }
             }
         }

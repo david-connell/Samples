@@ -37,4 +37,6 @@ namespace IntegrationTestNUnit.Logger.GlossMeter
         }
     }
     
+
+
 }

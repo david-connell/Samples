@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -48,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeviceResponseUnexpectedException.cs" />
+    <Compile Include="GlossMeter\GlossMeterLogger.cs" />
     <Compile Include="GradientOven\ButtonStatus.cs" />
     <Compile Include="GradientOven\CarrierPosition.cs" />
     <Compile Include="GradientOven\ClampState.cs" />
@@ -57,6 +60,7 @@
     <Compile Include="GradientOven\Percentage.cs" />
     <Compile Include="GradientOven\PowerState.cs" />
     <Compile Include="GradientOven\Speed.cs" />
+    <Compile Include="HidDevice.cs" />
     <Compile Include="ICoreCommands.cs" />
     <Compile Include="LinearCalibrationDetails.cs" />
     <Compile Include="Properties\AssemblyInfoShared.cs" />
@@ -67,6 +71,8 @@
     <Compile Include="ISimpleTQCDevice.cs" />
     <Compile Include="ThermocoupleSimulator\ThermocoupleSimulator.cs" />
     <Compile Include="TQCUsbLogger.cs" />
+    <Compile Include="GlossMeter\TmrLogger.cs" />
+    <Compile Include="UsbDevices.cs" />
     <Compile Include="USBLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

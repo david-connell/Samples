@@ -213,6 +213,20 @@ namespace TQC.USBDevice
             }
             return m_Handle >= 0;
         }
+        public bool Open(USBProductId id, string portName, bool minimumCommunications = false)
+        {
+            m_Handle = -1;
+            try
+            {
+                m_Handle = m_Logger.OpenAndReturnHandle(minimumCommunications ? 2 : 0, 0, 0, portName, (uint)id);
+                ClearCachedData();
+            }
+            catch (COMException ex)
+            {
+                Console.WriteLine("Failed to open logger {0} - '{1}'", id.ToString(), ex.Message);
+            }
+            return m_Handle >= 0;
+        }
 
         public bool CanLoggerBeConfigured
         {
@@ -243,6 +257,7 @@ namespace TQC.USBDevice
             ReadCurrentProbeVals = 0x05,
             ReadCurrentRawProbeVals = 0x06,
             WriteSetup = 0x17,
+            LoggerSpecificCommand=0x43,
             GROSetCommand = 0x60,
             GROReadCommand = 0x61,
             NotValidCommand = 0x7F,
