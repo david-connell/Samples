@@ -30,6 +30,17 @@ namespace TQC.USBDevice.GlossMeter
             Request(Commands.LoggerSpecificCommand, request.ToArray());
         }
 
+        public string CalibrationCertificate
+        {
+            get
+            {
+                return ReadDeviceInfoAsString(0, 199);
+            }
+            set
+            {
+                WriteDeviceInfo(0, 199, value, 40);
+            }
+        }
 
         public bool ReadButtonStatus()
         {

@@ -39,6 +39,8 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
             {
                 Console.WriteLine("Logger serial Number is: '{0}'", logger.LoggerSerialNumber);
                 Console.WriteLine("Version: '{0}'", logger.Version);
+                
+                
                 logger.Close();
             }
         }
@@ -50,6 +52,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
             {
 
                 Assert.That(logger.IsTmr, Is.EqualTo(true), "TMR is not set!");
+                Console.WriteLine("CalibrationCertificate: '{0}'", logger.CalibrationCertificate);
                 logger.Close();
             }
         }

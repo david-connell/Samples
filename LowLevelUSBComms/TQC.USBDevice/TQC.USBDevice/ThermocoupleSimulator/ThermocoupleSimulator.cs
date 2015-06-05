@@ -36,11 +36,11 @@ namespace TQC.USBDevice.ThermocoupleSimulator
         {
             get
             {
-                return GetReadDeviceInfoAsString(0, 200);
+                return ReadDeviceInfoAsString(0, 200);
             }
             set
             {
-                SetReadDeviceInfo(0, 200, value, 40);
+                WriteDeviceInfo(0, 200, value, 40);
             }
         }
 

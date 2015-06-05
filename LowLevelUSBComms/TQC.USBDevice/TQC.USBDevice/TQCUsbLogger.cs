@@ -166,7 +166,7 @@ namespace TQC.USBDevice
             return GetInt32(deviceId, Commands.ReadDeviceInfo, 0);
         }
 
-        internal void SetReadDeviceInfo(byte deviceId, int enumerationId, string value, int maxLength)
+        internal void WriteDeviceInfo(byte deviceId, int enumerationId, string value, int maxLength)
         {
             if (CanLoggerBeConfigured)
             {
@@ -182,7 +182,7 @@ namespace TQC.USBDevice
             }
         }
 
-        internal void SetReadDeviceInfo(byte deviceId, int enumerationId, Int32 value)
+        internal void WriteDeviceInfo(byte deviceId, int enumerationId, Int32 value)
         {
             if (CanLoggerBeConfigured)
             {
@@ -192,7 +192,7 @@ namespace TQC.USBDevice
             }
         }
 
-        internal void SetReadDeviceInfo(byte deviceId, int enumerationId, Version version)
+        internal void WriteDeviceInfo(byte deviceId, int enumerationId, Version version)
         {
             if (CanLoggerBeConfigured)
             {
@@ -241,7 +241,7 @@ namespace TQC.USBDevice
             }
             set
             {                
-                SetReadDeviceInfo(0, 2, value);
+                WriteDeviceInfo(0, 2, value);
             }
         }
 
@@ -276,15 +276,23 @@ namespace TQC.USBDevice
             return new Version(result[0], result[1]);
         }
 
-        internal string GetReadDeviceInfoAsString(byte deviceId, int enumerationId)
+        internal string ReadDeviceInfoAsString(byte deviceId, int enumerationId)
         {
-            var result = GetResponse(deviceId, Commands.ReadDeviceInfo, enumerationId);
-            return DecodeString(result);
+            try
+            {
+                var result = GetResponse(deviceId, Commands.ReadDeviceInfo, enumerationId);
+                return DecodeString(result);
+            }
+            catch
+            {
+                // ignored
+            }
+            return "";
         }
 
         internal string _DeviceName(byte deviceId)
         {
-            return GetReadDeviceInfoAsString(deviceId, 3);
+            return ReadDeviceInfoAsString(deviceId, 3);
         }
 
         public string DeviceName
@@ -295,18 +303,24 @@ namespace TQC.USBDevice
             }
             set
             {
-                SetReadDeviceInfo(0, 3, value, 16);
+                WriteDeviceInfo(0, 3, value, 16);
             }
         }
 
         internal string _ManufactureName(byte deviceId)
         {
-            return GetReadDeviceInfoAsString(deviceId, 4);            
+            return ReadDeviceInfoAsString(deviceId, 4);            
         }
 
         private static string DecodeString(byte[] result)
         {
-            return Encoding.UTF8.GetString(result, 0, result.Length).Replace('\0', ' ').Replace('�', ' ').Trim();
+            var textResult = Encoding.UTF8.GetString(result, 0, result.Length);
+            int location = textResult.IndexOf('\0');
+            if (location >= 0)
+            {
+                textResult = textResult.Substring(0, location);
+            }
+            return textResult.Replace('�', ' ').Trim();
         }
 
         public string ManufactureName
@@ -317,7 +331,7 @@ namespace TQC.USBDevice
             }
             set
             {
-                SetReadDeviceInfo(0, 4, value, 16);
+                WriteDeviceInfo(0, 4, value, 16);
             }
         }
 
@@ -354,7 +368,7 @@ namespace TQC.USBDevice
                 DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                 var span = value - dtDateTime;
                 numberOfSecs = (Int32) span.TotalSeconds;
-                SetReadDeviceInfo(0, 5, numberOfSecs);
+                WriteDeviceInfo(0, 5, numberOfSecs);
             }
         }
 
@@ -367,7 +381,7 @@ namespace TQC.USBDevice
             }
             set
             {
-                SetReadDeviceInfo(0, 1, value);
+                WriteDeviceInfo(0, 1, value);
             }
         }
 
