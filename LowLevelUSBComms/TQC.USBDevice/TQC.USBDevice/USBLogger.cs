@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-
+using TQC.IF.USBLogger;
 
 namespace TQC.USBDevice
 {
@@ -31,6 +28,7 @@ namespace TQC.USBDevice
     }
     public class USBLogger : IDisposable
     {
+        const int InvalidHandle = -1;
         int m_Handle;
 
         public enum USBProductId
@@ -43,13 +41,14 @@ namespace TQC.USBDevice
             USB_THERMOCOUPLE_SIMULATOR = 0x20470828,
 
         }
-        private TQC.IF.USBLogger.USBGeneric m_Logger;
+        private USBGeneric m_Logger;
 
         const string c_COMObjectFileName = "USBGenericLogger.dll";
 
         internal USBLogger()
         {
-            m_Logger = new IF.USBLogger.USBGeneric();
+            m_Handle = InvalidHandle;
+            m_Logger = new USBGeneric();
             var compatibleVersion = new Version(6, 0, 49, 0);
             if (COMObjectVersion < compatibleVersion)
             {
@@ -201,7 +200,7 @@ namespace TQC.USBDevice
 
         public bool Open(USBProductId id, bool minimumCommunications = false)
         {
-            m_Handle = -1;
+            m_Handle = InvalidHandle;
             try
             {
                 m_Handle = m_Logger.OpenAndReturnHandle(minimumCommunications ? 2 : 0, 0, 0, null, (uint)id);
@@ -215,7 +214,7 @@ namespace TQC.USBDevice
         }
         public bool Open(USBProductId id, string portName, bool minimumCommunications = false)
         {
-            m_Handle = -1;
+            m_Handle = InvalidHandle;
             try
             {
                 m_Handle = m_Logger.OpenAndReturnHandle(minimumCommunications ? 2 : 0, 0, 0, portName, (uint)id);
@@ -241,8 +240,12 @@ namespace TQC.USBDevice
         }
 
         public void Close()
-        {            
-            m_Logger.CloseByHandle(m_Handle);
+        {
+            if (m_Handle != InvalidHandle)
+            {
+                m_Logger.CloseByHandle(m_Handle);
+            }
+            m_Handle = InvalidHandle;
 
         }
 
@@ -379,7 +382,7 @@ namespace TQC.USBDevice
 
                     if (newException != null)
                     {
-                        if (attempts != 0 && (newException.GetType() == typeof(TQC.USBDevice.ResponsePacketErrorTimeoutException)))
+                        if (attempts != 0 && (newException.GetType() == typeof(ResponsePacketErrorTimeoutException)))
                         {
                             attempts = attempts - 1;
                             retry = true;
@@ -515,10 +518,9 @@ namespace TQC.USBDevice
         public Version DotNetDLLVersion
         {
             get
-            {
-                Version version = new System.Version();
-                var ass = Assembly.GetAssembly(typeof(IF.USBLogger.USBGeneric));
-                version = ass.GetName().Version;
+            {                
+                var ass = Assembly.GetAssembly(typeof(USBGeneric));
+                var version = ass.GetName().Version;
                 
                 //foreach(var module in ass.GetLoadedModules(false))
                 //{
@@ -551,7 +553,7 @@ namespace TQC.USBDevice
             }
         }
 
-        private static System.Version FileVersionToVersion(FileVersionInfo myFileVersionInfo)
+        private static Version FileVersionToVersion(FileVersionInfo myFileVersionInfo)
         {
             return new Version(myFileVersionInfo.FileMajorPart, myFileVersionInfo.FileMinorPart, myFileVersionInfo.FileBuildPart, myFileVersionInfo.FilePrivatePart);
         }
