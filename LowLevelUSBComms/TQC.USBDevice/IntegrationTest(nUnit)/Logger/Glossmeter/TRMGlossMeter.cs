@@ -227,7 +227,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
                 while (DateTime.Now < until)
                 {                    
                     Assert.That(logger.ReadButtonStatus(), Is.EqualTo(true));
-                    Console.WriteLine("Looking for {0}", nameOfButton);
+                    Console.WriteLine("Looking for {0}", nameOfButton);                    
                     if (buttonToPress(logger))
                     {
                         break;

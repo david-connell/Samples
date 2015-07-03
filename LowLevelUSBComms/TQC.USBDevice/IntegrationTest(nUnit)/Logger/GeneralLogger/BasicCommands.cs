@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice;
+using TQC.USBDevice.GlossMeter;
+using TQC.USBDevice.GradientOven;
 
 namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
@@ -92,15 +95,16 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             {
                 using (var logger = new TQCUsbLogger())
                 {
-                    logger.DebugOpen();
+                    
                     if (logger.OpenWithMinumumRequests(ProductId))
-                    {                        
+                    {
+                        logger.DebugOpen();
                         Console.WriteLine(logger.DebugOutputFromPreviousCommand);
                         logger.DebugClose();
                     }
                     else
                     {
-                        throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                        Assert.Fail("Failed to connect to logger " + ProductId.ToString());                        
                     }
                 }
             }
@@ -110,8 +114,8 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [TestCase(2)]
             public void DebugingPurging(int numberOfDays)
             {
-                using (var logger = new TQCUsbLogger())
-                {
+                using (var logger = OpenLogger(true))
+                {                    
                     Console.WriteLine(logger.DebugPurgePolicy) ;
                     logger.DebugPurgePolicy = numberOfDays;
                     Assert.That(logger.DebugPurgePolicy, Is.EqualTo(numberOfDays));
@@ -232,6 +236,111 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                     Console.WriteLine(value);
                 }
             }
+
+            [Test]
+            public void TestDisconnect()
+            {                
+                using (var logger = GetLoggerByType(ProductId))
+                {
+                    if (logger.Open(ProductId))
+                    {                    
+                        DateTime timeToFinish = DateTime.Now.AddSeconds(10);
+                        int state = 0;
+                        while ((DateTime.Now < timeToFinish) && (state < 2) )
+                        {
+                            double time2Finish = (timeToFinish-DateTime.Now ).TotalSeconds;
+                            bool isConnected = OutputText(logger, string.Format(" Disconnect Test {0} secs", (int)time2Finish));
+                            switch (state)
+                            {
+                                case 0:
+                                    if (!isConnected)
+                                    {
+                                        state++;
+                                        timeToFinish = DateTime.Now.AddSeconds(30);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Waiting for Disconnect");
+                                        Thread.Sleep(100);
+                                    }
+                                    break;
+                                case 1:
+                                    if (isConnected)
+                                    {
+                                        state++;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Waiting for Connect");
+                                        Thread.Sleep(200);
+                                    }
+                                    break;                                
+                            }
+                        }
+                        OutputText(logger, "Finished");
+                        Assert.That(state, Is.Not.EqualTo(1));
+                    }
+                    
+                }
+            }
+
+            private bool OutputText(TQCUsbLogger logger, string text)
+            {
+                bool isConnected = false ;
+                try
+                {
+                    switch (ProductId)
+                    {
+                        case USBLogger.USBProductId.Glossmeter:
+                            {
+                                var gml = logger as GlossMeterLogger;
+                                if (gml != null)
+                                {
+                                    gml.WriteTextString(5, text);
+                                }
+                            }
+                            break;
+                        case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR:
+                            {
+                                var ts = logger as TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator;
+                                Console.WriteLine("BoardTemp = {0}", ts.BoardTemperature);
+                            }
+                            break;
+                    }
+                    isConnected = true;
+                }
+                catch (UsbDisconnectedException )
+                {
+                    ;
+                }
+                return isConnected;
+            }
+            
+
+            public TQCUsbLogger GetLoggerByType(USBLogger.USBProductId loggerType)
+            {
+                switch (loggerType)
+                {
+                    case USBLogger.USBProductId.Glossmeter:
+                        return new GlossMeterLogger();
+                        
+
+                    case USBLogger.USBProductId.GRADIENT_OVEN:
+                        return new GROMainBoard();
+                        
+
+                    case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR:
+                        return new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator();
+                        
+
+                    default:
+                    case USBLogger.USBProductId.USB_CURVEX_3:
+                    case USBLogger.USBProductId.USB_CURVEX_3a:
+                        return new TQCUsbLogger();
+                        
+                }
+            }
+
 
             [Test]
             public void ReadDeviceType()

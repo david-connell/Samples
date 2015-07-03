@@ -290,7 +290,7 @@ namespace TQC.USBDevice
             ResponsePacketErrorTimeout,
             ResponsePacketErrorBadLength,
             ResponsePacketErrorBadCommand,
-
+            ResponseUsbDeviceRemoved,
             Unknown,
         }
 
@@ -310,6 +310,7 @@ namespace TQC.USBDevice
         const int ERROR_BAD_LENGTH = (int)24L;
         const int ERROR_BAD_COMMAND = (int)22L;
         const int ERROR_TIMEOUT = unchecked((int)(0x8003001EL));
+        const int USB_DISCONNECTED = unchecked((int)(0x80040004L));
 
 
 
@@ -358,6 +359,8 @@ namespace TQC.USBDevice
 
                 case ERROR_TIMEOUT:
                     return new ResponsePacketErrorTimeoutException();
+                case USB_DISCONNECTED:
+                    return new UsbDisconnectedException();
 
                 default:
                     return null;

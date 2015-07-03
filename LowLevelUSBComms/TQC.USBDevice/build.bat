@@ -1,5 +1,5 @@
 @echo on
-"%1..\..\NuGet.exe" pack "%1TQC.USBDevice\TQC.USBDevice.nuspec" -Version 1.3.10
+"%1..\..\NuGet.exe" pack "%1TQC.USBDevice\TQC.USBDevice.nuspec" -Version 1.3.11
 echo '%1'
 del "%1Build\*.nupkg"
 xcopy "*.nupkg" "%1Build\" /Y

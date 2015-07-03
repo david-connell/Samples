@@ -203,7 +203,22 @@ namespace TQC.USBDevice
             : base(USBLogger.USBCommandResponseCode.ResponsePacketErrorTimeout)
         {
         }
+        protected ResponsePacketErrorTimeoutException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context)
+            : base(info, context) { }
     }
+
+    [Serializable]
+    public class UsbDisconnectedException : DeviceResponseUnexpectedException
+    {
+        public UsbDisconnectedException() : base(USBLogger.USBCommandResponseCode.ResponseUsbDeviceRemoved) { }
+        protected UsbDisconnectedException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context)
+            : base(info, context) { }
+    }
+    
     
 
     
