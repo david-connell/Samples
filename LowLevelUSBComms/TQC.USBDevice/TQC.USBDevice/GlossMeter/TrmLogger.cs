@@ -1,6 +1,6 @@
 ﻿namespace TQC.USBDevice.GlossMeter
 {
-    public class TmrLogger : GlossMeterLogger
+    public class TrmLogger : GlossMeterLogger
     {
         public bool Open(bool minimumCommunications = false)
         {            

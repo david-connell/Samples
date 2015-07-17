@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using IntegrationTestNUnit.Logger.GeneralLogger;
 using NUnit.Framework;
 using TQC.USBDevice;
@@ -11,19 +8,19 @@ using TQC.USBDevice.GlossMeter;
 namespace IntegrationTestNUnit.Logger.Glossmeter
 {
     [TestFixture]
-    class TRMGlossMeterBasicCommands : BasicCommands
+    class TrmGlossMeterBasicCommands : BasicCommands
     {
-        public TRMGlossMeterBasicCommands() : base(USBLogger.USBProductId.Glossmeter)           
+        public TrmGlossMeterBasicCommands() : base(USBLogger.USBProductId.Glossmeter)           
         {
         }
         protected override TQCUsbLogger OpenLogger(bool miniumum = true)
         {
-            return OpenTmrLogger(miniumum);
+            return OpenTrmLogger(miniumum);
         }
 
-        TmrLogger OpenTmrLogger(bool miniumum = true)
+        TrmLogger OpenTrmLogger(bool miniumum = true)
         {
-            var logger = new TmrLogger();
+            var logger = new TrmLogger();
             if (logger.Open(miniumum))
             {
                 return logger;
@@ -46,12 +43,12 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         }
 
         [Test]
-        public void CheckTRM()
+        public void CheckTrm()
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
 
-                Assert.That(logger.IsTmr, Is.EqualTo(true), "TMR is not set!");
+                Assert.That(logger.IsTmr, Is.EqualTo(true), "TRM is not set!");
                 Console.WriteLine("CalibrationCertificate: '{0}'", logger.CalibrationCertificate);
                 logger.Close();
             }
@@ -61,7 +58,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         [Test]
         public void CheckBuzz()
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
 
                 logger.Buzzer(1, 10, 2, 10);
@@ -76,7 +73,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         [TestCase(5, "Line 5")]
         public void CheckText(int lineNo, string text)
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
 
                 logger.WriteTextString(lineNo, text);
@@ -87,7 +84,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         [Test]
         public void CheckResetScreen()
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
 
                 logger.ResetScreen();
@@ -99,7 +96,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         [TestCase(0)]
         public void CheckCoefficients(int channelId)
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
 
                 var coeffs = logger.get_CalibrationCoeffients(channelId);
@@ -115,7 +112,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         [TestCase(0)]
         public void CheckSettingCoefficients(int channelId)
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
 
                 var coeffs = logger.get_CalibrationCoeffients(channelId);
@@ -144,7 +141,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         [Test]
         public void CheckInternalGloss()
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
 
                 var result = logger.InternalGloss;
@@ -164,7 +161,7 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
         [Test]
         public void CheckSettingOfInternalGloss()
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
 
                 var result = logger.InternalGloss;
@@ -219,9 +216,9 @@ namespace IntegrationTestNUnit.Logger.Glossmeter
             TestButton(x => x.IsInCraddle, "Craddle");
         }
 
-        public void TestButton(Func<TmrLogger, bool> buttonToPress, string nameOfButton)
+        public void TestButton(Func<TrmLogger, bool> buttonToPress, string nameOfButton)
         {
-            using (var logger = OpenTmrLogger(false))
+            using (var logger = OpenTrmLogger(false))
             {
                 DateTime until = DateTime.Now.AddSeconds(10);
                 while (DateTime.Now < until)
