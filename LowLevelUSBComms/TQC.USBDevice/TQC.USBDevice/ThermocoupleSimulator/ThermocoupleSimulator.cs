@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-
 
 namespace TQC.USBDevice.ThermocoupleSimulator
 {
@@ -18,7 +16,7 @@ namespace TQC.USBDevice.ThermocoupleSimulator
             {
                 var response = Request(Commands.ReadCurrentProbeVals, BitConverter.GetBytes((short)100));
 
-                return System.BitConverter.ToSingle(response, 1);
+                return BitConverter.ToSingle(response, 1);
             }
         }
 
@@ -28,7 +26,7 @@ namespace TQC.USBDevice.ThermocoupleSimulator
             {
                 var response = Request(Commands.ReadCurrentProbeVals, BitConverter.GetBytes((short)101));
 
-                return System.BitConverter.ToSingle(response, 1);
+                return BitConverter.ToSingle(response, 1);
             }
         }
 
@@ -45,16 +43,10 @@ namespace TQC.USBDevice.ThermocoupleSimulator
         }
 
         public void SetTemperatureOutput(double temperature)
-        {                        
-            List<byte> request = new List<byte>();
-            request.Add(0x10);
-            request.Add(0x00);
-            request.AddRange(System.BitConverter.GetBytes((float)temperature));
-            var response = Request(Commands.WriteDeviceInfo, request.ToArray());
-            return;            
+        {
+            List<byte> request = new List<byte> {0x10, 0x00};
+            request.AddRange(BitConverter.GetBytes((float)temperature));
+            Request(Commands.WriteDeviceInfo, request.ToArray());
         }
-
-
-
     }
 }

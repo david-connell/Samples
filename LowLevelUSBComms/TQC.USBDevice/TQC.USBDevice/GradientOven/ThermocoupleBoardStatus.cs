@@ -13,12 +13,12 @@ namespace TQC.USBDevice.GradientOven
 
     public class ThermcoupleBoardStatus
     {
-        private byte m_OverTempBySensor;
-        private byte m_DisconnectedBySensor;
+        private readonly byte m_OverTempBySensor;
+        private readonly byte m_DisconnectedBySensor;
 
         public ThermcoupleBoardStatusValue ThermcoupleBoardStatusValue { get; internal set; }
 
-        public ThermcoupleBoardStatus(TQC.USBDevice.TQCUsbLogger.BoardStatus status)
+        public ThermcoupleBoardStatus(TQCUsbLogger.BoardStatus status)
         {
             ThermcoupleBoardStatusValue = (ThermcoupleBoardStatusValue)status.Status;
             m_OverTempBySensor = status.AdditionalValues(0);

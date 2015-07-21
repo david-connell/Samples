@@ -1,5 +1,4 @@
-﻿using System;
-namespace TQC.USBDevice.GradientOven
+﻿namespace TQC.USBDevice.GradientOven
 {
     public enum LiftState : byte
     {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -64,6 +63,10 @@ namespace TQC.USBDevice.GlossMeter
             return status;
         }
 
+
+        /// <summary>
+        /// This will set or get the internal gloss values (for setting it will automatically wait until the calibration has been completed!
+        /// </summary>
         public IList<double> InternalGloss
         {
             get
@@ -113,8 +116,8 @@ namespace TQC.USBDevice.GlossMeter
             List<byte> request = new List<byte>();
             request.AddRange(BitConverter.GetBytes((short)(20 + channelId)));
             
-            request.AddRange(BitConverter.GetBytes((float)0.0f));
-            request.AddRange(BitConverter.GetBytes((float)0.0f));
+            request.AddRange(BitConverter.GetBytes(0.0f));
+            request.AddRange(BitConverter.GetBytes(0.0f));
             foreach (var value in values)
             {
                 request.AddRange(BitConverter.GetBytes((float)value));
@@ -155,7 +158,7 @@ namespace TQC.USBDevice.GlossMeter
             {
                 List<byte> request = new List<byte>();
                 request.AddRange(BitConverter.GetBytes((UInt16)(200 + lineNo)));
-                request.AddRange(System.Text.ASCIIEncoding.Default.GetBytes(text));
+                request.AddRange(ASCIIEncoding.Default.GetBytes(text));
                 request.Add(0);
                 Request(Commands.WriteDeviceInfo, request.ToArray());
             }

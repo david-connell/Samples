@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Runtime.Serialization;
 
 namespace TQC.USBDevice
 {
@@ -22,8 +20,8 @@ namespace TQC.USBDevice
         }
         public DeviceResponseException(string message, Exception inner) : base(message, inner) { }
         protected DeviceResponseException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
+          SerializationInfo info,
+          StreamingContext context)
             : base(info, context)
         {
         }
@@ -64,8 +62,8 @@ namespace TQC.USBDevice
         public DeviceResponseUnexpectedException(string message) : base(message) { }
         public DeviceResponseUnexpectedException(string message, Exception inner) : base(message, inner) { }
         protected DeviceResponseUnexpectedException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
+          SerializationInfo info,
+          StreamingContext context)
             : base(info, context)
         {
         }
@@ -176,7 +174,7 @@ namespace TQC.USBDevice
 
     
 
-        [Serializable]
+    [Serializable]
     public class ResponsePacketErrorBadLengthException : DeviceResponseUnexpectedException
     {
         public ResponsePacketErrorBadLengthException()
@@ -186,7 +184,7 @@ namespace TQC.USBDevice
     }
 
     
-        [Serializable]
+    [Serializable]
     public class ResponsePacketErrorBadCommandException : DeviceResponseUnexpectedException
     {
         public ResponsePacketErrorBadCommandException()
@@ -204,8 +202,8 @@ namespace TQC.USBDevice
         {
         }
         protected ResponsePacketErrorTimeoutException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
+          SerializationInfo info,
+          StreamingContext context)
             : base(info, context) { }
     }
 
@@ -214,8 +212,8 @@ namespace TQC.USBDevice
     {
         public UsbDisconnectedException() : base(USBLogger.USBCommandResponseCode.ResponseUsbDeviceRemoved) { }
         protected UsbDisconnectedException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
+          SerializationInfo info,
+          StreamingContext context)
             : base(info, context) { }
     }
     
