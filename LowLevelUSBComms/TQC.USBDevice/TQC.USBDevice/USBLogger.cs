@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using log4net;
 using TQC.IF.USBLogger;
 
 namespace TQC.USBDevice
@@ -30,6 +31,7 @@ namespace TQC.USBDevice
     {
         const int InvalidHandle = -1;
         int m_Handle;
+        private ILog m_Log = LogManager.GetLogger("TQC.USBDevice.USBLogger");
 
         public enum USBProductId
         {
@@ -140,6 +142,7 @@ namespace TQC.USBDevice
         /// <returns>If the debug file is open (true => open)</returns>
         public bool DebugOpen(string fileNameRoot = null)
         {
+            m_Log.Info("DebugOpen");
             IsDebugOutputOpen = false;
             if (!String.IsNullOrEmpty(fileNameRoot))
             {
@@ -155,6 +158,7 @@ namespace TQC.USBDevice
         /// <returns>if the debug file is open or closed (false => Closed)</returns>
         public bool DebugClose()
         {
+            m_Log.Info("DebugClose");
             IsDebugOutputOpen = false;
             return IsDebugOutputOpen;
         }
@@ -201,6 +205,7 @@ namespace TQC.USBDevice
         public bool Open(USBProductId id, bool minimumCommunications = false)
         {
             m_Handle = InvalidHandle;
+            m_Log.Info(string.Format("Open {0} {1}", id, minimumCommunications));
             try
             {
                 m_Handle = m_Logger.OpenAndReturnHandle(minimumCommunications ? 2 : 0, 0, 0, null, (uint)id);
@@ -208,13 +213,14 @@ namespace TQC.USBDevice
             }
             catch (COMException ex)
             {
-                Console.WriteLine("Failed to open logger {0} - '{1}'", id.ToString(), ex.Message);
+                m_Log.Error(string.Format("Failed to open logger {0} ", id.ToString()), ex);
             }
             return m_Handle >= 0;
         }
         public bool Open(USBProductId id, string portName, bool minimumCommunications = false)
         {
             m_Handle = InvalidHandle;
+            m_Log.Info(string.Format("Open {0}/{1} {2}", id, portName, minimumCommunications));
             try
             {
                 m_Handle = m_Logger.OpenAndReturnHandle(minimumCommunications ? 2 : 0, 0, 0, portName, (uint)id);
@@ -222,7 +228,7 @@ namespace TQC.USBDevice
             }
             catch (COMException ex)
             {
-                Console.WriteLine("Failed to open logger {0} - '{1}'", id.ToString(), ex.Message);
+                m_Log.Error(string.Format("Failed to open logger {0} ", id.ToString()), ex);
             }
             return m_Handle >= 0;
         }
@@ -241,6 +247,7 @@ namespace TQC.USBDevice
 
         public void Close()
         {
+            m_Log.Info("Close");
             if (m_Handle != InvalidHandle)
             {
                 m_Logger.CloseByHandle(m_Handle);
@@ -371,13 +378,13 @@ namespace TQC.USBDevice
         {
             bool retry;
             int attempts = MAX_RETRY_ATTEMPTS;
-
+            m_Log.Info(string.Format("Request {0} to {1}", command, conversationId));
             do
             {
                 retry = false;
                 try
                 {
-                    return m_Logger.GenericCommandByHandle(m_Handle, conversationId, (byte)command, request) as byte[];                    
+                    return m_Logger.GenericCommandByHandle(m_Handle, conversationId, (byte)command, request) as byte[];
                 }
                 catch (COMException ex)
                 {
@@ -392,13 +399,20 @@ namespace TQC.USBDevice
                         }
                         else
                         {
+                            m_Log.Info("Known COM exception in Request", newException);
                             throw newException;
                         }
                     }
                     else
                     {
+                        m_Log.Error("Unknown COM exception in Request", ex);
                         throw;
                     }
+                }
+                catch (Exception ex)
+                {
+                    m_Log.Error("Unknown exception in Request", ex);
+                    throw;
                 }
             }
             while (retry);
