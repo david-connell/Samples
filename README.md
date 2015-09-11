@@ -1,4 +1,4 @@
-# Sample interface with TQC COM Components
+# Sample .NET code to mainly communicate TQC-Ideal Finish Analysis
 ## LowLevelUSBComms
 Alows simple Logger specific communications with most the USB devices supplied by TQC, with logger specific extensions. (For .NET)
 This code is based on COM Dll supplied by Ideal Finish Analysis
