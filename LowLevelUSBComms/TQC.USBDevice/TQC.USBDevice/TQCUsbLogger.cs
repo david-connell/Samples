@@ -307,6 +307,11 @@ namespace TQC.USBDevice
             }
         }
 
+        public byte[] TestCommand(byte deviceId)
+        {
+            var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 5);
+            return result;
+        }
         internal string _ManufactureName(byte deviceId)
         {
             return ReadDeviceInfoAsString(deviceId, 4);            
