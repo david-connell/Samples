@@ -5,6 +5,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net;
 using TQC.GOC.InterProcessCommunication.DataToBeSent;
 using TQC.GOC.InterProcessCommunication.Model;
 using TQC.GOC.InterProcessCommunication.ToolTray;
@@ -35,7 +36,7 @@ namespace TQC.GOC.InterProcessCommunication
         private DataRunDetail DataRunDetails { get; set; }
         private bool CollectingData { get; set; }
         private ToolTrayUI m_ToolTray;
-
+        private ILog m_Log = LogManager.GetLogger("TQC.GOCServerImplementation");
 
         private bool m_IsTerminating;
 
@@ -52,7 +53,9 @@ namespace TQC.GOC.InterProcessCommunication
         }
 
         public void CreateServer(TextWriter writer, System.ComponentModel.IContainer container, System.Drawing.Icon icon)
-        {            
+        {
+            HelpAbout.LogApplicationDetails();
+            m_Log.Debug("Create Server");
             if (m_IsRunning)
             {
                 Exception ex = new Exception("Cannot create more than one InterProcessServer");

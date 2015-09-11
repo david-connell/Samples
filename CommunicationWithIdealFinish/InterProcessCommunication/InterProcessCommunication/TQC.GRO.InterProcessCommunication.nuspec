@@ -9,12 +9,12 @@
     <description>Communication between the Gradient Oven and TQC Ideal Finish Analysis</description>
     <copyright>Copyright 2015</copyright>
     <tags>TQC InterProcess Communication</tags>
-
+    <dependencies>
+      <dependency id="log4net" version="2.0.3" />
+    </dependencies>
   </metadata>
   <files>
-
-       <file src="bin\release\TQC.GOC.InterProcessCommunication.dll" target="lib\net35\" />
-      <file src="bin\release\TQC.GOC.InterProcessCommunication.pdb" target="lib\net35\" />
-
+       <file src="bin\release\TQC.GOC.InterProcessCommunication.dll" target="lib\net45\" />
+      <file src="bin\release\TQC.GOC.InterProcessCommunication.pdb" target="lib\net45\" />
   </files>
 </package>

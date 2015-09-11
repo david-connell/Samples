@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -74,6 +77,12 @@
     <Compile Include="ToolTray\HelpAbout.Designer.cs">
       <DependentUpon>HelpAbout.cs</DependentUpon>
     </Compile>
+    <Compile Include="ToolTray\LogFormDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToolTray\LogFormDetails.Designer.cs">
+      <DependentUpon>LogFormDetails.cs</DependentUpon>
+    </Compile>
     <Compile Include="ToolTray\ToolTrayUI.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -87,8 +96,12 @@
     <EmbeddedResource Include="ToolTray\HelpAbout.resx">
       <DependentUpon>HelpAbout.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ToolTray\LogFormDetails.resx">
+      <DependentUpon>LogFormDetails.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="TQC.GRO.InterProcessCommunication.nuspec">
       <SubType>Designer</SubType>
     </None>

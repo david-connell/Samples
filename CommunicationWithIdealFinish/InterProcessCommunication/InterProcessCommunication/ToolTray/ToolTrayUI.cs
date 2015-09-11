@@ -13,6 +13,7 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
     {
         private NotifyIcon m_NotifyIcon;				            // the icon that sits in the system tray
         DetailsForm m_DetailsForm;
+        LogFormDetails m_LogFilesForm;
         Form m_HelpAboutForm;
         GOCServerImplementation m_Server;
         public event EventHandler Update;
@@ -45,6 +46,13 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
             m_Server.GOCServerStatus += m_Server_GOCServerStatus;            
         }
 
+        internal System.Drawing.Icon Icon
+        {
+            get
+            {
+                return m_NotifyIcon.Icon;
+            }
+        }
 
         public string Status
         {
@@ -123,6 +131,18 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
             else { m_DetailsForm.Activate(); }
         }
 
+
+        private void ShowLogFilesForm()
+        {
+            if (m_LogFilesForm == null)
+            {
+                m_LogFilesForm = new LogFormDetails(this);
+                m_LogFilesForm.Closed += logFilesForm_Closed;
+                m_LogFilesForm.Show();
+            }
+            else { m_LogFilesForm.Activate(); }
+        }
+
         private void notifyIcon_DoubleClick(object sender, EventArgs e) 
         {            
             HelpAboutForm();    
@@ -132,9 +152,12 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
         // attach to context menu items
         private void showHelpItem_Click(object sender, EventArgs e)     { HelpAboutForm();    }
         private void showDetailsItem_Click(object sender, EventArgs e)  { ShowDetailsForm();  }
+        private void showLogFileItem_Click(object sender, EventArgs e) { ShowLogFilesForm(); }
 
         // null out the forms so we know to create a new one.
         private void detailsForm_Closed(object sender, EventArgs e)     { m_DetailsForm = null; }
+        private void logFilesForm_Closed(object sender, EventArgs e) { m_LogFilesForm = null; }
+        
         private void helpAboutForm_Closed(object sender, EventArgs e)        { m_HelpAboutForm = null;   }
         
         
@@ -145,8 +168,9 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
 
             //m_NotifyIcon.ContextMenuStrip.Items.Add(new ToolStripSeparator());
             
-            m_NotifyIcon.ContextMenuStrip.Items.Add(ToolStripMenuItemWithHandler("Show &current status", showDetailsItem_Click));
-            m_NotifyIcon.ContextMenuStrip.Items.Add(ToolStripMenuItemWithHandler("&About", showHelpItem_Click));
+            m_NotifyIcon.ContextMenuStrip.Items.Add(ToolStripMenuItemWithHandler("Show &current status...", showDetailsItem_Click));
+            m_NotifyIcon.ContextMenuStrip.Items.Add(ToolStripMenuItemWithHandler("Log files...", showLogFileItem_Click));
+            m_NotifyIcon.ContextMenuStrip.Items.Add(ToolStripMenuItemWithHandler("&About...", showHelpItem_Click));
         }
 
 

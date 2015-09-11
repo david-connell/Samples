@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{8A5D2EB2-93D8-4A3A-B822-E34B8927523B}"
 	ProjectSection(SolutionItems) = preProject
 		build.bat = build.bat
+		InterProcessCommunication\TQC.GRO.InterProcessCommunication.nuspec = InterProcessCommunication\TQC.GRO.InterProcessCommunication.nuspec
 	EndProjectSection
 EndProject
 Global

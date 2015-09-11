@@ -16,13 +16,19 @@ namespace TQC.GOC.InterProcessCommunication
 {
     internal class IdealFinishApplication
     {
-
+        internal static Guid IdealFinishUpgradeCode
+        {
+            get
+            {
+                return new Guid("{C97015C6-5C71-47DA-B8EB-418115005B5D}");
+            }
+        }
         public static void StartUp()
         {
             string programName = "TQC.IdealFinish.Analysis.exe";
             if (!IsProgramRunning(programName))
             {
-                Thread myNewThread = new Thread(() => RunFirstInstalledProgram(new Guid("{C97015C6-5C71-47DA-B8EB-418115005B5D}"), programName));
+                Thread myNewThread = new Thread(() => RunFirstInstalledProgram(IdealFinishUpgradeCode, programName));
                 myNewThread.Start();
 
             }

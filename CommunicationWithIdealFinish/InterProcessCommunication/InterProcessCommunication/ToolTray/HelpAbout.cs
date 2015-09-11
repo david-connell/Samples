@@ -9,11 +9,65 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using log4net;
+using TQC.GOC.InterProcessCommunication.Installer;
 
 namespace TQC.GOC.InterProcessCommunication.ToolTray
 {
     public partial class HelpAbout : Form
     {
+        private static ILog s_Log = LogManager.GetLogger("TQC.Help");
+
+        public static void LogApplicationDetails()
+        {
+
+            StringBuilder extraInformation = new StringBuilder();
+
+            FormatAssemblyTitleAndVersion(extraInformation, Assembly.GetEntryAssembly());
+            s_Log.Info(extraInformation.ToString());
+            extraInformation.Clear();
+            var copyright = Assembly.GetEntryAssembly().GetCustomAttribute(typeof(AssemblyCopyrightAttribute)) as AssemblyCopyrightAttribute;
+            s_Log.Info(string.Format("{0}", copyright.Copyright));
+            s_Log.Info("");
+
+
+            Assembly assembly = Assembly.GetCallingAssembly();
+            var desc = assembly.GetCustomAttribute(typeof(AssemblyDescriptionAttribute)) as AssemblyDescriptionAttribute;
+            s_Log.Info(string.Format("{0}", desc.Description));
+            
+
+            var title = assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute)) as AssemblyTitleAttribute;
+            s_Log.Info(string.Format("{0} V{1}", title.Title, assembly.GetName().Version.ToString()));
+            
+            copyright = assembly.GetCustomAttribute(typeof(AssemblyCopyrightAttribute)) as AssemblyCopyrightAttribute;
+            s_Log.Info(string.Format("{0}", copyright.Copyright));
+            s_Log.Info("");
+
+            
+
+            
+            if (FormatAssemblyTitleAndVersion(extraInformation, "usbgenericlogger.dll"))
+            {
+                s_Log.Info(extraInformation.ToString());
+                s_Log.Info("");
+                extraInformation.Clear();
+            }
+
+            if (FormatAssemblyTitleAndVersion(extraInformation, "tqc.usbdevice.dll"))
+            {
+                s_Log.Info(extraInformation.ToString());
+                s_Log.Info("");
+                extraInformation.Clear();
+            }
+
+            var idealFinishInstallations = InstallerInformation.GetProducts(IdealFinishApplication.IdealFinishUpgradeCode);
+            foreach (var idealFinishInstallation in idealFinishInstallations)
+            {
+                s_Log.Info(String.Format("Ideal Finish Analysis installed @ '{0}'", idealFinishInstallation.InstalledPath));
+            }  
+
+            
+        }
         public HelpAbout()
         {
             InitializeComponent();
@@ -41,10 +95,12 @@ namespace TQC.GOC.InterProcessCommunication.ToolTray
             }
             FormatAssemblyTitleAndVersion(extraInformation, Assembly.GetEntryAssembly());
             m_VersionInfo.Text = extraInformation.ToString();
+
+            LogApplicationDetails();
             
         }
 
-        private bool FormatAssemblyTitleAndVersion(StringBuilder extraInformation, string dllName)
+        private static bool FormatAssemblyTitleAndVersion(StringBuilder extraInformation, string dllName)
         {
             var process = Process.GetCurrentProcess();
             foreach (ProcessModule module in process.Modules)
