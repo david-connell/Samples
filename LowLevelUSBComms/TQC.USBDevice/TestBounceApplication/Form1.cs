@@ -22,6 +22,7 @@ namespace TestBounceApplication
         
         public Form1()
         {
+            //ProductId = USBLogger.USBProductId.Glossmeter;
             InitializeComponent();
             comboBox1.SelectedIndex = 0;            
             backgroundWorker1.RunWorkerAsync() ;
@@ -109,7 +110,7 @@ namespace TestBounceApplication
 
             try
             {
-                result = m_DataLogger.TestCommand(0);
+                result = m_DataLogger.BounceCommand(0, m_Id%255);
             }
             catch (Exception ex1)
             {

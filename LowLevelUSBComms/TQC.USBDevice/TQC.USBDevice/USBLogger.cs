@@ -271,6 +271,7 @@ namespace TQC.USBDevice
             GROSetCommand = 0x60,
             GROReadCommand = 0x61,
             NotValidCommand = 0x7F,
+            BounceCommand=0xFF,
         }
 
         public enum USBCommandResponseCode

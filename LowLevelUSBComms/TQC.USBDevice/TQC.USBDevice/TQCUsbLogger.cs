@@ -307,9 +307,10 @@ namespace TQC.USBDevice
             }
         }
 
-        public byte[] TestCommand(byte deviceId)
+        public byte[] BounceCommand(byte deviceId, int command)
         {
-            var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 5);
+            var result = GetResponse(deviceId, Commands.BounceCommand, command);
+
             return result;
         }
         internal string _ManufactureName(byte deviceId)
