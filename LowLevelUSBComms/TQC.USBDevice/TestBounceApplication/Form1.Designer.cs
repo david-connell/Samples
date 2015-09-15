@@ -32,7 +32,7 @@
             this.m_Connect = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.m_StartStop = new System.Windows.Forms.Button();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.m_Exception = new System.Windows.Forms.Label();
             this.m_ResultBuffer = new System.Windows.Forms.Label();
@@ -75,14 +75,6 @@
             this.m_StartStop.Text = "Start test";
             this.m_StartStop.UseVisualStyleBackColor = true;
             this.m_StartStop.Click += new System.EventHandler(this.m_StartStop_Click);
-            // 
-            // backgroundWorker1
-            // 
-            this.backgroundWorker1.WorkerReportsProgress = true;
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
             // 
             // groupBox1
             // 

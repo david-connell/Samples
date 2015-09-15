@@ -21,16 +21,35 @@ namespace TestBounceApplication
         bool m_IsTestButtonStop;
         TQCUsbLogger m_DataLogger;
         int m_Count;
-        int m_NumberOfThreads;
+        int m_NumberOfThreads = 10;
         Stopwatch m_StopWatch;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        List<System.ComponentModel.BackgroundWorker> backgroundWorkers = new List<BackgroundWorker>();
 
         public Form1()
         {
-            ProductId = USBLogger.USBProductId.Glossmeter;
+            //ProductId = USBLogger.USBProductId.Glossmeter;
             InitializeComponent();
-            comboBox1.SelectedIndex = 0;            
-            backgroundWorker1.RunWorkerAsync() ;
+            comboBox1.SelectedIndex = 0;
+            CreateBackGroundWorkers();
+        }
+
+        bool CancellationPending { get; set; }
+
+        private void CreateBackGroundWorkers()
+        {
+            for (int i = 0; i < m_NumberOfThreads; i++)
+            {
+                var backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+
+                backgroundWorker1.WorkerReportsProgress = true;
+                backgroundWorker1.WorkerSupportsCancellation = true;
+                backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+                backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+                backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+
+                backgroundWorker1.RunWorkerAsync();
+                backgroundWorkers.Add(backgroundWorker1);
+            }
         }
 
         private void m_Connect_Click(object sender, EventArgs e)
@@ -94,15 +113,14 @@ namespace TestBounceApplication
                 m_DoTest = false;
                 m_StartStop.Text = "Start";
                 
-            }
-            
+            }            
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            while (!backgroundWorker1.CancellationPending)
+            while (!CancellationPending)
             {
-                //Thread.Sleep(100);
+                Thread.Sleep(0);
                 if (m_DoTest && m_DataLogger != null)
                 {
                     IssueCommand();
@@ -132,7 +150,7 @@ namespace TestBounceApplication
                     Result = result,
                     Exception = ex,
                 };
-                backgroundWorker1.ReportProgress(0, state);
+                backgroundWorkers[0].ReportProgress(0, state);
             }
         }
 
@@ -167,18 +185,20 @@ namespace TestBounceApplication
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            backgroundWorker1.CancelAsync();
+            CancellationPending = true;
             CloseLogger();
         }
 
+        int m_TickerCounter;
         private void timer1_Tick(object sender, EventArgs e)
         {
             string result = "Not running";
-            if (m_StopWatch != null && m_StopWatch.ElapsedMilliseconds > 0)
+            m_TickerCounter++;
+            if (m_StopWatch != null && m_DoTest && m_StopWatch.ElapsedMilliseconds > 0)
             {
                 result = string.Format("{0:.0} packets/sec", m_Count / ((float)m_StopWatch.ElapsedMilliseconds / 1000.0f));
             }
-            m_RequestsPerSecond.Text = result;
+            m_RequestsPerSecond.Text = (m_TickerCounter %2 == 0 ? " " : "*") +result;
         }
     }
 
