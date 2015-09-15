@@ -94,7 +94,7 @@ namespace TestBounceApplication
         {
             while (!backgroundWorker1.CancellationPending)
             {
-                Thread.Sleep(100);
+                //Thread.Sleep(100);
                 if (m_DoTest && m_DataLogger != null)
                 {
                     IssueCommand();
