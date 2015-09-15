@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -19,10 +20,14 @@ namespace TestBounceApplication
         bool m_IsConnectButtonClose;
         bool m_IsTestButtonStop;
         TQCUsbLogger m_DataLogger;
-        
+        int m_Count;
+        int m_NumberOfThreads;
+        Stopwatch m_StopWatch;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+
         public Form1()
         {
-            //ProductId = USBLogger.USBProductId.Glossmeter;
+            ProductId = USBLogger.USBProductId.Glossmeter;
             InitializeComponent();
             comboBox1.SelectedIndex = 0;            
             backgroundWorker1.RunWorkerAsync() ;
@@ -39,7 +44,7 @@ namespace TestBounceApplication
             }
             else
             {
-                
+                m_DataLogger = OpenLogger();   
                 m_StartStop.Enabled = true;
                 m_Connect.Text = "Close";
             }
@@ -76,9 +81,12 @@ namespace TestBounceApplication
         private void SetStartStopButton(bool setToStop)
         {
             if (setToStop)
-            {
-                m_DataLogger = OpenLogger();
+            {                
                 m_DoTest = true;
+                m_StopWatch = new Stopwatch();
+                m_Count = 0;
+                m_StopWatch.Start();
+
                 m_StartStop.Text = "Stop";
             }
             else
@@ -99,8 +107,7 @@ namespace TestBounceApplication
                 {
                     IssueCommand();
                 }
-            }
-            CloseLogger();
+            }            
         }
         
         private void IssueCommand()
@@ -111,21 +118,22 @@ namespace TestBounceApplication
             try
             {
                 result = m_DataLogger.BounceCommand(0, m_Id%255);
+                m_Count++;
             }
             catch (Exception ex1)
             {
                 ex = ex1;
             }
-
-            ProgressState state = new ProgressState
+            if (ex != null)
             {
-                RequestId = m_Id++,
-                Result = result,
-                Exception = ex,
-            };
-            
-
-            backgroundWorker1.ReportProgress(0, state);
+                ProgressState state = new ProgressState
+                {
+                    RequestId = m_Id++,
+                    Result = result,
+                    Exception = ex,
+                };
+                backgroundWorker1.ReportProgress(0, state);
+            }
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -160,6 +168,17 @@ namespace TestBounceApplication
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             backgroundWorker1.CancelAsync();
+            CloseLogger();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            string result = "Not running";
+            if (m_StopWatch != null && m_StopWatch.ElapsedMilliseconds > 0)
+            {
+                result = string.Format("{0:.0} packets/sec", m_Count / ((float)m_StopWatch.ElapsedMilliseconds / 1000.0f));
+            }
+            m_RequestsPerSecond.Text = result;
         }
     }
 

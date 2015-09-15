@@ -28,15 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.m_Connect = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.m_StartStop = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.m_RequestId = new System.Windows.Forms.Label();
-            this.m_ResultBuffer = new System.Windows.Forms.Label();
             this.m_Exception = new System.Windows.Forms.Label();
+            this.m_ResultBuffer = new System.Windows.Forms.Label();
+            this.m_RequestId = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.m_RequestsPerSecond = new System.Windows.Forms.Label();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -82,6 +86,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.m_RequestsPerSecond);
+            this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.m_Exception);
             this.groupBox1.Controls.Add(this.m_ResultBuffer);
             this.groupBox1.Controls.Add(this.m_RequestId);
@@ -93,41 +99,65 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Commands";
             // 
-            // label1
+            // m_Exception
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(23, 31);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(100, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Request packet ID:";
-            // 
-            // m_RequestId
-            // 
-            this.m_RequestId.AutoSize = true;
-            this.m_RequestId.Location = new System.Drawing.Point(145, 31);
-            this.m_RequestId.Name = "m_RequestId";
-            this.m_RequestId.Size = new System.Drawing.Size(13, 13);
-            this.m_RequestId.TabIndex = 1;
-            this.m_RequestId.Text = "0";
+            this.m_Exception.AutoSize = true;
+            this.m_Exception.Location = new System.Drawing.Point(152, 102);
+            this.m_Exception.Name = "m_Exception";
+            this.m_Exception.Size = new System.Drawing.Size(99, 13);
+            this.m_Exception.TabIndex = 3;
+            this.m_Exception.Text = "Exceptions go here";
             // 
             // m_ResultBuffer
             // 
             this.m_ResultBuffer.AutoSize = true;
-            this.m_ResultBuffer.Location = new System.Drawing.Point(152, 56);
+            this.m_ResultBuffer.Location = new System.Drawing.Point(152, 71);
             this.m_ResultBuffer.Name = "m_ResultBuffer";
             this.m_ResultBuffer.Size = new System.Drawing.Size(190, 13);
             this.m_ResultBuffer.TabIndex = 2;
             this.m_ResultBuffer.Text = "Result data from request goes here...";
             // 
-            // m_Exception
+            // m_RequestId
             // 
-            this.m_Exception.AutoSize = true;
-            this.m_Exception.Location = new System.Drawing.Point(152, 87);
-            this.m_Exception.Name = "m_Exception";
-            this.m_Exception.Size = new System.Drawing.Size(99, 13);
-            this.m_Exception.TabIndex = 3;
-            this.m_Exception.Text = "Exceptions go here";
+            this.m_RequestId.AutoSize = true;
+            this.m_RequestId.Location = new System.Drawing.Point(145, 46);
+            this.m_RequestId.Name = "m_RequestId";
+            this.m_RequestId.Size = new System.Drawing.Size(13, 13);
+            this.m_RequestId.TabIndex = 1;
+            this.m_RequestId.Text = "0";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(23, 46);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(100, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Request packet ID:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(23, 23);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(107, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Request per second:";
+            // 
+            // m_RequestsPerSecond
+            // 
+            this.m_RequestsPerSecond.AutoSize = true;
+            this.m_RequestsPerSecond.Location = new System.Drawing.Point(145, 26);
+            this.m_RequestsPerSecond.Name = "m_RequestsPerSecond";
+            this.m_RequestsPerSecond.Size = new System.Drawing.Size(31, 13);
+            this.m_RequestsPerSecond.TabIndex = 5;
+            this.m_RequestsPerSecond.Text = "        ";
+            // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 1000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Form1
             // 
@@ -153,12 +183,15 @@
         private System.Windows.Forms.Button m_Connect;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Button m_StartStop;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label m_RequestId;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label m_ResultBuffer;
         private System.Windows.Forms.Label m_Exception;
+        private System.Windows.Forms.Label m_RequestsPerSecond;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 
