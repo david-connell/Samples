@@ -27,7 +27,7 @@ namespace TestBounceApplication
 
         public Form1()
         {
-            ProductId = USBLogger.USBProductId.Glossmeter;
+            //ProductId = USBLogger.USBProductId.Glossmeter;
             InitializeComponent();
             comboBox1.SelectedIndex = 0;
             CreateBackGroundWorkers();
