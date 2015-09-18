@@ -32,15 +32,16 @@
             this.m_Connect = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.m_StartStop = new System.Windows.Forms.Button();
-            
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.m_RequestsPerSecond = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.m_Exception = new System.Windows.Forms.Label();
             this.m_ResultBuffer = new System.Windows.Forms.Label();
             this.m_RequestId = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.m_RequestsPerSecond = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.m_Errors = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -78,6 +79,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.m_Errors);
+            this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.m_RequestsPerSecond);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.m_Exception);
@@ -91,10 +94,28 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Commands";
             // 
+            // m_RequestsPerSecond
+            // 
+            this.m_RequestsPerSecond.AutoSize = true;
+            this.m_RequestsPerSecond.Location = new System.Drawing.Point(145, 26);
+            this.m_RequestsPerSecond.Name = "m_RequestsPerSecond";
+            this.m_RequestsPerSecond.Size = new System.Drawing.Size(31, 13);
+            this.m_RequestsPerSecond.TabIndex = 5;
+            this.m_RequestsPerSecond.Text = "        ";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(23, 23);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(107, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Request per second:";
+            // 
             // m_Exception
             // 
             this.m_Exception.AutoSize = true;
-            this.m_Exception.Location = new System.Drawing.Point(152, 102);
+            this.m_Exception.Location = new System.Drawing.Point(145, 132);
             this.m_Exception.Name = "m_Exception";
             this.m_Exception.Size = new System.Drawing.Size(99, 13);
             this.m_Exception.TabIndex = 3;
@@ -103,7 +124,7 @@
             // m_ResultBuffer
             // 
             this.m_ResultBuffer.AutoSize = true;
-            this.m_ResultBuffer.Location = new System.Drawing.Point(152, 71);
+            this.m_ResultBuffer.Location = new System.Drawing.Point(145, 101);
             this.m_ResultBuffer.Name = "m_ResultBuffer";
             this.m_ResultBuffer.Size = new System.Drawing.Size(190, 13);
             this.m_ResultBuffer.TabIndex = 2;
@@ -127,29 +148,29 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Request packet ID:";
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(23, 23);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(107, 13);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Request per second:";
-            // 
-            // m_RequestsPerSecond
-            // 
-            this.m_RequestsPerSecond.AutoSize = true;
-            this.m_RequestsPerSecond.Location = new System.Drawing.Point(145, 26);
-            this.m_RequestsPerSecond.Name = "m_RequestsPerSecond";
-            this.m_RequestsPerSecond.Size = new System.Drawing.Size(31, 13);
-            this.m_RequestsPerSecond.TabIndex = 5;
-            this.m_RequestsPerSecond.Text = "        ";
-            // 
             // timer1
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // m_Errors
+            // 
+            this.m_Errors.AutoSize = true;
+            this.m_Errors.Location = new System.Drawing.Point(145, 74);
+            this.m_Errors.Name = "m_Errors";
+            this.m_Errors.Size = new System.Drawing.Size(13, 13);
+            this.m_Errors.TabIndex = 7;
+            this.m_Errors.Text = "0";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(23, 74);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(84, 13);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Error packet ID:";
             // 
             // Form1
             // 
@@ -184,6 +205,8 @@
         private System.Windows.Forms.Label m_RequestsPerSecond;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label m_Errors;
+        private System.Windows.Forms.Label label4;
     }
 }
 

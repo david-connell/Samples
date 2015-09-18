@@ -27,7 +27,7 @@ namespace TestBounceApplication
 
         public Form1()
         {
-            //ProductId = USBLogger.USBProductId.Glossmeter;
+            ProductId = USBLogger.USBProductId.Glossmeter;
             InitializeComponent();
             comboBox1.SelectedIndex = 0;
             CreateBackGroundWorkers();
@@ -127,7 +127,9 @@ namespace TestBounceApplication
                 }
             }            
         }
-        
+
+        Random value = new Random(0);
+
         private void IssueCommand()
         {
             byte[] result = null;
@@ -135,7 +137,30 @@ namespace TestBounceApplication
 
             try
             {
-                result = m_DataLogger.BounceCommand(0, m_Id%255);
+                byte[] data = new byte[0];
+                int length = value.Next(45);
+                if (length > 0)
+                {
+                    data = new byte[length];
+                    value.NextBytes(data);
+                }
+                Int16 commandId = (Int16)(m_Id % 255);
+                result = m_DataLogger.BounceCommand(0, commandId, data);
+                Int16 commandReadBack = BitConverter.ToInt16(result, 0);
+                if (commandId != commandReadBack)
+                {
+                    Error(commandId,commandReadBack);
+                }
+                //if (data != null)
+                {
+                    for (int counter = 0; counter < data.Length; counter++)
+                    {
+                        if (data[counter] != result[counter + 2])
+                        {
+                            Error(counter, data[counter], result[counter + 2]);
+                        }
+                    }
+                }
                 m_Count++;
             }
             catch (Exception ex1)
@@ -144,14 +169,26 @@ namespace TestBounceApplication
             }
             if (ex != null)
             {
+                
                 ProgressState state = new ProgressState
                 {
                     RequestId = m_Id++,
                     Result = result,
                     Exception = ex,
                 };
+                Thread.Sleep(100);
                 backgroundWorkers[0].ReportProgress(0, state);
             }
+        }
+
+        private void Error(int counter, byte p1, byte p2)
+        {
+            throw new Exception(string.Format("Element {0} {1} != {2}", counter, p1, p2));
+        }
+
+        private void Error(Int16 p1, Int16 p2)
+        {
+            throw new Exception("Invalid Int16 found");
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -171,7 +208,7 @@ namespace TestBounceApplication
                     }
                     builder.Append("]");
                 }
-                m_RequestId.Text = state.RequestId.ToString();
+                m_Errors.Text = state.RequestId.ToString();
                 m_ResultBuffer.Text = builder.ToString();
                 m_Exception.Text = state.Exception == null ? "" : state.Exception.Message;
             }
@@ -194,11 +231,13 @@ namespace TestBounceApplication
         {
             string result = "Not running";
             m_TickerCounter++;
+            int count = m_Count;
             if (m_StopWatch != null && m_DoTest && m_StopWatch.ElapsedMilliseconds > 0)
             {
-                result = string.Format("{0:.0} packets/sec", m_Count / ((float)m_StopWatch.ElapsedMilliseconds / 1000.0f));
+                result = string.Format("{0:.0} packets/sec", count / ((float)m_StopWatch.ElapsedMilliseconds / 1000.0f));
             }
             m_RequestsPerSecond.Text = (m_TickerCounter %2 == 0 ? " " : "*") +result;
+            m_RequestId.Text = count.ToString();
         }
     }
 

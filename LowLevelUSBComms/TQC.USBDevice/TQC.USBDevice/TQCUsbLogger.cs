@@ -307,9 +307,9 @@ namespace TQC.USBDevice
             }
         }
 
-        public byte[] BounceCommand(byte deviceId, int command)
+        public byte[] BounceCommand(byte deviceId, int command, byte [] bytes)
         {
-            var result = GetResponse(deviceId, Commands.BounceCommand, command);
+            var result = GetResponse(deviceId, Commands.BounceCommand, command, new List<byte>(bytes));
 
             return result;
         }
