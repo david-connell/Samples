@@ -27,7 +27,7 @@ namespace TestBounceApplication
 
         public Form1()
         {
-            ProductId = USBLogger.USBProductId.Glossmeter;
+            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
             InitializeComponent();
             comboBox1.SelectedIndex = 0;
             CreateBackGroundWorkers();
@@ -123,13 +123,18 @@ namespace TestBounceApplication
                 Thread.Sleep(0);
                 if (m_DoTest && m_DataLogger != null)
                 {
-                    IssueCommand();
+                    IssueCommand1();
                 }
             }            
         }
 
         Random value = new Random(0);
 
+        private void IssueCommand1()
+        {
+            var result = m_DataLogger.NumberOfBatches;
+            m_Count++;
+        }
         private void IssueCommand()
         {
             byte[] result = null;
@@ -138,7 +143,8 @@ namespace TestBounceApplication
             try
             {
                 byte[] data = new byte[0];
-                int length = value.Next(45);
+                int length = value.Next(50);
+                
                 if (length > 0)
                 {
                     data = new byte[length];

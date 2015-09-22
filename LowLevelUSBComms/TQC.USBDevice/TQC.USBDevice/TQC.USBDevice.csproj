@@ -78,6 +78,7 @@
     <Compile Include="UsbDevices.cs" />
     <Compile Include="USBLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Crc32.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="stdole">
@@ -93,6 +94,12 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="TQC.USBDevice.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UsbLibrary\UsbLibrary.csproj">
+      <Project>{71e42a6d-c432-4c03-bf4f-abfd2a3173e0}</Project>
+      <Name>UsbLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
