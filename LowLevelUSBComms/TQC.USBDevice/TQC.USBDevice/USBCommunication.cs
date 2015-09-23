@@ -13,6 +13,12 @@ namespace TQC.USBDevice
         private UsbLibrary.UsbHidPort m_UsbHidPort1;
         USBLogger m_UsbLogger;
         private ILog m_Log = LogManager.GetLogger("TQC.USBDevice.USBCommunication");
+        ManualResetEvent m_Event = new ManualResetEvent(false);
+        byte[] m_Data;
+        Exception m_DataException;
+        byte m_ConversationId;
+        byte m_Request;
+        const byte BounceCommand = 0xFF;
 
         public USBCommunication(USBLogger logger)
         {
@@ -49,18 +55,12 @@ namespace TQC.USBDevice
         }
 
 
-        ManualResetEvent m_Event = new ManualResetEvent(false);
-        byte[] m_Data;
-        Exception m_DataException;
-        byte m_ConversationId;
-        byte m_Request;
-        const byte BounceCommand = 0xFF;
 
         void m_UsbHidPort1_OnDataRecieved(object sender, UsbLibrary.DataRecievedEventArgs args)
         {
             try
             {
-                DecodeData(args.data);
+                m_Data = args.data;
             }
             finally
             {
@@ -68,12 +68,13 @@ namespace TQC.USBDevice
             }
         }
 
-        private void DecodeData(byte[] inputData)
+        private byte[] DecodeData(byte[] inputData)
         {
+            byte[] response = null;
             LogResponsePacket(inputData);
             if (inputData.Length < 10)
             {
-                m_DataException = new ResponsePacketErrorBadLengthException();
+                throw new ResponsePacketErrorBadLengthException();
             }
             else
             {
@@ -100,12 +101,12 @@ namespace TQC.USBDevice
 
                             if (IsValidCrc(inputData, i, requestLength))
                             {
-                                m_Data = new byte[requestLength];
-                                Buffer.BlockCopy(inputData, 5 + i, m_Data, 0, m_Data.Length);
+                                response = new byte[requestLength];
+                                Buffer.BlockCopy(inputData, 5 + i, response, 0, response.Length);
                             }
                             else
                             {
-                                m_DataException = new ResponsePacketErrorCRCException();
+                                throw new ResponsePacketErrorCRCException();
                             }
                         }
                         else if (responseCommand == 0) //This is a status result
@@ -118,60 +119,59 @@ namespace TQC.USBDevice
                                     switch (inputData[5 + i])
                                     {
                                         case 0:
-                                            m_Data = new byte[0];
+                                            response = new byte[0];
                                             break;
                                         case 1:
-                                            m_DataException = new DeviceUnknownErrorException(); break;
+                                            throw new DeviceUnknownErrorException();
 
                                         case 2:
-                                            m_DataException = new CommandCorruptException(); break;
+                                            throw new CommandCorruptException(); 
 
                                         case 3:
-                                            m_DataException = new CommandOutOfSequenceException(); break;
+                                            throw new CommandOutOfSequenceException(); 
 
                                         case 4:
-                                            m_DataException = new CommandUnexpectedException(); break;
+                                            throw new CommandUnexpectedException(); 
 
                                         case 5:
-                                            m_DataException = new DeviceBusyException(); break;
+                                            throw new DeviceBusyException(); 
 
                                         case 6:
-                                            m_DataException = new CommandNotSuportedException(); break;
+                                            throw new CommandNotSuportedException(); 
 
                                         case 7:
-                                            m_DataException = new EnumerationNotSuportedException(); break;
+                                            throw new EnumerationNotSuportedException(); 
 
                                         case 8:
-                                            m_DataException = new BatchNotAvailableException(); break;
+                                            throw new BatchNotAvailableException(); 
 
                                         case 9:
-                                            m_DataException = new DataOutOfRangeException(); break;
+                                            throw new DataOutOfRangeException();
 
-                                        case 10: m_DataException = new CommandModeNotSupportedException(); break;
+                                        case 10: throw new CommandModeNotSupportedException(); 
 
                                         default:
-                                            m_DataException = new ResponsePacketErrorBadCommandException();
-                                            break;
+                                            throw new ResponsePacketErrorBadCommandException();                                            
                                     }
                                 }
                                 else
                                 {
-                                    m_DataException = new ResponsePacketErrorCRCException();
+                                    throw new ResponsePacketErrorCRCException();
                                 }
                             }
                         }
                     }
                     else
                     {
-                        m_DataException = new ResponsePacketErrorBadCommandException();
+                        throw new ResponsePacketErrorBadCommandException();
                     }
                 }
                 else
                 {
-                    m_DataException = new ResponsePacketErrorBadCommandException();
+                    throw new ResponsePacketErrorBadCommandException();
                 }
             }
-
+            return response;
         }
 
         private bool IsValidCrc(byte[] inputData, int i, int requestLength)
@@ -192,81 +192,96 @@ namespace TQC.USBDevice
 
         public byte[] IssueRequest(TQC.USBDevice.USBLogger.Commands command, byte[] request, byte conversationId)
         {
+            byte[] dataRecieved;
             lock (m_UsbHidPort1)
             {
                 m_Data = null;
-                m_DataException = null;
-
-                m_ConversationId = conversationId;
-                m_Request = (byte)command;
-                if (request.Length > 65 - 6 - 4)
-                {
-                    throw new ResponsePacketErrorBadLengthException();
-                }
-                byte[] data = new byte[65];
-                int i = 0;
-                if (IsUsbCommsStyleCurvex3)
-                {
-                    data[i++] = 63;
-                    data[i++] = 64;
-                }
-                else
-                {
-                    data[i++] = 0x00;
-                }
-                data[i++] = 0xCD;
-                data[i++] = 0xCD;
-                data[i++] = conversationId;
-                data[i++] = m_Request;
-                data[i++] = (byte)request.Length;
-                foreach (byte val in request)
-                {
-                    data[i++] = val;
-                }
-
-                byte[] crcAsBits = null; ;
-                if (IsUsbCommsStyleCurvex3)
-                {
-                    var buffer = new byte[request.Length + 5];
-                    Buffer.BlockCopy(data, 2, buffer, 0, buffer.Length);
-                    var crc = Crc32.Calculate(buffer);
-                    crcAsBits = BitConverter.GetBytes(crc);
-
-                }
-                else
-                {
-                    var buffer = new byte[request.Length + 6];
-                    Buffer.BlockCopy(data, 0, buffer, 0, buffer.Length);
-                    var crc = Crc32.Calculate(buffer);
-                    crcAsBits = BitConverter.GetBytes(crc);
-                }
-                foreach (byte val in crcAsBits)
-                {
-                    data[i++] = val;
-                }
                 m_Event.Reset();
-                var arrayToSend = new byte[0x41];
-                Buffer.BlockCopy(data, 0, arrayToSend, 0, arrayToSend.Length);
-                LogRequestPacket(arrayToSend);
-
-                m_UsbHidPort1.SpecifiedDevice.SendData(arrayToSend);
-
-
-                if (!m_Event.WaitOne(GetTimeOutForCommand(command)))
+                m_UsbHidPort1.SpecifiedDevice.SendData(GenerateRequest(command, request, conversationId));
+                
+                if (!m_Event.WaitOne(GetTimeOutForCommand(command)) )
                 {
                     throw new ResponsePacketErrorTimeoutException();
                 }
-                if (m_DataException != null)
-                {
-                    throw m_DataException;
-                }                
-                return m_Data;
+                dataRecieved = m_Data;
+                m_Data = null;                
             }
+            return DecodeData(dataRecieved);
 
         }
 
-        private void LogRequestPacket(byte[] data)
+        private byte[] GenerateRequest(TQC.USBDevice.USBLogger.Commands command, byte[] request, byte conversationId)
         {
+            m_ConversationId = conversationId;
+            m_Request = (byte)command;
+            if (request.Length > 65 - 6 - 4)
+            {
+                throw new ResponsePacketErrorBadLengthException();
+            }
+            byte[] data = new byte[65];
+            int i = 0;
+            if (IsUsbCommsStyleCurvex3)
+            {
+                data[i++] = 63;
+                data[i++] = 64;
+            }
+            else
+            {
+                data[i++] = 0x00;
+            }
+            data[i++] = 0xCD;
+            data[i++] = 0xCD;
+            data[i++] = conversationId;
+            data[i++] = m_Request;
+            data[i++] = (byte)request.Length;
+            foreach (byte val in request)
+            {
+                data[i++] = val;
+            }
+
+            byte[] crcAsBits = null; ;
+            if (IsUsbCommsStyleCurvex3)
+            {
+                var buffer = new byte[request.Length + 5];
+                Buffer.BlockCopy(data, 2, buffer, 0, buffer.Length);
+                var crc = Crc32.Calculate(buffer);
+                crcAsBits = BitConverter.GetBytes(crc);
+
+            }
+            else
+            {
+                var buffer = new byte[request.Length + 6];
+                Buffer.BlockCopy(data, 0, buffer, 0, buffer.Length);
+                var crc = Crc32.Calculate(buffer);
+                crcAsBits = BitConverter.GetBytes(crc);
+            }
+            foreach (byte val in crcAsBits)
+            {
+                data[i++] = val;
+            }            
+            var arrayToSend = new byte[0x41];
+            Buffer.BlockCopy(data, 0, arrayToSend, 0, arrayToSend.Length);
+            LogRequestPacket(arrayToSend);
+
+            return arrayToSend;
+        }
+
+        bool? m_IsLoggingEnabled;
+
+        bool IsLoggingEnabled
+        {
+            get
+            {
+                if (!m_IsLoggingEnabled.HasValue)
+                {
+                    m_IsLoggingEnabled = m_Log.IsDebugEnabled;
+                }
+                return m_IsLoggingEnabled.Value;
+            }
+        }
+
+        private void LogRequestPacket(byte[] data)
+        {            
             LogPacket("PC->USB", data);
         }
 
@@ -277,26 +292,29 @@ namespace TQC.USBDevice
 
         private void LogPacket(string text, byte[] data)
         {
-            int lineLength = 16;
-            StringBuilder builder = new StringBuilder();
-            builder.AppendLine(text);
-            for (int line = 0; line < data.Length / lineLength; line++)
+            if (IsLoggingEnabled)
             {
-                StringBuilder part1 = new StringBuilder();
-                StringBuilder part2 = new StringBuilder();
-                int pos = line * lineLength;
-                for (int col = 0; col <lineLength && ((pos+col) < data.Length); col++)
+                int lineLength = 16;
+                StringBuilder builder = new StringBuilder();
+                builder.AppendLine(text);
+                for (int line = 0; line < data.Length / lineLength; line++)
                 {
-                    byte dataValue = data[pos+col];
-                    part1.Append(dataValue.ToString("X2"));
-                    part1.Append(" ");
-                    part2.Append(dataValue < 32 ? '*' : (char)dataValue);
+                    StringBuilder part1 = new StringBuilder();
+                    StringBuilder part2 = new StringBuilder();
+                    int pos = line * lineLength;
+                    for (int col = 0; col < lineLength && ((pos + col) < data.Length); col++)
+                    {
+                        byte dataValue = data[pos + col];
+                        part1.Append(dataValue.ToString("X2"));
+                        part1.Append(" ");
+                        part2.Append(dataValue < 32 ? '*' : (char)dataValue);
+                    }
+                    builder.Append(part1);
+                    builder.Append(part2);
+                    builder.AppendLine();
                 }
-                builder.Append(part1);                
-                builder.Append(part2);
-                builder.AppendLine();                
+                m_Log.Info(builder.ToString());
             }
-            m_Log.Info(builder.ToString());
 
         }
 
