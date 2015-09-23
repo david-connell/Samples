@@ -60,11 +60,9 @@
             // 
             this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "GRO (VID 0403 PID 7B60)"});
             this.comboBox1.Location = new System.Drawing.Point(119, 13);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(166, 21);
+            this.comboBox1.Size = new System.Drawing.Size(239, 21);
             this.comboBox1.TabIndex = 1;
             // 
             // m_StartStop

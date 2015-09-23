@@ -15,6 +15,7 @@ namespace TQC.USBDevice
     public class TQCUsbLogger : USBLogger, ISimpleTQCDevice
     {
         Dictionary<byte, int> ProbesPerDevice = new Dictionary<byte, int>();
+        Dictionary<byte, CachedData> m_CachedData = new Dictionary<byte, CachedData>();
         
         private string CommandDescription(Commands command, int commandId)
         {
@@ -104,6 +105,7 @@ namespace TQC.USBDevice
         protected override void ClearCachedData()
         {
             ProbesPerDevice = new Dictionary<byte, int>();
+            m_CachedData = new Dictionary<byte, CachedData>();
         }
 
         public Int32 SerialNumber
@@ -625,15 +627,39 @@ namespace TQC.USBDevice
 
 
         
+        class CachedData
+        {
+            public int NumberOfProbes {get; private set;}
+            public DeviceType DeviceType {get; private set;}
+            public CachedData(int numberOfProbes, DeviceType devType)
+            {
+                NumberOfProbes = numberOfProbes;
+                DeviceType =devType;
+            }
+        }
+        
+
+        CachedData GetData(byte deviceId)
+        {
+            lock (m_CachedData)
+            {
+                if (!m_CachedData.ContainsKey(deviceId))
+                {
+                    m_CachedData[deviceId] = new CachedData(_NumberOfProbes(deviceId), _DeviceType(deviceId));
+                }
+            }
+            return m_CachedData[deviceId];
+        }
         internal IEnumerable<double> _ProbeValues(byte deviceId)
         {
             List<double> data = new List<double>();
-            int totalNumberOfProbes = _NumberOfProbes(deviceId);
+            var cachedData = GetData(deviceId);
+            int totalNumberOfProbes = cachedData.NumberOfProbes;
             int maxNumberOfSets = 1; // (int)(totalNumberOfProbes / 8 + 0.999);
             for (int setId = 1; setId <= maxNumberOfSets; setId++)
             {
                 byte mode = 0x05;
-                switch(_DeviceType(deviceId))
+                switch (cachedData.DeviceType)
                 {
                     case DeviceType.PolyGlossmeter:
                     case DeviceType.DuoGlossmeter:

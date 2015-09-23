@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -53,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeviceResponseUnexpectedException.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GlossMeter\GlossMeterLogger.cs" />
     <Compile Include="GradientOven\ButtonStatus.cs" />
     <Compile Include="GradientOven\CarrierPosition.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace TQC.USBDevice
 {
@@ -25,6 +26,12 @@ namespace TQC.USBDevice
             : base(info, context)
         {
         }
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+        }        
+
     }
 
     [Serializable]
@@ -35,6 +42,12 @@ namespace TQC.USBDevice
         {
             
         }
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+        }
+
     }
 
     [Serializable]
@@ -48,6 +61,12 @@ namespace TQC.USBDevice
             Length = length;
             Expected = expected;
         }
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+        }
+
     }
     
 
@@ -67,6 +86,12 @@ namespace TQC.USBDevice
             : base(info, context)
         {
         }
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+        }
+
     }
 
     [Serializable]

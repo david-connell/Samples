@@ -501,7 +501,7 @@ namespace TQC.USBDevice
 
         [DllImport("hid.dll", SetLastError = true)]
 
-        protected static extern bool HidD_GetAttributes(
+        protected static extern Boolean HidD_GetAttributes(
 
                 IntPtr hFile,                                                           // IN HANDLE  HidDeviceObject,
 

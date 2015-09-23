@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using log4net;
 using TQC.USBDevice.Utils;
 
 namespace TQC.USBDevice
@@ -11,6 +12,7 @@ namespace TQC.USBDevice
     {
         private UsbLibrary.UsbHidPort m_UsbHidPort1;
         USBLogger m_UsbLogger;
+        private ILog m_Log = LogManager.GetLogger("TQC.USBDevice.USBCommunication");
 
         public USBCommunication(USBLogger logger)
         {
@@ -68,6 +70,7 @@ namespace TQC.USBDevice
 
         private void DecodeData(byte[] inputData)
         {
+            LogResponsePacket(inputData);
             if (inputData.Length < 10)
             {
                 m_DataException = new ResponsePacketErrorBadLengthException();
@@ -244,19 +247,75 @@ namespace TQC.USBDevice
                 m_Event.Reset();
                 var arrayToSend = new byte[0x41];
                 Buffer.BlockCopy(data, 0, arrayToSend, 0, arrayToSend.Length);
+                LogRequestPacket(arrayToSend);
+
                 m_UsbHidPort1.SpecifiedDevice.SendData(arrayToSend);
 
-                if (!m_Event.WaitOne(2000))
+
+                if (!m_Event.WaitOne(GetTimeOutForCommand(command)))
                 {
                     throw new ResponsePacketErrorTimeoutException();
                 }
                 if (m_DataException != null)
                 {
                     throw m_DataException;
-                }
+                }                
                 return m_Data;
             }
 
+        }
+
+        private void LogRequestPacket(byte[] data)
+        {
+            LogPacket("PC->USB", data);
+        }
+
+        private void LogResponsePacket(byte[] data)
+        {
+            LogPacket("USB->PC", data);
+        }
+
+        private void LogPacket(string text, byte[] data)
+        {
+            int lineLength = 16;
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(text);
+            for (int line = 0; line < data.Length / lineLength; line++)
+            {
+                StringBuilder part1 = new StringBuilder();
+                StringBuilder part2 = new StringBuilder();
+                int pos = line * lineLength;
+                for (int col = 0; col <lineLength && ((pos+col) < data.Length); col++)
+                {
+                    byte dataValue = data[pos+col];
+                    part1.Append(dataValue.ToString("X2"));
+                    part1.Append(" ");
+                    part2.Append(dataValue < 32 ? '*' : (char)dataValue);
+                }
+                builder.Append(part1);                
+                builder.Append(part2);
+                builder.AppendLine();                
+            }
+            m_Log.Info(builder.ToString());
+
+        }
+
+        private TimeSpan GetTimeOutForCommand(USBLogger.Commands command)
+        {
+            TimeSpan time2Wait = new TimeSpan(0, 0, 0, 6, 0);
+            if (m_UsbLogger.IsCurvex3)
+            {
+                time2Wait = new TimeSpan(0, 0, 0, 1, 0);
+            }
+            else if (m_UsbLogger.IsGlossmeter)
+            {
+                time2Wait = new TimeSpan(0, 0, 0, 2, 0);
+            }
+            else if (m_UsbLogger.IsGRO)
+            {
+                time2Wait = new TimeSpan(0, 0, 0, 0, 200);
+            }
+            return time2Wait;
         }
 
         public void Close()

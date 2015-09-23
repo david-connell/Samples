@@ -14,8 +14,7 @@ using TQC.USBDevice;
 namespace TestBounceApplication
 {
     public partial class Form1 : Form
-    {
-        private USBLogger.USBProductId ProductId = USBLogger.USBProductId.GRADIENT_OVEN;
+    {        
         int m_Id = 0;
         bool m_DoTest;
         bool m_IsConnectButtonClose;
@@ -27,15 +26,60 @@ namespace TestBounceApplication
         List<System.ComponentModel.BackgroundWorker> backgroundWorkers = new List<BackgroundWorker>();
         Configuration m_Configuration = new Configuration();
         private ILog m_Log = LogManager.GetLogger("TestBounce");
+        USBLogger.USBProductId m_CachedProduct;
+
         public Form1()
-        {
-            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
+        {            
             InitializeComponent();
-            comboBox1.SelectedIndex = 0;
+            comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.Glossmeter));
+            comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.GRADIENT_OVEN));
+            comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_CURVEX_3));
+            comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_CURVEX_3a));
+            comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_PRODUCT2));
+            comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR));
+            comboBox1.SelectedIndex = 1;
             m_UseIFAComms.Checked = m_Configuration.UseNativeCommunication;
             CreateBackGroundWorkers();
         }
+        USBLogger.USBProductId ProductId
+        {
+            get
+            {
+                USBLogger.USBProductId id = USBLogger.USBProductId.GRADIENT_OVEN;
+                if (comboBox1.SelectedIndex >= 0)
+                {
+                    var result = comboBox1.Items[comboBox1.SelectedIndex] as UserSelection;
+                    if (result != null)
+                    {
+                        id = result.ProductId;
+                    }
+                }
+                return id;
+            }
+        }
 
+
+        class UserSelection
+        {
+            public USBLogger.USBProductId ProductId { get; set; }
+            public UserSelection(USBLogger.USBProductId id)
+            {
+                ProductId = id;
+            }
+            
+            public override string ToString()
+            {
+                switch (ProductId)
+                {                    
+                    case USBLogger.USBProductId.GRADIENT_OVEN: return "GRO";
+                    case USBLogger.USBProductId.Glossmeter: return "Glossmeter";
+                    case USBLogger.USBProductId.USB_CURVEX_3a: return "CurveX 3 (VID=0x2047, PID=0x0827)";
+                    case USBLogger.USBProductId.USB_CURVEX_3: return "CurveX 3 (VID=0x2047, PID=0xFFFE)";                    
+                    case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR: return "Thermocouple Simulator";                  
+                }
+                return string.Format("VID/PID{0:X}", (int)ProductId);
+            }
+        }
         bool CancellationPending { get; set; }
 
         private void CreateBackGroundWorkers()
@@ -81,17 +125,18 @@ namespace TestBounceApplication
             m_IsTestButtonStop = !m_IsTestButtonStop;
         }
 
-
+        
         protected TQCUsbLogger OpenLogger(bool miniumum = true)
         {
             var logger = new TQCUsbLogger();
             CloseLogger();
-            if (logger.Open(ProductId, miniumum))
+            m_CachedProduct = ProductId;
+            if (logger.Open(m_CachedProduct, miniumum))
             {
                 return logger;
             }
-            m_Log.Error("Failed to connect to logger " + ProductId.ToString());
-            throw new Exception("Failed to connect to logger " + ProductId.ToString());
+            m_Log.Error("Failed to connect to logger " + new UserSelection(m_CachedProduct));
+            throw new Exception("Failed to connect to logger " + new UserSelection(m_CachedProduct));
         }
 
         void CloseLogger()
@@ -130,7 +175,24 @@ namespace TestBounceApplication
                 {
                     try
                     {
-                        IssueCommand1();
+                        switch (m_CachedProduct)
+                        {
+                            case USBLogger.USBProductId.GRADIENT_OVEN:
+                                IssueGroTestCommand();
+                                break;
+                            case USBLogger.USBProductId.Glossmeter:
+                                IssueRandomBounceCommand();
+                                break;
+                            default:
+                                {
+                                    var deviceId = (byte)(m_Count % 8);
+                                    m_DataLogger._ProbeValues((byte)(m_Count % 4));
+                                    //var result = m_DataLogger._SerialNumber(deviceId);
+                                    m_Count++;
+                                }
+                                break;
+                        }
+                        
                     }
                     catch (Exception ex)
                     {
@@ -170,14 +232,57 @@ namespace TestBounceApplication
             return status;
         }
 
-        private void IssueCommand1()
+        const int NumberOfFansPerBoard = 8;
+        const int NumberOfProbesPerBoard = 8;
+
+        byte AbsoluteFanIdToLocalFanId(short fanId)
         {
-            var deviceId = (byte)(m_Count % 4);
-            var result = m_DataLogger._SerialNumber(deviceId);
-            _GetStatus(deviceId);
+            return (byte)(fanId % NumberOfFansPerBoard);
+        }
+
+        byte AbsoluteFanIdToThermcoupleBoardID(short fanId)
+        {
+            return (byte)((fanId / NumberOfFansPerBoard) + 1);
+        }
+
+
+        public void SetTempSetting(short channelId, float temperatureSettingInDegreesC)
+        {
+            if (channelId < 0 || channelId > 32)
+            {
+                throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
+            }
+            if ((temperatureSettingInDegreesC < 0.0f) || (temperatureSettingInDegreesC > 500.0f))
+            {
+                throw new ArgumentOutOfRangeException("temperatureSettingInDegreesC", "Valid Temeprature 0->500C");
+            }
+
+            List<byte> request = new List<byte>();
+
+            request.AddRange(BitConverter.GetBytes((short)(200 + AbsoluteFanIdToLocalFanId(channelId))));
+            request.AddRange(BitConverter.GetBytes(((UInt16)(temperatureSettingInDegreesC * 10.0f + 0.5))));
+            m_DataLogger.Request(TQC.USBDevice.USBLogger.Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(channelId));
+        }
+
+        private void IssueGroTestCommand()
+        {
+            var deviceId = (byte)(m_Count % 2);
+            //var result = m_DataLogger._SerialNumber(deviceId);
+            
+            float temp = (float) (35.0 + ((m_Count % 1000) - 500) / 100.0);
+            m_Log.Info(string.Format("Set channel {0} to {1:0.0}", m_Count % 32, temp));
+            SetTempSetting((short) (m_Count % 32), temp);
+
+            m_DataLogger._ProbeValues((byte)((m_Count % 4)+1));
+
+            if (deviceId != 0)
+            {
+
+            }
+            _GetStatus((byte) (deviceId * (m_Count % 5)));
             m_Count++;
         }
-        private void IssueCommand()
+        private void IssueRandomBounceCommand()
         {
             byte[] result = null;
             Exception ex = null;

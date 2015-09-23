@@ -246,6 +246,7 @@ namespace TQC.USBDevice
         public bool Open(USBProductId id, bool minimumCommunications = false)
         {
             m_ProductId = id;
+            m_Log.Info(string.Format("Open {0} {1}", id, minimumCommunications));
             if (m_bUseTQCCommunications)
             {
                 return OpenCom(id, minimumCommunications, null);
@@ -259,7 +260,7 @@ namespace TQC.USBDevice
         private bool OpenCom(USBProductId id, bool minimumCommunications, string portName)
         {
             m_Handle = InvalidHandle;
-            m_Log.Info(string.Format("Open {0} {1}", id, minimumCommunications));
+            
             try
             {
                 m_Handle = m_Logger.OpenAndReturnHandle(minimumCommunications ? 2 : 0, 0, 0, portName, (uint)id);
@@ -302,6 +303,7 @@ namespace TQC.USBDevice
         public void Close()
         {
             m_Log.Info("Close");
+            ClearCachedData();
             if (m_bUseTQCCommunications)
             {
                 if (m_Handle != InvalidHandle)
@@ -439,7 +441,15 @@ namespace TQC.USBDevice
         {
             bool retry;
             int attempts = MAX_RETRY_ATTEMPTS;
-            m_Log.Info(string.Format("Request {0} to {1}", command, conversationId));
+            if (request != null && request.Length >= 2)
+            {
+                var id = BitConverter.ToInt16(request, 0);
+                m_Log.Info(string.Format("Request {0}/{1} to {2}", command, id, conversationId));
+            }
+            else
+            {
+                m_Log.Info(string.Format("Request {0} to {1}", command, conversationId));
+            }
             do
             {
                 retry = false;
@@ -760,5 +770,22 @@ namespace TQC.USBDevice
                 return (m_ProductId == USBProductId.USB_THERMOCOUPLE_SIMULATOR);
             }
         }
+
+        public bool IsGlossmeter
+        {
+            get
+            {
+                return (m_ProductId == USBProductId.Glossmeter);
+            }
+        }
+
+        public bool IsGRO
+        {
+            get
+            {
+                return (m_ProductId == USBProductId.GRADIENT_OVEN);
+            }
+        }
+
     }
 }
