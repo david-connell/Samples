@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using log4net;
 using TQC.USBDevice;
 
 namespace TestBounceApplication
@@ -25,9 +26,10 @@ namespace TestBounceApplication
         Stopwatch m_StopWatch;
         List<System.ComponentModel.BackgroundWorker> backgroundWorkers = new List<BackgroundWorker>();
         Configuration m_Configuration = new Configuration();
+        private ILog m_Log = LogManager.GetLogger("TestBounce");
         public Form1()
         {
-            //ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
+            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
             InitializeComponent();
             comboBox1.SelectedIndex = 0;
             m_UseIFAComms.Checked = m_Configuration.UseNativeCommunication;
@@ -88,6 +90,7 @@ namespace TestBounceApplication
             {
                 return logger;
             }
+            m_Log.Error("Failed to connect to logger " + ProductId.ToString());
             throw new Exception("Failed to connect to logger " + ProductId.ToString());
         }
 
@@ -125,7 +128,14 @@ namespace TestBounceApplication
             {
                 if (m_DoTest && m_DataLogger != null)
                 {
-                    IssueCommand1();
+                    try
+                    {
+                        IssueCommand1();
+                    }
+                    catch (Exception ex)
+                    {
+                        m_Log.Error("Issue Command", ex);
+                    }
                 }
                 else
                 {
