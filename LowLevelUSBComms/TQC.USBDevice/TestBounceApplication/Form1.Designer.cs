@@ -33,6 +33,8 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.m_StartStop = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.m_Errors = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.m_RequestsPerSecond = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.m_Exception = new System.Windows.Forms.Label();
@@ -40,8 +42,7 @@
             this.m_RequestId = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.m_Errors = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.m_UseIFAComms = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -93,6 +94,24 @@
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Commands";
+            // 
+            // m_Errors
+            // 
+            this.m_Errors.AutoSize = true;
+            this.m_Errors.Location = new System.Drawing.Point(145, 74);
+            this.m_Errors.Name = "m_Errors";
+            this.m_Errors.Size = new System.Drawing.Size(13, 13);
+            this.m_Errors.TabIndex = 7;
+            this.m_Errors.Text = "0";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(23, 74);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(84, 13);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Error packet ID:";
             // 
             // m_RequestsPerSecond
             // 
@@ -154,29 +173,23 @@
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // m_Errors
+            // m_UseIFAComms
             // 
-            this.m_Errors.AutoSize = true;
-            this.m_Errors.Location = new System.Drawing.Point(145, 74);
-            this.m_Errors.Name = "m_Errors";
-            this.m_Errors.Size = new System.Drawing.Size(13, 13);
-            this.m_Errors.TabIndex = 7;
-            this.m_Errors.Text = "0";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(23, 74);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(84, 13);
-            this.label4.TabIndex = 6;
-            this.label4.Text = "Error packet ID:";
+            this.m_UseIFAComms.AutoSize = true;
+            this.m_UseIFAComms.Location = new System.Drawing.Point(14, 44);
+            this.m_UseIFAComms.Name = "m_UseIFAComms";
+            this.m_UseIFAComms.Size = new System.Drawing.Size(228, 17);
+            this.m_UseIFAComms.TabIndex = 4;
+            this.m_UseIFAComms.Text = "Use Ideal Finish to Communicate to device";
+            this.m_UseIFAComms.UseVisualStyleBackColor = true;
+            this.m_UseIFAComms.CheckedChanged += new System.EventHandler(this.m_UseIFAComms_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(621, 322);
+            this.Controls.Add(this.m_UseIFAComms);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.m_StartStop);
             this.Controls.Add(this.comboBox1);
@@ -188,6 +201,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -207,6 +221,7 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label m_Errors;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox m_UseIFAComms;
     }
 }
 

@@ -24,12 +24,13 @@ namespace TestBounceApplication
         int m_NumberOfThreads = 10;
         Stopwatch m_StopWatch;
         List<System.ComponentModel.BackgroundWorker> backgroundWorkers = new List<BackgroundWorker>();
-
+        Configuration m_Configuration = new Configuration();
         public Form1()
         {
-            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
+            //ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
             InitializeComponent();
             comboBox1.SelectedIndex = 0;
+            m_UseIFAComms.Checked = m_Configuration.UseNativeCommunication;
             CreateBackGroundWorkers();
         }
 
@@ -60,9 +61,11 @@ namespace TestBounceApplication
                 SetStartStopButton(m_IsTestButtonStop);
                 m_Connect.Text = "Open";
                 m_StartStop.Enabled = false;
+                m_UseIFAComms.Enabled = true;
             }
             else
             {
+                m_UseIFAComms.Enabled = false;
                 m_DataLogger = OpenLogger();   
                 m_StartStop.Enabled = true;
                 m_Connect.Text = "Close";
@@ -120,19 +123,48 @@ namespace TestBounceApplication
         {
             while (!CancellationPending)
             {
-                Thread.Sleep(0);
                 if (m_DoTest && m_DataLogger != null)
                 {
                     IssueCommand1();
+                }
+                else
+                {
+                    Thread.Sleep(10);
                 }
             }            
         }
 
         Random value = new Random(0);
 
+
+        internal UInt32 _GetStatus(byte deviceId)
+        {
+            Byte[] response;
+            try
+            {
+                response = m_DataLogger.GetResponse(deviceId, TQC.USBDevice.USBLogger.Commands.GROReadCommand, 0x09);
+            }
+            catch (EnumerationNotSuportedException )
+            {
+                return 0;
+            }
+            if (response == null)
+            {                
+                throw new NoDataReceivedException("getHarwareStatus");
+            }
+            if (response.Length < sizeof(UInt32))
+            {                
+                throw new TooLittleDataReceivedException("getHarwareStatus", response.Length, sizeof(UInt32));
+            }
+            UInt32 status = BitConverter.ToUInt32(response, 0);
+            return status;
+        }
+
         private void IssueCommand1()
         {
-            var result = m_DataLogger.NumberOfBatches;
+            var deviceId = (byte)(m_Count % 4);
+            var result = m_DataLogger._SerialNumber(deviceId);
+            _GetStatus(deviceId);
             m_Count++;
         }
         private void IssueCommand()
@@ -244,6 +276,11 @@ namespace TestBounceApplication
             }
             m_RequestsPerSecond.Text = (m_TickerCounter %2 == 0 ? " " : "*") +result;
             m_RequestId.Text = count.ToString();
+        }
+
+        private void m_UseIFAComms_CheckedChanged(object sender, EventArgs e)
+        {
+            m_Configuration.UseNativeCommunication = m_UseIFAComms.Checked;            
         }
     }
 

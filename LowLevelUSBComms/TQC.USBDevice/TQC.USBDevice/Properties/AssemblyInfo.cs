@@ -11,3 +11,4 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("IntegrationTestProject1")]
 [assembly: InternalsVisibleTo("IntegrationTest(nUnit)")]
+[assembly: InternalsVisibleTo("TQC.USBDevice.TestBounceApplication")]

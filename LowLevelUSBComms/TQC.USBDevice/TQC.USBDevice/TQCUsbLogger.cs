@@ -66,7 +66,7 @@ namespace TQC.USBDevice
         }
 
 
-        private byte[] GetResponse(byte deviceId, Commands command, int commandId)
+        internal byte[] GetResponse(byte deviceId, Commands command, int commandId)
         {
             List<byte> request = new List<byte>();
             request.AddRange(BitConverter.GetBytes((short)commandId));
@@ -161,7 +161,7 @@ namespace TQC.USBDevice
         }
 
 
-        internal Int32 _SerialNumber(byte deviceId)
+        override internal Int32 _SerialNumber(byte deviceId)
         {
             return GetInt32(deviceId, Commands.ReadDeviceInfo, 0);
         }
@@ -221,7 +221,7 @@ namespace TQC.USBDevice
         }
 
 
-        internal Version _SoftwareVersion(byte deviceId)
+        override internal Version _SoftwareVersion(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 1);
             if (result.Length < 4)
@@ -508,7 +508,7 @@ namespace TQC.USBDevice
             }
         }
 
-        internal DateTime _Calibration(byte deviceId)
+        internal virtual DateTime _Calibration(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 0);
             return ResultToDateTime("Calibration Date", result, 0);
@@ -525,7 +525,7 @@ namespace TQC.USBDevice
             }
         }
 
-        internal String _CalibrationCompany(byte deviceId)
+        internal override String _CalibrationCompany(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 1);
             return result == null ? "" : DecodeString(result);
@@ -541,14 +541,14 @@ namespace TQC.USBDevice
             }
         }
 
-        internal String _CalibrationUserName(byte deviceId)
+        internal override String _CalibrationUserName(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 2);
 
             return result == null ? "": DecodeString(result);
         }
 
-        internal DeviceType _DeviceType(byte deviceId)
+        internal override DeviceType _DeviceType(byte deviceId)
         {
             return LoggerTypeToDeviceType(GetInt16(deviceId, Commands.ReadDeviceInfo, 102));
         }

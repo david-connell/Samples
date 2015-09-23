@@ -33,6 +33,7 @@ namespace TQC.USBDevice
     {
         const int InvalidHandle = -1;
         int m_Handle;
+        
         private ILog m_Log = LogManager.GetLogger("TQC.USBDevice.USBLogger");
 
         public enum USBProductId
@@ -47,20 +48,22 @@ namespace TQC.USBDevice
         }
         USBProductId m_ProductId;
         private USBGeneric m_Logger;
-        private UsbLibrary.UsbHidPort m_UsbHidPort1;
-        bool m_bUseTQCCommunications = true;
+        private USBCommunication m_UsbCommunications;
+        bool m_bUseTQCCommunications;
 
         const string c_COMObjectFileName = "USBGenericLogger.dll";
 
         internal USBLogger()
         {
+            Configuration config = new Configuration();
             m_Handle = InvalidHandle;
             m_Logger = new USBGeneric();
-            m_UsbHidPort1 = new UsbLibrary.UsbHidPort();
-            m_UsbHidPort1.OnSpecifiedDeviceArrived += m_UsbHidPort1_OnSpecifiedDeviceArrived;
-            m_UsbHidPort1.OnDataRecieved += m_UsbHidPort1_OnDataRecieved;
-            m_UsbHidPort1.OnDeviceRemoved += m_UsbHidPort1_OnDeviceRemoved;
-            m_UsbHidPort1.OnDataSend += m_UsbHidPort1_OnDataSend;
+            m_UsbCommunications = new USBCommunication(this);
+            m_bUseTQCCommunications = config.UseNativeCommunication;
+
+            m_Log.Info(m_bUseTQCCommunications ?
+                "Using COM wrapper to speak to device" :
+                "Using .NET wrapper to speak to device");
 
             var compatibleVersion = new Version(6, 0, 49, 0);
             if (COMObjectVersion < compatibleVersion)
@@ -68,29 +71,7 @@ namespace TQC.USBDevice
                 throw new ApplicationException(string.Format("Underlying COM object {0} too old (Found Version {1}). Update Ideal Finish Analysis or Calibration software to {2}", c_COMObjectFileName, COMObjectVersion, compatibleVersion));
             }
         }
-
-        bool IsUsbCommsStyleCurvex3
-        {
-            get
-            {
-                return IsThermocoupleSimulator || IsCurvex3;
-            }
-        }
-
-        void m_UsbHidPort1_OnDataSend(object sender, EventArgs e)
-        {
-            
-        }
-
-        void m_UsbHidPort1_OnDeviceRemoved(object sender, EventArgs e)
-        {
-            
-        }
-
-        void m_UsbHidPort1_OnSpecifiedDeviceArrived(object sender, EventArgs e)
-        {
-            
-        }
+        
 
         ~USBLogger()
         {
@@ -122,15 +103,21 @@ namespace TQC.USBDevice
             {
                 int resultVal = -1;
                 object result = null;
-                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70205, ref result);
+                if (m_bUseTQCCommunications)
+                {
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70205, ref result);
+                }
                 string val = result as string;
                 int.TryParse(val, out resultVal);
                 return resultVal;
             }
             set
             {
-                object result = value.ToString();
-                m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 70205, ref result);
+                if (m_bUseTQCCommunications)
+                {
+                    object result = value.ToString();
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 70205, ref result);
+                }
 
             }
         }
@@ -143,14 +130,20 @@ namespace TQC.USBDevice
             get
             {
                 object result = null;
-                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70204, ref result);
+                if (m_bUseTQCCommunications)
+                {
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70204, ref result);
+                }
                 string val = result as string;
                 return val;
             }
             set
             {
                 object result = value;
-                m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 70204, ref result);                                
+                if (m_bUseTQCCommunications)
+                {
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, -1001, 70204, ref result);
+                }
             }
         }
 
@@ -162,7 +155,10 @@ namespace TQC.USBDevice
             get
             {
                 object result = null;
-                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70206, ref result);
+                if (m_bUseTQCCommunications)
+                {
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70206, ref result);
+                }
                 string val = result as string;
                 return val;
             }
@@ -196,28 +192,36 @@ namespace TQC.USBDevice
             IsDebugOutputOpen = false;
             return IsDebugOutputOpen;
         }
+        
 
         public bool IsDebugOutputOpen
         {
             get
             {
                 object result = null;
-                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70201, ref result);
-                string val = result as string;
-                switch (val)
+                if (m_bUseTQCCommunications)
                 {
-                    case "TRUE":
-                        return true;
-                    case "FALSE":
-                        return false;
-                    default:
-                        throw new Exception("Not valid response");
-                }                
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70201, ref result);
+                    string val = result as string;
+                    switch (val)
+                    {
+                        case "TRUE":
+                            return true;
+                        case "FALSE":
+                            return false;
+                        default:
+                            throw new Exception("Not valid response");
+                    }
+                }
+                return false;
             }
             private set
             {
                 object result = null;
-                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, value ? 70203 : 70202, ref result);
+                if (m_bUseTQCCommunications)
+                {
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, 0, value ? 70203 : 70202, ref result);
+                }
             }
         }
 
@@ -226,7 +230,10 @@ namespace TQC.USBDevice
             get
             {
                 object result = null;
-                m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70200, ref result);
+                if (m_bUseTQCCommunications)
+                {
+                    m_Logger.GetCalibrationDataByHandle(m_Handle, 0, 70200, ref result);
+                }
                 return result as string;
             }
         }
@@ -245,7 +252,7 @@ namespace TQC.USBDevice
             }
             else
             {
-                return OpenDotNet(id, minimumCommunications, null);
+                return m_UsbCommunications.Open(id, minimumCommunications);
             }
         }
 
@@ -265,14 +272,6 @@ namespace TQC.USBDevice
             return m_Handle >= 0;
         }
 
-        private bool OpenDotNet(USBProductId id, bool minimumCommunications, string portName)
-        {
-            m_UsbHidPort1.VendorId = ((int)id >> 16);
-            m_UsbHidPort1.ProductId = ((int)id & 0xFFFF);
-
-            m_UsbHidPort1.CheckDevicePresent();
-            return m_UsbHidPort1.SpecifiedDevice != null;
-        }
 
 
         public bool Open(USBProductId id, string portName, bool minimumCommunications = false)
@@ -284,7 +283,7 @@ namespace TQC.USBDevice
             }
             else
             {
-                return OpenDotNet(id, minimumCommunications, portName);
+                return m_UsbCommunications.Open(id, minimumCommunications, portName);
             }            
         }
 
@@ -313,12 +312,7 @@ namespace TQC.USBDevice
             }
             else
             {
-                if (m_UsbHidPort1 != null)
-                {
-                    m_UsbHidPort1.SpecifiedDevice.Dispose();
-                    m_UsbHidPort1 = null;
-                }
-               
+                m_UsbCommunications.Close();
             }
         }
 
@@ -486,143 +480,6 @@ namespace TQC.USBDevice
             return null;
         }
 
-        ManualResetEvent m_Event = new ManualResetEvent(false);        
-        byte[] m_Data;
-        Exception m_DataException;
-        byte m_ConversationId;
-        byte m_Request;
-        const byte BounceCommand = 0xFF;
-        void m_UsbHidPort1_OnDataRecieved(object sender, UsbLibrary.DataRecievedEventArgs args)
-        {
-            try
-            {
-                DecodeData(args.data);
-            }
-            finally
-            {
-                m_Event.Set();
-            }
-        }
-
-        private void DecodeData(byte[] inputData)
-        {
-            if (inputData.Length < 10)
-            {
-                m_DataException = new ResponsePacketErrorBadLengthException();
-            }
-            else
-            {
-                int i = 0;
-                if (IsUsbCommsStyleCurvex3)
-                {
-                    i+=2;
-                }
-                else
-                {
-                    if (inputData[0] == 0)
-                    {
-                        i++;
-                    }
-                }
-                if (inputData[i] == 0xCD && inputData[i+1] == 0xCD)
-                {
-                    if (inputData[i+2] == m_ConversationId)
-                    {
-                        byte responseCommand = inputData[i+3];
-                        if ((responseCommand == (0xFF - m_Request)) || ((responseCommand == BounceCommand) && (m_Request == BounceCommand)))
-                        {
-                            int requestLength = inputData[4+i];
-
-                            if (IsValidCrc(inputData, i, requestLength))
-                            {
-                                m_Data = new byte[requestLength];
-                                Buffer.BlockCopy(inputData, 5+i, m_Data, 0, m_Data.Length);
-                            }
-                            else
-                            {
-                                m_DataException = new ResponsePacketErrorCRCException();
-                            }
-                        }
-                        else if (responseCommand == 0) //This is a status result
-                        {
-                            int requestLength = inputData[4 + i];
-                            if (requestLength == 4)
-                            {
-                                if (IsValidCrc(inputData, i, requestLength))
-                                {
-                                    switch (inputData[5+i])
-                                    {
-                                        case 0:
-                                            m_Data = new byte[0];
-                                            break;
-                                        case 1:
-                                            m_DataException = new DeviceUnknownErrorException(); break;
-
-                                        case 2:
-                                            m_DataException = new CommandCorruptException(); break;
-
-                                        case 3:
-                                            m_DataException = new CommandOutOfSequenceException();break;
-
-                                        case 4:
-                                            m_DataException = new CommandUnexpectedException();break;
-
-                                        case 5:
-                                            m_DataException = new DeviceBusyException();break;
-
-                                        case 6:
-                                            m_DataException = new CommandNotSuportedException();break;
-
-                                        case 7:
-                                            m_DataException = new EnumerationNotSuportedException();break;
-
-                                        case 8:
-                                            m_DataException = new BatchNotAvailableException();break;
-
-                                        case 9:
-                                            m_DataException =  new DataOutOfRangeException(); break;
-
-                                        case 10: m_DataException= new CommandModeNotSupportedException(); break;
-
-                                        default:
-                                            m_DataException= new ResponsePacketErrorBadCommandException();
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    m_DataException = new ResponsePacketErrorCRCException();
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        m_DataException = new ResponsePacketErrorBadCommandException();
-                    }
-                }
-                else
-                {
-                    m_DataException = new ResponsePacketErrorBadCommandException();                    
-                }
-            }
-            
-        }
-
-        private bool IsValidCrc(byte[] inputData, int i, int requestLength)
-        {
-            var crcFromLogger = BitConverter.ToUInt32(inputData, i + requestLength + 5);
-            var crcFromPacket = GetCRC32(inputData, i, requestLength + 5);
-            bool isValidCrc = crcFromPacket == crcFromLogger;
-            return isValidCrc;
-        }
-
-        private UInt32 GetCRC32(byte[] inputData, int offset, int requestLength)
-        {
-            var buffer = new byte[requestLength];
-            Buffer.BlockCopy(inputData, offset, buffer, 0, buffer.Length);
-            return Crc32.Calculate(buffer);
-        }
 
 
         private byte[] IssueRequest(Commands command, byte[] request, byte conversationId)
@@ -633,74 +490,16 @@ namespace TQC.USBDevice
             }
             else
             {
-                m_Data = null;
-                m_DataException = null;
-                
-                m_ConversationId = conversationId;
-                m_Request = (byte)command;
-                if (request.Length > 65 - 6 - 4)
-                {
-                    throw new ResponsePacketErrorBadLengthException();
-                }
-                byte[] data = new byte[65];
-                int i = 0;
-                if (IsUsbCommsStyleCurvex3)
-                {
-                    data[i++] = 63;
-                    data[i++] = 64;
-                }
-                else
-                {
-                    data[i++] = 0x00;
-                }
-                data[i++] = 0xCD;
-                data[i++] = 0xCD;
-                data[i++] = conversationId;
-                data[i++] = m_Request;
-                data[i++] = (byte)request.Length;
-                foreach (byte val in request)
-                {
-                    data[i++] = val;
-                }
-                
-                byte[] crcAsBits = null; ;
-                if (IsUsbCommsStyleCurvex3)
-                {
-                    var buffer = new byte[request.Length + 5];
-                    Buffer.BlockCopy(data, 2, buffer, 0, buffer.Length);                    
-                    var crc = Crc32.Calculate(buffer);
-                    crcAsBits = BitConverter.GetBytes(crc);
-
-                }
-                else
-                {
-                    var buffer = new byte[request.Length + 6];
-                    Buffer.BlockCopy(data, 0, buffer, 0, buffer.Length);
-                    var crc = Crc32.Calculate(buffer);
-                    crcAsBits = BitConverter.GetBytes(crc);
-                }
-                foreach (byte val in crcAsBits)
-                {
-                    data[i++] = val;
-                }
-                m_Event.Reset();
-                var arrayToSend = new byte[0x41];
-                Buffer.BlockCopy(data, 0, arrayToSend, 0, arrayToSend.Length);
-                m_UsbHidPort1.SpecifiedDevice.SendData(arrayToSend);
-
-                if (!m_Event.WaitOne(2000))
-                {
-                    throw new ResponsePacketErrorTimeoutException();
-                }
-                if (m_DataException != null)
-                {
-                    throw m_DataException;
-                }
-                return m_Data;                
+                return m_UsbCommunications.IssueRequest(command, request, conversationId);
             }
         }
 
-        
+
+        virtual internal Version _SoftwareVersion(byte deviceId)
+        {
+            return new Version();
+        }
+
 
         public string Version
         {
@@ -712,10 +511,15 @@ namespace TQC.USBDevice
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    return _SoftwareVersion(0).ToString() ;
                 }
 
             }
+        }
+
+        virtual internal Int32 _SerialNumber(byte deviceId)
+        {
+            return -1;
         }
 
         public string LoggerSerialNumber
@@ -728,9 +532,14 @@ namespace TQC.USBDevice
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    return _SerialNumber(0).ToString();
                 }
             }
+        }
+
+        internal virtual DeviceType _DeviceType(byte deviceId)
+        {
+            return DeviceType.Unknown;
         }
 
         public DeviceType LoggerType
@@ -743,7 +552,7 @@ namespace TQC.USBDevice
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    return _DeviceType(0);
                 }
 
             }
@@ -779,6 +588,11 @@ namespace TQC.USBDevice
             }
         }
 
+        virtual internal String _CalibrationCompany(byte deviceId)
+        {
+            return null;
+        }
+
         public string CalibrationCompany
         {
             get
@@ -791,7 +605,7 @@ namespace TQC.USBDevice
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    return _CalibrationCompany(0);
                 }
 
             }
@@ -815,6 +629,10 @@ namespace TQC.USBDevice
 
         }
 
+        internal virtual String _CalibrationUserName(byte deviceId)
+        {
+            return null;
+        }
 
         public string CalibrationUser
         {
@@ -828,7 +646,7 @@ namespace TQC.USBDevice
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    return _CalibrationUserName(0);
                 }
 
             }
@@ -852,6 +670,11 @@ namespace TQC.USBDevice
 
         }
 
+        internal virtual DateTime _Calibration(byte deviceId)
+        {
+            return DateTime.MinValue;
+        }
+
         public DateTime CalibrationDate
         {
             get
@@ -864,8 +687,7 @@ namespace TQC.USBDevice
                 }
                 else
                 {
-
-                    throw new NotImplementedException();
+                    return _Calibration(0);                    
                 }
 
             }
@@ -923,7 +745,7 @@ namespace TQC.USBDevice
             return new Version(myFileVersionInfo.FileMajorPart, myFileVersionInfo.FileMinorPart, myFileVersionInfo.FileBuildPart, myFileVersionInfo.FilePrivatePart);
         }
 
-        bool IsCurvex3
+        internal bool IsCurvex3
         {
             get
             {
@@ -931,7 +753,7 @@ namespace TQC.USBDevice
             }
         }
 
-        bool IsThermocoupleSimulator
+        internal bool IsThermocoupleSimulator
         {
             get
             {

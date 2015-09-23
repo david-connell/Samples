@@ -64,6 +64,7 @@ namespace UsbLibrary
                     {
                         m_oFile.Close();
                         m_oFile = null;
+                        m_hHandle = InvalidHandleValue;
                     }
                 }
                 if (m_hHandle != InvalidHandleValue)	// Dispose and finalize, get rid of unmanaged resources
@@ -71,6 +72,7 @@ namespace UsbLibrary
                     CloseHandle(m_hHandle);
                     m_hHandle = InvalidHandleValue;
                 }
+
             }
             catch (Exception ex)
             {

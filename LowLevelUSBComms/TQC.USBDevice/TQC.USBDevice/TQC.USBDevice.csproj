@@ -72,9 +72,11 @@
     <Compile Include="GradientOven\IGROMainBoard.cs" />
     <Compile Include="GradientOven\GROMainBoard.cs" />
     <Compile Include="ISimpleTQCDevice.cs" />
+    <Compile Include="Registry.cs" />
     <Compile Include="ThermocoupleSimulator\ThermocoupleSimulator.cs" />
     <Compile Include="TQCUsbLogger.cs" />
     <Compile Include="GlossMeter\TrmLogger.cs" />
+    <Compile Include="USBCommunication.cs" />
     <Compile Include="UsbDevices.cs" />
     <Compile Include="USBLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
