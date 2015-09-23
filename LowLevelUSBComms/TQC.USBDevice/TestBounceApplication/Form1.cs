@@ -186,8 +186,8 @@ namespace TestBounceApplication
                             default:
                                 {
                                     var deviceId = (byte)(m_Count % 8);
-                                    m_DataLogger._ProbeValues((byte)(m_Count % 4));
-                                    //var result = m_DataLogger._SerialNumber(deviceId);
+                                    //m_DataLogger._ProbeValues((byte)(m_Count % 4));
+                                    var result = m_DataLogger._SerialNumber(deviceId);
                                     m_Count++;
                                 }
                                 break;
