@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+using log4net;
 
 namespace UsbLibrary
 {
@@ -31,6 +32,7 @@ namespace UsbLibrary
     public abstract class HIDDevice : Win32Usb, IDisposable
     {
 		#region Privates variables
+        static ILog s_Log = LogManager.GetLogger("UsbLibrary.HIDDevice");
 		/// <summary>Filestream we can use to read/write from</summary>
         private FileStream m_oFile;
 		/// <summary>Length of input report : device gives us this</summary>
@@ -76,7 +78,7 @@ namespace UsbLibrary
             }
             catch (Exception ex)
             {
-                //Console.WriteLine(ex.ToString());
+                s_Log.Info("Dispose", ex);                
             }
         }
         #endregion
@@ -190,13 +192,12 @@ namespace UsbLibrary
             }
             catch (IOException ex)
             {
-                //Console.WriteLine(ex.ToString());
-                // The device was removed!
+                s_Log.Info("Write IOException", ex);
                 throw new HIDDeviceException("Probably the device was removed, or an invalid report ID was used...");
             }
 			catch(Exception exx)
 			{
-                //Console.WriteLine(exx.ToString());	
+                s_Log.Info("Write general exception", exx);                
 			}
         }
 		/// <summary>
@@ -272,15 +273,15 @@ namespace UsbLibrary
             }
             catch(Exception ex)
             {
-                throw HIDDeviceException.GenerateError(ex.ToString());
-                //Console.WriteLine(ex.ToString());
+                s_Log.Info("Find device", ex);
+                throw HIDDeviceException.GenerateError(ex.ToString());                
             }
             finally
             {
 				// Before we go, we have to free up the InfoSet memory reserved by SetupDiGetClassDevs
                 SetupDiDestroyDeviceInfoList(hInfoSet);
             }
-            return null;	// oops, didn't find our device
+            return null;
         }
 		#endregion
 

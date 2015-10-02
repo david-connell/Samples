@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
+using log4net;
 
 namespace UsbLibrary
 {
@@ -14,6 +15,7 @@ namespace UsbLibrary
     [ToolboxBitmap(typeof(UsbHidPort), "UsbHidBmp.bmp")]
     public partial class UsbHidPort : Component
     {
+        static ILog s_Log = LogManager.GetLogger("UsbLibrary.UsbHidPort");
         //private memebers
         private int                             product_id;
         private int                             vendor_id;
@@ -235,7 +237,7 @@ namespace UsbLibrary
             }
             catch (Exception ex)
             {
-                //Console.WriteLine(ex.ToString());
+                s_Log.Info("CheckDevicePresent", ex);
             }
         }
 

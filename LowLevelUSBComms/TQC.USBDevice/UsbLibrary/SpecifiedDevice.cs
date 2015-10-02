@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Text;
+using log4net;
 
 namespace UsbLibrary
 {
@@ -30,6 +31,7 @@ namespace UsbLibrary
 
     public class SpecifiedDevice : HIDDevice
     {
+        static ILog s_Log = LogManager.GetLogger("UsbLibrary.SpecifiedDevice");
         public event DataRecievedEventHandler DataRecieved;
         public event DataSendEventHandler DataSend;
 
@@ -64,12 +66,14 @@ namespace UsbLibrary
                 {
                     DataSend(this, new DataSendEventArgs(data));
                 }
-            }catch (HIDDeviceException ex)
+            }
+            catch (HIDDeviceException ex)
             {
-                // Device may have been removed!
-            }catch (Exception ex)
+                s_Log.Info("SendData HIDDevice (removed device)", ex);
+            }
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                s_Log.Info("SendData", ex);
             }
         }
 
