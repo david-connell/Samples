@@ -186,16 +186,16 @@ namespace UsbLibrary
                     case Win32Usb.DEVICE_ARRIVAL:	// inserted
                         if (OnDeviceArrived != null)
                         {
-                            OnDeviceArrived(this, new EventArgs());
-                            CheckDevicePresent();
+                            OnDeviceArrived(this, new EventArgs());                            
                         }
+                        CheckDevicePresent();
                         break;
                     case Win32Usb.DEVICE_REMOVECOMPLETE:	// removed
                         if (OnDeviceRemoved != null)
                         {
-                            OnDeviceRemoved(this, new EventArgs());
-                            CheckDevicePresent();
+                            OnDeviceRemoved(this, new EventArgs());                            
                         }
+                        CheckDevicePresent();
                         break;
                 }
             }
@@ -235,7 +235,7 @@ namespace UsbLibrary
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                //Console.WriteLine(ex.ToString());
             }
         }
 
