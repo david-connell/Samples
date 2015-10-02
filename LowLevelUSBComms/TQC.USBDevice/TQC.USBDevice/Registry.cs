@@ -41,7 +41,7 @@ namespace TQC.USBDevice
         }
     }
 
-    internal class Configuration
+    public class Configuration
     {
         public bool UseNativeCommunication
         {
