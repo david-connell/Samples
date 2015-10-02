@@ -182,6 +182,10 @@ namespace UsbLibrary
         {
             try
             {
+                if (m_oFile == null)
+                {
+                    return;
+                }
                 m_oFile.Write(oOutRep.Buffer, 0, oOutRep.BufferLength);
             }
             catch (IOException ex)
@@ -192,7 +196,7 @@ namespace UsbLibrary
             }
 			catch(Exception exx)
 			{
-                Console.WriteLine(exx.ToString());	
+                //Console.WriteLine(exx.ToString());	
 			}
         }
 		/// <summary>
