@@ -180,15 +180,17 @@ namespace UsbLibrary
 		/// Write an output report to the device.
 		/// </summary>
 		/// <param name="oOutRep">Output report to write</param>
-        protected void Write(OutputReport oOutRep)
+        protected bool Write(OutputReport oOutRep)
         {
+            bool sentData = false;
             try
             {
                 if (m_oFile == null)
                 {
-                    return;
+                    return false;
                 }
                 m_oFile.Write(oOutRep.Buffer, 0, oOutRep.BufferLength);
+                sentData = true;
             }
             catch (IOException ex)
             {
@@ -199,6 +201,7 @@ namespace UsbLibrary
 			{
                 s_Log.Info("Write general exception", exx);                
 			}
+            return sentData;
         }
 		/// <summary>
 		/// virtual handler for any action to be taken when data is received. Override to use.

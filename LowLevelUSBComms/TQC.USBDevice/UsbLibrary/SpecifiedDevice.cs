@@ -55,13 +55,14 @@ namespace UsbLibrary
             }
         }
 
-        public void SendData(byte[] data)
+        public bool SendData(byte[] data)
         {
+            bool sentData = false;
             SpecifiedOutputReport oRep = new SpecifiedOutputReport(this);	// create output report
             oRep.SendData(data);	// set the lights states
             try
             {
-                Write(oRep); // write the output report
+                sentData = Write(oRep); // write the output report
                 if (DataSend != null)
                 {
                     DataSend(this, new DataSendEventArgs(data));
@@ -75,6 +76,7 @@ namespace UsbLibrary
             {
                 s_Log.Info("SendData", ex);
             }
+            return sentData;
         }
 
         protected override void Dispose(bool bDisposing)

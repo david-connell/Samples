@@ -23,9 +23,11 @@ namespace TQC.USBDevice
         byte[] m_Data;
         const byte BounceCommand = 0xFF;
         IUsbInterfaceForm m_MainWindowForm;
+        bool m_IsConnected;
 
         public USBCommunication(IUsbInterfaceForm mainWindowForm, USBLogger logger)
         {
+            m_IsConnected = true;
             m_UsbLogger = logger;
             m_UsbHidPort1 = new UsbLibrary.UsbHidPort();
             m_UsbHidPort1.OnSpecifiedDeviceArrived += m_UsbHidPort1_OnSpecifiedDeviceArrived;
@@ -64,11 +66,13 @@ namespace TQC.USBDevice
         void m_UsbHidPort1_OnDeviceRemoved(object sender, EventArgs e)
         {
             m_Log.Info("Device removed");
+            m_IsConnected = false;
         }
 
         void m_UsbHidPort1_OnSpecifiedDeviceArrived(object sender, EventArgs e)
         {
             m_Log.Info("Device Arrived");
+            m_IsConnected = true;
         }
 
 
@@ -219,11 +223,21 @@ namespace TQC.USBDevice
                 {
                     m_Data = null;
                     m_Event.Reset();
-                    m_UsbHidPort1.SpecifiedDevice.SendData(GenerateRequest(command, request, conversationId));
-
-                    if (!m_Event.WaitOne(GetTimeOutForCommand(command)))
+                    if (m_IsConnected)
                     {
-                        throw new ResponsePacketErrorTimeoutException();
+                        if (!m_UsbHidPort1.SpecifiedDevice.SendData(GenerateRequest(command, request, conversationId)))
+                        {
+                            m_UsbHidPort1.CheckDevicePresent();
+                            
+                        }
+                        else
+                        {
+                            if (!m_Event.WaitOne(GetTimeOutForCommand(command)))
+                            {
+                                m_UsbHidPort1.CheckDevicePresent();
+                                throw new ResponsePacketErrorTimeoutException();
+                            }
+                        }
                     }
                 }
                 dataRecieved = m_Data;
