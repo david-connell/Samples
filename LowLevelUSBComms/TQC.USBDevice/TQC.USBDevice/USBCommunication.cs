@@ -90,7 +90,7 @@ namespace TQC.USBDevice
             LogResponsePacket(inputData);
             if (inputData == null)
             {
-                
+                throw new USBDevice.UsbDisconnectedException(); 
             }
             else if (inputData.Length < 10)
             {
