@@ -8,16 +8,10 @@ using TQC.USBDevice.Utils;
 
 namespace TQC.USBDevice
 {
-    public class MessageEventEventArgs : EventArgs
-    {
-        public System.Windows.Forms.Message Message;
-    }
-    public delegate void MessageEventEventHandler(Object sender, MessageEventEventArgs e);
+
     public interface IUsbInterfaceForm
     {
-        IntPtr Handle { get; }
-        event MessageEventEventHandler MessageEvent;
-        //void OnMessageEvent(object sender, MessageEventEventArgs m);
+        IntPtr Handle { get; }        
     }
 
     internal class USBCommunication : IDisposable
@@ -42,21 +36,18 @@ namespace TQC.USBDevice
             if (mainWindowForm != null)
             {
                 m_UsbHidPort1.RegisterHandle(m_MainWindowForm.Handle);
-                m_MainWindowForm.MessageEvent += m_MainWindowForm_MessageEvent;
-                //m_MainWindowForm.WndProc
-            }
-            
+            }            
         }
 
-        void m_MainWindowForm_MessageEvent(object sender, MessageEventEventArgs e)
-        {
-            m_UsbHidPort1.ParseMessages(ref e.Message);
-        }
         ~USBCommunication()
         {
             Dispose(false);
         }
 
+        internal void OnWindowsMessage(ref System.Windows.Forms.Message m)
+        {
+            m_UsbHidPort1.ParseMessages(ref m);
+        }
         bool IsUsbCommsStyleCurvex3
         {
             get
@@ -79,7 +70,6 @@ namespace TQC.USBDevice
         {
             m_Log.Info("Device Arrived");
         }
-
 
 
         void m_UsbHidPort1_OnDataRecieved(object sender, UsbLibrary.DataRecievedEventArgs args)
@@ -410,7 +400,7 @@ namespace TQC.USBDevice
             {
                 if (m_MainWindowForm != null)
                 {
-                    m_MainWindowForm.MessageEvent -= m_MainWindowForm_MessageEvent;
+                    //m_MainWindowForm.MessageEvent -= m_MainWindowForm_MessageEvent;
                 }
                 if (m_UsbHidPort1 != null)
                 {

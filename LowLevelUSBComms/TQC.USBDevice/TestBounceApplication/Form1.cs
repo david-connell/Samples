@@ -21,7 +21,7 @@ namespace TestBounceApplication
         bool m_IsTestButtonStop;
         TQCUsbLogger m_DataLogger;
         int m_Count;
-        int m_NumberOfThreads = 10;
+        int m_NumberOfThreads = 1;
         Stopwatch m_StopWatch;
         List<System.ComponentModel.BackgroundWorker> backgroundWorkers = new List<BackgroundWorker>();
         Configuration m_Configuration = new Configuration();
@@ -144,8 +144,11 @@ namespace TestBounceApplication
             m_DoTest = false;
             if (m_DataLogger != null)
             {
-                m_DataLogger.Close();
-                m_DataLogger.Dispose();
+                var dataLogger = m_DataLogger;
+                m_DataLogger = null;
+
+                dataLogger.Close();
+                dataLogger.Dispose();
             }
         }
         private void SetStartStopButton(bool setToStop)
@@ -407,20 +410,12 @@ namespace TestBounceApplication
 
         protected override void WndProc(ref Message m)
         {
-            OnMessageEvent(ref m);
-            base.WndProc(ref m);	    // pass message on to base form
-        }
-        protected virtual void OnMessageEvent(ref Message m)
-        {
-            MessageEventEventHandler handler = MessageEvent;
-            if (handler != null)
+            if (m_DataLogger != null)
             {
-
-                handler(this, new MessageEventEventArgs{Message = m } );
+                m_DataLogger.OnWindowsMessage(ref m);
             }
+            base.WndProc(ref m);
         }
-
-        public event MessageEventEventHandler MessageEvent;
     }
 
     class ProgressState

@@ -26,7 +26,7 @@ namespace TQC.USBDevice
             return string.Format("{0} sub command {1}", command.ToString(), commandId);
         }
 
-
+        
         private int GetInt8(byte deviceId, Commands command, int commandId)
         {                            
             var response = GetResponse(deviceId, command, commandId);

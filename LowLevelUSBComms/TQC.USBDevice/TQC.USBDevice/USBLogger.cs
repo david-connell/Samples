@@ -78,6 +78,13 @@ namespace TQC.USBDevice
             Dispose(false);
         }
 
+
+        public void OnWindowsMessage(ref System.Windows.Forms.Message m)
+        {
+            m_UsbCommunications.OnWindowsMessage(ref m);
+        }
+
+
         public int GradientOvenComPort
         {
             get
