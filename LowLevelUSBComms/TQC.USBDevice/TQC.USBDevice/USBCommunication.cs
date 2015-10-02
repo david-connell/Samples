@@ -14,10 +14,7 @@ namespace TQC.USBDevice
         USBLogger m_UsbLogger;
         private ILog m_Log = LogManager.GetLogger("TQC.USBDevice.USBCommunication");
         ManualResetEvent m_Event = new ManualResetEvent(false);
-        byte[] m_Data;
-        Exception m_DataException;
-        byte m_ConversationId;
-        byte m_Request;
+        byte[] m_Data;                   
         const byte BounceCommand = 0xFF;
 
         public USBCommunication(USBLogger logger)
@@ -68,7 +65,7 @@ namespace TQC.USBDevice
             }
         }
 
-        private byte[] DecodeData(byte[] inputData)
+        private byte[] DecodeData(byte[] inputData, byte request, byte conversationId)
         {
             byte[] response = null;
             LogResponsePacket(inputData);
@@ -92,10 +89,10 @@ namespace TQC.USBDevice
                 }
                 if (inputData[i] == 0xCD && inputData[i + 1] == 0xCD)
                 {
-                    if (inputData[i + 2] == m_ConversationId)
+                    if (inputData[i + 2] == conversationId) 
                     {
                         byte responseCommand = inputData[i + 3];
-                        if ((responseCommand == (0xFF - m_Request)) || ((responseCommand == BounceCommand) && (m_Request == BounceCommand)))
+                        if ((responseCommand == (0xFF - request)) || ((responseCommand == BounceCommand) && (request == BounceCommand)))
                         {
                             int requestLength = inputData[4 + i];
 
@@ -206,14 +203,13 @@ namespace TQC.USBDevice
                 dataRecieved = m_Data;
                 m_Data = null;                
             }
-            return DecodeData(dataRecieved);
+            return DecodeData(dataRecieved, (byte)command, conversationId);
 
         }
 
         private byte[] GenerateRequest(TQC.USBDevice.USBLogger.Commands command, byte[] request, byte conversationId)
-        {
-            m_ConversationId = conversationId;
-            m_Request = (byte)command;
+        {            
+            
             if (request.Length > 65 - 6 - 4)
             {
                 throw new ResponsePacketErrorBadLengthException();
@@ -232,7 +228,7 @@ namespace TQC.USBDevice
             data[i++] = 0xCD;
             data[i++] = 0xCD;
             data[i++] = conversationId;
-            data[i++] = m_Request;
+            data[i++] = (byte)command;
             data[i++] = (byte)request.Length;
             foreach (byte val in request)
             {
@@ -313,7 +309,8 @@ namespace TQC.USBDevice
                     builder.Append(part2);
                     builder.AppendLine();
                 }
-                m_Log.Info(builder.ToString());
+                
+                m_Log.Debug(builder.ToString());
             }
 
         }
