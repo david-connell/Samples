@@ -10,7 +10,7 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
 {
     class ThermocoupleBoard : IDisposable
     {
-        GROMainBoard m_Logger = new GROMainBoard();
+        GROMainBoard m_Logger = new GROMainBoard(null);
         byte m_ThermocoupleBoard;
         public ThermocoupleBoard(USBLogger.USBProductId productId, byte thermocoupleBoard)
         {

@@ -53,12 +53,12 @@ namespace TQC.USBDevice
 
         const string c_COMObjectFileName = "USBGenericLogger.dll";
 
-        internal USBLogger()
+        internal USBLogger(IUsbInterfaceForm mainWinForm)
         {
             Configuration config = new Configuration();
             m_Handle = InvalidHandle;
             m_Logger = new USBGeneric();
-            m_UsbCommunications = new USBCommunication(this);
+            m_UsbCommunications = new USBCommunication(mainWinForm, this);
             m_bUseTQCCommunications = config.UseNativeCommunication;
 
             m_Log.Info(m_bUseTQCCommunications ?
@@ -594,6 +594,7 @@ namespace TQC.USBDevice
             if (inDispose)
             {
                 Close();
+                m_UsbCommunications.Dispose();
                 GC.SuppressFinalize(this);
             }
         }

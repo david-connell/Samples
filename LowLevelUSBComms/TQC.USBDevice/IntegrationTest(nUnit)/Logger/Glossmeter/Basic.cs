@@ -20,7 +20,7 @@ namespace IntegrationTestNUnit.Logger.GlossMeter
 
         protected virtual GlossMeterLogger OpenGlossMeterLogger(bool miniumum = true)
         {
-            var logger = new GlossMeterLogger();
+            var logger = new GlossMeterLogger(null);
             if (logger.Open(USBLogger.USBProductId.Glossmeter, miniumum))
             {
                 return logger;

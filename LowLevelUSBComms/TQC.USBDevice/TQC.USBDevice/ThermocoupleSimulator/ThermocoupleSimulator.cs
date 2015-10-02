@@ -5,6 +5,11 @@ namespace TQC.USBDevice.ThermocoupleSimulator
 {
     public class ThermocoupleSimulator : TQCUsbLogger 
     {
+        public ThermocoupleSimulator(IUsbInterfaceForm mainWinForm)
+            : base(mainWinForm)
+        {
+        }
+
         public bool Open(bool minimumCommunications = false)
         {
             return Open(USBProductId.USB_THERMOCOUPLE_SIMULATOR, minimumCommunications);

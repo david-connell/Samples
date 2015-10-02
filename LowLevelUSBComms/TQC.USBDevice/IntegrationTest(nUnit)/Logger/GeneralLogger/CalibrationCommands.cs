@@ -23,7 +23,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadDateOfCalibration()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.Open(ProductId))
                 {
@@ -41,7 +41,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadCalibrationCompany()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -61,7 +61,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadCalibrationUserName()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -79,7 +79,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadCalibrationDetails()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -109,7 +109,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadTypesOfProbe()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -138,7 +138,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadProbeNames()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {

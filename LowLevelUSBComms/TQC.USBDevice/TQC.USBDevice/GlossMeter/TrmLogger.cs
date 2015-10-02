@@ -2,6 +2,11 @@
 {
     public class TrmLogger : GlossMeterLogger
     {
+
+        public TrmLogger(IUsbInterfaceForm mainWinForm)
+            : base(mainWinForm)
+        {
+        }
         public bool Open(bool minimumCommunications = false)
         {            
             var code = new UsbDevices();

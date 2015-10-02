@@ -21,7 +21,7 @@ namespace IntegrationTestNUnit.Logger.ThermocoupleSimulator
         [Test]
         public void ColdJunctionTemperature()
         {
-            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -42,7 +42,7 @@ namespace IntegrationTestNUnit.Logger.ThermocoupleSimulator
         [Test]
         public void BoardTemperature()
         {
-            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -67,7 +67,7 @@ namespace IntegrationTestNUnit.Logger.ThermocoupleSimulator
         [TestCase(300)]
         public void SetTemperatureOutput(double temp)
         {
-            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -84,7 +84,7 @@ namespace IntegrationTestNUnit.Logger.ThermocoupleSimulator
         [TestCase(1933)]
         public void SetSerialNumber(int serialNumber)
         {
-            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -103,7 +103,7 @@ namespace IntegrationTestNUnit.Logger.ThermocoupleSimulator
         [TestCase("This is a certificate")]
         public void SetCalibrationCertificate(string certificate)
         {
-            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+            using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -124,7 +124,7 @@ namespace IntegrationTestNUnit.Logger.ThermocoupleSimulator
         {
             if (MessageBox.Show("Are you sure you want to enter bootloader?", "Bootloader", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator())
+                using (var logger = new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator(null))
                 {
                     if (logger.OpenWithMinumumRequests(ProductId))
                     {

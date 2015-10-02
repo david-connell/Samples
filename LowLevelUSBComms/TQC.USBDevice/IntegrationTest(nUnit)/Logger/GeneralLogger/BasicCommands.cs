@@ -24,7 +24,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [Test]
             public void TestVersioning()
             {
-                using (var logger = new USBLogger())
+                using (var logger = new USBLogger(null))
                 {
                     var version = logger.COMObjectVersion;
                     Assert.That(version, Is.GreaterThan(new Version(1, 0)));
@@ -34,7 +34,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
 
             protected virtual TQCUsbLogger OpenLogger(bool miniumum = true)
             {
-                var logger = new TQCUsbLogger();
+                var logger = new TQCUsbLogger(null);
                 if (logger.Open(ProductId, miniumum))
                 {
                     return logger;
@@ -93,7 +93,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [Test]
             public void EnableDebuging()
             {
-                using (var logger = new TQCUsbLogger())
+                using (var logger = new TQCUsbLogger(null))
                 {
                     
                     if (logger.OpenWithMinumumRequests(ProductId))
@@ -322,21 +322,21 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 switch (loggerType)
                 {
                     case USBLogger.USBProductId.Glossmeter:
-                        return new GlossMeterLogger();
+                        return new GlossMeterLogger(null);
                         
 
                     case USBLogger.USBProductId.GRADIENT_OVEN:
-                        return new GROMainBoard();
+                        return new GROMainBoard(null);
                         
 
                     case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR:
-                        return new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator();
+                        return new TQC.USBDevice.ThermocoupleSimulator.ThermocoupleSimulator(null);
                         
 
                     default:
                     case USBLogger.USBProductId.USB_CURVEX_3:
                     case USBLogger.USBProductId.USB_CURVEX_3a:
-                        return new TQCUsbLogger();
+                        return new TQCUsbLogger(null);
                         
                 }
             }

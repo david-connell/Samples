@@ -82,7 +82,7 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
         [Test]
         public void ReadCalibrationDetails()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -110,7 +110,7 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
         [Test]
         public void ReadProbeNames()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {

@@ -16,7 +16,11 @@ namespace TQC.USBDevice
     {
         Dictionary<byte, int> ProbesPerDevice = new Dictionary<byte, int>();
         Dictionary<byte, CachedData> m_CachedData = new Dictionary<byte, CachedData>();
-        
+
+        public TQCUsbLogger(IUsbInterfaceForm mainWinForm)
+            : base(mainWinForm)
+        {
+        }
         private string CommandDescription(Commands command, int commandId)
         {
             return string.Format("{0} sub command {1}", command.ToString(), commandId);

@@ -20,7 +20,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadChannelValues()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
            { 
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -51,7 +51,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadColdJunctionValues()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -76,7 +76,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         [Test]
         public void ReadUserInterfaceStatus()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {

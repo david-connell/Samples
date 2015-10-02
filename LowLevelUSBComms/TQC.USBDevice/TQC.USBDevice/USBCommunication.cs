@@ -8,24 +8,53 @@ using TQC.USBDevice.Utils;
 
 namespace TQC.USBDevice
 {
-    internal class USBCommunication
+    public class MessageEventEventArgs : EventArgs
+    {
+        public System.Windows.Forms.Message Message;
+    }
+    public delegate void MessageEventEventHandler(Object sender, MessageEventEventArgs e);
+    public interface IUsbInterfaceForm
+    {
+        IntPtr Handle { get; }
+        event MessageEventEventHandler MessageEvent;
+        //void OnMessageEvent(object sender, MessageEventEventArgs m);
+    }
+
+    internal class USBCommunication : IDisposable
     {
         private UsbLibrary.UsbHidPort m_UsbHidPort1;
         USBLogger m_UsbLogger;
         private ILog m_Log = LogManager.GetLogger("TQC.USBDevice.USBCommunication");
         ManualResetEvent m_Event = new ManualResetEvent(false);
-        byte[] m_Data;                   
+        byte[] m_Data;
         const byte BounceCommand = 0xFF;
+        IUsbInterfaceForm m_MainWindowForm;
 
-        public USBCommunication(USBLogger logger)
+        public USBCommunication(IUsbInterfaceForm mainWindowForm, USBLogger logger)
         {
             m_UsbLogger = logger;
             m_UsbHidPort1 = new UsbLibrary.UsbHidPort();
             m_UsbHidPort1.OnSpecifiedDeviceArrived += m_UsbHidPort1_OnSpecifiedDeviceArrived;
             m_UsbHidPort1.OnDataRecieved += m_UsbHidPort1_OnDataRecieved;
-            m_UsbHidPort1.OnDeviceRemoved += m_UsbHidPort1_OnDeviceRemoved;
+            m_UsbHidPort1.OnSpecifiedDeviceRemoved += m_UsbHidPort1_OnDeviceRemoved;
             m_UsbHidPort1.OnDataSend += m_UsbHidPort1_OnDataSend;
+            m_MainWindowForm = mainWindowForm;
+            if (mainWindowForm != null)
+            {
+                m_UsbHidPort1.RegisterHandle(m_MainWindowForm.Handle);
+                m_MainWindowForm.MessageEvent += m_MainWindowForm_MessageEvent;
+                //m_MainWindowForm.WndProc
+            }
+            
+        }
 
+        void m_MainWindowForm_MessageEvent(object sender, MessageEventEventArgs e)
+        {
+            m_UsbHidPort1.ParseMessages(ref e.Message);
+        }
+        ~USBCommunication()
+        {
+            Dispose(false);
         }
 
         bool IsUsbCommsStyleCurvex3
@@ -43,12 +72,12 @@ namespace TQC.USBDevice
 
         void m_UsbHidPort1_OnDeviceRemoved(object sender, EventArgs e)
         {
-
+            m_Log.Debug("Device removed");
         }
 
         void m_UsbHidPort1_OnSpecifiedDeviceArrived(object sender, EventArgs e)
         {
-
+            m_Log.Debug("Device Arrived");
         }
 
 
@@ -69,7 +98,11 @@ namespace TQC.USBDevice
         {
             byte[] response = null;
             LogResponsePacket(inputData);
-            if (inputData.Length < 10)
+            if (inputData == null)
+            {
+                
+            }
+            else if (inputData.Length < 10)
             {
                 throw new ResponsePacketErrorBadLengthException();
             }
@@ -89,7 +122,7 @@ namespace TQC.USBDevice
                 }
                 if (inputData[i] == 0xCD && inputData[i + 1] == 0xCD)
                 {
-                    if (inputData[i + 2] == conversationId) 
+                    if (inputData[i + 2] == conversationId)
                     {
                         byte responseCommand = inputData[i + 3];
                         if ((responseCommand == (0xFF - request)) || ((responseCommand == BounceCommand) && (request == BounceCommand)))
@@ -122,33 +155,33 @@ namespace TQC.USBDevice
                                             throw new DeviceUnknownErrorException();
 
                                         case 2:
-                                            throw new CommandCorruptException(); 
+                                            throw new CommandCorruptException();
 
                                         case 3:
-                                            throw new CommandOutOfSequenceException(); 
+                                            throw new CommandOutOfSequenceException();
 
                                         case 4:
-                                            throw new CommandUnexpectedException(); 
+                                            throw new CommandUnexpectedException();
 
                                         case 5:
-                                            throw new DeviceBusyException(); 
+                                            throw new DeviceBusyException();
 
                                         case 6:
-                                            throw new CommandNotSuportedException(); 
+                                            throw new CommandNotSuportedException();
 
                                         case 7:
-                                            throw new EnumerationNotSuportedException(); 
+                                            throw new EnumerationNotSuportedException();
 
                                         case 8:
-                                            throw new BatchNotAvailableException(); 
+                                            throw new BatchNotAvailableException();
 
                                         case 9:
                                             throw new DataOutOfRangeException();
 
-                                        case 10: throw new CommandModeNotSupportedException(); 
+                                        case 10: throw new CommandModeNotSupportedException();
 
                                         default:
-                                            throw new ResponsePacketErrorBadCommandException();                                            
+                                            throw new ResponsePacketErrorBadCommandException();
                                     }
                                 }
                                 else
@@ -192,24 +225,27 @@ namespace TQC.USBDevice
             byte[] dataRecieved;
             lock (m_UsbHidPort1)
             {
-                m_Data = null;
-                m_Event.Reset();
-                m_UsbHidPort1.SpecifiedDevice.SendData(GenerateRequest(command, request, conversationId));
-                
-                if (!m_Event.WaitOne(GetTimeOutForCommand(command)) )
+                if (m_UsbHidPort1.SpecifiedDevice != null)
                 {
-                    throw new ResponsePacketErrorTimeoutException();
+                    m_Data = null;
+                    m_Event.Reset();
+                    m_UsbHidPort1.SpecifiedDevice.SendData(GenerateRequest(command, request, conversationId));
+
+                    if (!m_Event.WaitOne(GetTimeOutForCommand(command)))
+                    {
+                        throw new ResponsePacketErrorTimeoutException();
+                    }
                 }
                 dataRecieved = m_Data;
-                m_Data = null;                
+                m_Data = null;
             }
             return DecodeData(dataRecieved, (byte)command, conversationId);
 
         }
 
         private byte[] GenerateRequest(TQC.USBDevice.USBLogger.Commands command, byte[] request, byte conversationId)
-        {            
-            
+        {
+
             if (request.Length > 65 - 6 - 4)
             {
                 throw new ResponsePacketErrorBadLengthException();
@@ -254,7 +290,7 @@ namespace TQC.USBDevice
             foreach (byte val in crcAsBits)
             {
                 data[i++] = val;
-            }            
+            }
             var arrayToSend = new byte[0x41];
             Buffer.BlockCopy(data, 0, arrayToSend, 0, arrayToSend.Length);
             LogRequestPacket(arrayToSend);
@@ -277,7 +313,7 @@ namespace TQC.USBDevice
         }
 
         private void LogRequestPacket(byte[] data)
-        {            
+        {
             LogPacket("PC->USB", data);
         }
 
@@ -293,23 +329,30 @@ namespace TQC.USBDevice
                 int lineLength = 16;
                 StringBuilder builder = new StringBuilder();
                 builder.AppendLine(text);
-                for (int line = 0; line < data.Length / lineLength; line++)
+                if (data == null)
                 {
-                    StringBuilder part1 = new StringBuilder();
-                    StringBuilder part2 = new StringBuilder();
-                    int pos = line * lineLength;
-                    for (int col = 0; col < lineLength && ((pos + col) < data.Length); col++)
-                    {
-                        byte dataValue = data[pos + col];
-                        part1.Append(dataValue.ToString("X2"));
-                        part1.Append(" ");
-                        part2.Append(dataValue < 32 ? '*' : (char)dataValue);
-                    }
-                    builder.Append(part1);
-                    builder.Append(part2);
-                    builder.AppendLine();
+                    builder.Append(" DATA IS NULL");
                 }
-                
+                else
+                {
+                    for (int line = 0; line < data.Length / lineLength; line++)
+                    {
+                        StringBuilder part1 = new StringBuilder();
+                        StringBuilder part2 = new StringBuilder();
+                        int pos = line * lineLength;
+                        for (int col = 0; col < lineLength && ((pos + col) < data.Length); col++)
+                        {
+                            byte dataValue = data[pos + col];
+                            part1.Append(dataValue.ToString("X2"));
+                            part1.Append(" ");
+                            part2.Append(dataValue < 32 ? '*' : (char)dataValue);
+                        }
+                        builder.Append(part1);
+                        builder.Append(part2);
+                        builder.AppendLine();
+                    }
+                }
+
                 m_Log.Debug(builder.ToString());
             }
 
@@ -342,10 +385,10 @@ namespace TQC.USBDevice
                     m_UsbHidPort1.SpecifiedDevice.Dispose();
                 }
                 m_UsbHidPort1 = null;
-            }               
+            }
         }
 
-        public bool Open(TQC.USBDevice.USBLogger.USBProductId id, bool minimumCommunications, string portName="")
+        public bool Open(TQC.USBDevice.USBLogger.USBProductId id, bool minimumCommunications, string portName = "")
         {
             m_UsbHidPort1.VendorId = ((int)id >> 16);
             m_UsbHidPort1.ProductId = ((int)id & 0xFFFF);
@@ -354,6 +397,28 @@ namespace TQC.USBDevice
             return m_UsbHidPort1.SpecifiedDevice != null;
         }
 
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        private void Dispose(bool inDispose)
+        {
+            if (inDispose)
+            {
+                if (m_MainWindowForm != null)
+                {
+                    m_MainWindowForm.MessageEvent -= m_MainWindowForm_MessageEvent;
+                }
+                if (m_UsbHidPort1 != null)
+                {
+                    m_UsbHidPort1.UnregisterHandle();
+                }
+                GC.SuppressFinalize(this);
+            }
+        }
 
     }
 }

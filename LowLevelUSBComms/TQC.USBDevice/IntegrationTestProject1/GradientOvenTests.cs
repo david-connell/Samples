@@ -15,7 +15,7 @@ namespace IntegrationTestProject1
         [TestMethod]
         public void TestConnectivity()
         {
-            using (var logger = new USBLogger())
+            using (var logger = new USBLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -34,7 +34,7 @@ namespace IntegrationTestProject1
         [TestMethod]
         public void ReadProbes()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -58,7 +58,7 @@ namespace IntegrationTestProject1
         [TestMethod]
         public void GetSerialNummberRawAndNormal()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -79,7 +79,7 @@ namespace IntegrationTestProject1
         [TestMethod]
         public void GetCalibrationRawAndNormal()
         {
-            using (var logger = new USBLogger())
+            using (var logger = new USBLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -103,7 +103,7 @@ namespace IntegrationTestProject1
         [TestMethod]
         public void GetDeviceName()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -122,7 +122,7 @@ namespace IntegrationTestProject1
         [TestMethod]
         public void GeNumberOfProbes()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {                    
@@ -139,7 +139,7 @@ namespace IntegrationTestProject1
         [TestMethod]
         public void CheckOffloafingAndSendingSetup()
         {
-            using (var logger = new TQCUsbLogger())
+            using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {

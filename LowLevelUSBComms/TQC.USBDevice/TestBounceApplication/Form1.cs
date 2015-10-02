@@ -13,7 +13,7 @@ using TQC.USBDevice;
 
 namespace TestBounceApplication
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, IUsbInterfaceForm
     {        
         int m_Id = 0;
         bool m_DoTest;
@@ -128,7 +128,7 @@ namespace TestBounceApplication
         
         protected TQCUsbLogger OpenLogger(bool miniumum = true)
         {
-            var logger = new TQCUsbLogger();
+            var logger = new TQCUsbLogger(this);
             CloseLogger();
             m_CachedProduct = ProductId;
             if (logger.Open(m_CachedProduct, miniumum))
@@ -299,22 +299,29 @@ namespace TestBounceApplication
                 }
                 Int16 commandId = (Int16)(m_Id % 255);
                 result = m_DataLogger.BounceCommand(0, commandId, data);
-                Int16 commandReadBack = BitConverter.ToInt16(result, 0);
-                if (commandId != commandReadBack)
+                if (result == null)
                 {
-                    Error(commandId,commandReadBack);
+                    //m_Count++
                 }
-                //if (data != null)
+                else
                 {
-                    for (int counter = 0; counter < data.Length; counter++)
+                    Int16 commandReadBack = BitConverter.ToInt16(result, 0);
+                    if (commandId != commandReadBack)
                     {
-                        if (data[counter] != result[counter + 2])
+                        Error(commandId, commandReadBack);
+                    }
+                    //if (data != null)
+                    {
+                        for (int counter = 0; counter < data.Length; counter++)
                         {
-                            Error(counter, data[counter], result[counter + 2]);
+                            if (data[counter] != result[counter + 2])
+                            {
+                                Error(counter, data[counter], result[counter + 2]);
+                            }
                         }
                     }
+                    m_Count++;
                 }
-                m_Count++;
             }
             catch (Exception ex1)
             {
@@ -397,6 +404,23 @@ namespace TestBounceApplication
         {
             m_Configuration.UseNativeCommunication = m_UseIFAComms.Checked;            
         }
+
+        protected override void WndProc(ref Message m)
+        {
+            OnMessageEvent(ref m);
+            base.WndProc(ref m);	    // pass message on to base form
+        }
+        protected virtual void OnMessageEvent(ref Message m)
+        {
+            MessageEventEventHandler handler = MessageEvent;
+            if (handler != null)
+            {
+
+                handler(this, new MessageEventEventArgs{Message = m } );
+            }
+        }
+
+        public event MessageEventEventHandler MessageEvent;
     }
 
     class ProgressState

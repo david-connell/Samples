@@ -24,7 +24,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         public void EricTest1(int numerOfAttempts)
         {
             float temperatureValue = 0.0f;
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -48,7 +48,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [TestCase(ButtonStatus.CancelPressed, "Press the Cancel Button")]
         public void CheckButton(ButtonStatus buttonToCheck, string outputMessage)
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 Console.WriteLine("Test '{0}' ", outputMessage);
                 if (logger.OpenWithMinumumRequests(ProductId))
@@ -96,7 +96,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [TestCase(1)]
         public void ReadProbeName(short id)
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -114,7 +114,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadThermocoupleBoardIDs()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -134,7 +134,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [TestCase(1)]
         public void ReadProbeType(short id)
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -152,7 +152,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadInternalStatus()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -174,7 +174,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadExternalFanSpeed()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -192,7 +192,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void SetExternalFanSpeed()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -220,7 +220,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadInternalFanSpeed()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -238,7 +238,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void SetInternalFanSpeed()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -263,7 +263,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadCooling()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -280,7 +280,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void SetCooling()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -307,7 +307,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadPowerSupply()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -325,7 +325,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void SetPowerSupply()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -345,7 +345,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadClamp()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -362,7 +362,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void SetClamp()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -384,7 +384,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadCarrierPosition()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -401,7 +401,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void SetCarrierPosition()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -427,7 +427,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadCarrierSpeed()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -444,7 +444,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void SetCarrierSpeed()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -469,7 +469,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void ReadLift()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -487,7 +487,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void SetLift()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -509,7 +509,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [TestCase(1)]
         public void SetTemperatureHeater(short id)
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
@@ -532,7 +532,7 @@ namespace IntegrationTestNUnit.Logger.GRO
         [Test]
         public void Status()
         {
-            using (var logger = new GROMainBoard())
+            using (var logger = new GROMainBoard(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {

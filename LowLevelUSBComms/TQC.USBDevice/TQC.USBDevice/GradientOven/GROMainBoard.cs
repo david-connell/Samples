@@ -11,6 +11,11 @@ namespace TQC.USBDevice.GradientOven
         const int NumberOfFansPerBoard = 8;
         const int NumberOfProbesPerBoard = 8;
 
+        public GROMainBoard(IUsbInterfaceForm mainWinForm)
+            : base(mainWinForm)
+        {
+        }
+
         public bool Open()
         {
             return Open(TQC.USBDevice.USBLogger.USBProductId.GRADIENT_OVEN);

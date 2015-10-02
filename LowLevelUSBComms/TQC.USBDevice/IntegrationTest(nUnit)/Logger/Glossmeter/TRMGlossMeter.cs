@@ -20,7 +20,7 @@ namespace IntegrationTestNUnit.Logger.GlossMeter
 
         override protected GlossMeterLogger OpenGlossMeterLogger(bool miniumum = true)
         {
-            var logger = new TrmLogger();
+            var logger = new TrmLogger(null);
             if (logger.Open(miniumum))
             {
                 return logger;
