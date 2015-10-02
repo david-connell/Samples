@@ -61,7 +61,7 @@ namespace TQC.USBDevice
         {
             get
             {
-                return m_UsbLogger.IsThermocoupleSimulator || m_UsbLogger.IsCurvex3;
+                return m_UsbLogger.IsThermocoupleSimulator || m_UsbLogger.IsCurvex3 || m_UsbLogger.IsGRO;
             }
         }
 
@@ -72,12 +72,12 @@ namespace TQC.USBDevice
 
         void m_UsbHidPort1_OnDeviceRemoved(object sender, EventArgs e)
         {
-            m_Log.Debug("Device removed");
+            m_Log.Info("Device removed");
         }
 
         void m_UsbHidPort1_OnSpecifiedDeviceArrived(object sender, EventArgs e)
         {
-            m_Log.Debug("Device Arrived");
+            m_Log.Info("Device Arrived");
         }
 
 
