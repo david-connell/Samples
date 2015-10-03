@@ -21,7 +21,7 @@ namespace TestBounceApplication
         bool m_IsTestButtonStop;
         TQCUsbLogger m_DataLogger;
         int m_Count;
-        int m_NumberOfThreads = 1;
+        int m_NumberOfThreads = 10;
         Stopwatch m_StopWatch;
         List<System.ComponentModel.BackgroundWorker> backgroundWorkers = new List<BackgroundWorker>();
         Configuration m_Configuration = new Configuration();
