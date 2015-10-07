@@ -24,6 +24,7 @@ namespace TQC.USBDevice
         const byte BounceCommand = 0xFF;
         IUsbInterfaceForm m_MainWindowForm;
         bool m_IsConnected;
+        Configuration m_Configuration = new Configuration();
 
         public USBCommunication(IUsbInterfaceForm mainWindowForm, USBLogger logger)
         {
@@ -374,8 +375,8 @@ namespace TQC.USBDevice
                 time2Wait = new TimeSpan(0, 0, 0, 2, 0);
             }
             else if (m_UsbLogger.IsGRO)
-            {
-                time2Wait = new TimeSpan(0, 0, 0, 0, 200);
+            {                
+                time2Wait = new TimeSpan(0, 0, 0, 0, m_Configuration.GROTimeoutInMilliseconds);
             }
             return time2Wait;
         }
