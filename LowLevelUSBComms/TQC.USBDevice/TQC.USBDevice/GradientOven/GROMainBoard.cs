@@ -199,6 +199,43 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
+        public double MaximumHeaterTemperature
+        {
+            get
+            {
+                Byte[] response = null;
+                try
+                {
+                    response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)10));
+                }
+                catch (CommandNotSuportedException )
+                {
+
+                }
+                catch (EnumerationNotSuportedException)
+                {
+
+                }
+                if (response == null)
+                {
+                    return 250.0;
+                }
+                if (response.Length < sizeof(UInt16))
+                {
+                    throw new TooLittleDataReceivedException("MaximumHeaterTemperature", response.Length, sizeof(UInt16));
+                }
+                return BitConverter.ToUInt16(response, 0);                
+            }
+            set
+            {
+                List<byte> request = new List<byte>();
+
+                request.AddRange(BitConverter.GetBytes((short)10));
+                request.AddRange(BitConverter.GetBytes((UInt16)value));
+
+                Request(Commands.GROSetCommand, request.ToArray());
+            }
+        }
         public Percentage Cooling
         {
             get

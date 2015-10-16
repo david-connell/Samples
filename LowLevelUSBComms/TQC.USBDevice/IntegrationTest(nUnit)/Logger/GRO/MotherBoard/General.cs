@@ -467,6 +467,52 @@ namespace IntegrationTestNUnit.Logger.GRO
         }
 
         [Test]
+        public void ReadMaximumHeaterTemps()
+        {
+            using (var logger = new GROMainBoard(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    var val = logger.MaximumHeaterTemperature;
+                    Console.WriteLine("Max Heater = {0}", val);
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+        [TestCase(300)]
+        public void SetMaximumHeaterTemps(double maxTemp)
+        {
+            using (var logger = new GROMainBoard(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    var originalValue = logger.MaximumHeaterTemperature;
+                    Console.WriteLine("MaxTemp = {0}", originalValue);
+                    logger.MaximumHeaterTemperature = maxTemp;
+
+                    Assert.That(logger.MaximumHeaterTemperature, Is.EqualTo(maxTemp));
+
+                    Console.WriteLine("Set to Max Heater Temperature = {0}", maxTemp);
+
+                    logger.MaximumHeaterTemperature = originalValue;
+
+                    Console.WriteLine("Returnign Max Heater Temperature = {0}", originalValue);
+                    
+                    
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+
+        [Test]
         public void ReadLift()
         {
             using (var logger = new GROMainBoard(null))
