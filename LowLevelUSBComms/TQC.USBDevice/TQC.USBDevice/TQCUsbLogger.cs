@@ -455,7 +455,7 @@ namespace TQC.USBDevice
                     request.AddRange(BitConverter.GetBytes((float)newValue.C));
                                                             
                     var result = GetResponse(deviceId, Commands.WriteCalibrationDetails, 20 + probeId, request);
-                    if (result == null)
+                    if (result != null)
                     {
                         throw new NoDataReceivedException("setCalibration");
                     }

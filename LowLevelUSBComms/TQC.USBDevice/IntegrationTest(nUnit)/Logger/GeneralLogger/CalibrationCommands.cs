@@ -14,7 +14,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
     //[TestFixture(USBLogger.USBProductId.USB_CURVEX_3a)]
     abstract class CalibrationCommands
     {
-        USBLogger.USBProductId ProductId;
+        protected USBLogger.USBProductId ProductId;
         public CalibrationCommands(USBLogger.USBProductId product)
         {
             ProductId = product;
@@ -99,10 +99,10 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
         {
             var value = logger.CalibrationDetails(probeId);
             Console.WriteLine("Probe {0} is '{1}'", probeId + 1, value);
-            Assert.That(Math.Abs(value.C), Is.LessThan(2.0));
+            Assert.That(Math.Abs(value.C), Is.LessThan(100.0), "Constannt too big");
             Assert.That(value.M, Is.Not.EqualTo(0.0));
-            Assert.That(Math.Abs(value.M), Is.LessThan(2.0));
-            Assert.That(Math.Abs(value.M), Is.GreaterThan(0.5));
+            Assert.That(Math.Abs(value.M), Is.LessThan(2.0), "Gain too big");
+            Assert.That(Math.Abs(value.M), Is.GreaterThan(0.5), "Gain too small");
             
         }
 

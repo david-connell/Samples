@@ -16,7 +16,7 @@ namespace IntegrationTestNUnit.Logger.Curvex3
             : base(USBLogger.USBProductId.USB_CURVEX_3a)
         {
         }
-
+        
 
     }
 
@@ -26,6 +26,29 @@ namespace IntegrationTestNUnit.Logger.Curvex3
         public Calibration()
             : base(USBLogger.USBProductId.USB_CURVEX_3a)
         {
+        }
+
+        [Test]
+        public void SetCalibrationConstant()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    int maxProbes = logger.NumberOfProbes;
+                    if (maxProbes > 0)
+                    {
+                        LinearCalibrationDetails details = new LinearCalibrationDetails(1,0);
+                        logger.SetCalibrationDetails(0, details);
+                        Assert.That(logger.CalibrationDetails(0), Is.EqualTo(details));
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+
         }
     }
 
