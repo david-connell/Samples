@@ -444,7 +444,37 @@ namespace TQC.USBDevice
             }
         }
 
-        public LinearCalibrationDetails CalibrationDetails(int probeId)
+        internal void _SetCalibration(byte deviceId, int probeId, LinearCalibrationDetails newValue)
+        {
+            if (probeId >= 0 && probeId < _NumberOfProbes(deviceId))
+            {
+                if (CanLoggerBeConfigured)
+                {
+                    List<byte> request = new List<byte>();
+                    request.AddRange(BitConverter.GetBytes((float)newValue.M));
+                    request.AddRange(BitConverter.GetBytes((float)newValue.C));
+                                                            
+                    var result = GetResponse(deviceId, Commands.WriteCalibrationDetails, 20 + probeId, request);
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("setCalibration");
+                    }
+                }
+
+                return; 
+            }
+            else
+            {
+                throw new IndexOutOfRangeException("probeId");
+            }
+        }
+
+        public virtual void SetCalibrationDetails(int probeId, LinearCalibrationDetails details)
+        {
+            _SetCalibration(0, probeId, details);
+        }
+
+        public virtual LinearCalibrationDetails CalibrationDetails(int probeId)
         {
             return _Calibration(0, probeId);
         }

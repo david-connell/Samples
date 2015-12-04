@@ -118,6 +118,12 @@ namespace TQC.USBDevice.GradientOven
         {
             return ParentDevice._Calibration(ChildDeviceID, probeId);            
         }
+
+        public void SetCalibrationDetails(int probeId, LinearCalibrationDetails details)
+        {
+            ParentDevice._SetCalibration(ChildDeviceID, probeId, details);
+        }
+
         public String CalibrationCompany
         {
             get

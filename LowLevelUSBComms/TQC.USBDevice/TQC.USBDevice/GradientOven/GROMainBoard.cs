@@ -71,11 +71,23 @@ namespace TQC.USBDevice.GradientOven
             }
             if (string.IsNullOrEmpty(probeName))
             {
-                probeName = string.Format("Probe {0}", probeId);
+                probeName = string.Format("Probe {0}", probeId+1);
             }
             return probeName;
         }
 
+        public override LinearCalibrationDetails CalibrationDetails(int probeId)
+        {
+            var thermocoupleBoard = GetChildDevice(AbsoluteProbeIdToThermcoupleBoardID((short)probeId));
+            return thermocoupleBoard.CalibrationDetails(AbsoluteProbeIdToLocalProbeId((short)probeId));
+        }
+
+        public override void SetCalibrationDetails(int probeId, LinearCalibrationDetails newDetails)
+        {
+            var thermocoupleBoard = GetChildDevice(AbsoluteProbeIdToThermcoupleBoardID((short)probeId));
+            thermocoupleBoard.SetCalibrationDetails(AbsoluteProbeIdToLocalProbeId((short)probeId), newDetails);
+
+        }
 
         public override ProbeType ProbeType(int probeId)
         {

@@ -9,6 +9,7 @@ namespace TQC.USBDevice
         string ProbeName(int probeId);
         ProbeType ProbeType(int probeId);
         LinearCalibrationDetails CalibrationDetails(int probeId);
+        void SetCalibrationDetails(int probeId, LinearCalibrationDetails details);
 
         DateTime Calibration { get; }
         string CalibrationCompany { get; }
