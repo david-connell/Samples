@@ -574,6 +574,30 @@ namespace TQC.USBDevice
 
             }
         }
+        public static string DeviceTypeToString(DeviceType type)
+        {
+            switch (type)
+            {
+                case DeviceType.PolyGlossmeter:
+                    return "PolyGloss";
+                case DeviceType.SoloGlossmeter:
+                    return "SoloGloss";
+                case DeviceType.DuoGlossmeter:
+                    return "DuoGloss";
+                case DeviceType.CurveX3_Basic:
+                case DeviceType.CurveX3_High:
+                case DeviceType.CurveX3_Mid:
+                    return "CurveX3";
+                case DeviceType.GRO:
+                    return "GRO";
+                case DeviceType.ThermocoupleSimulator:
+                    return "TCT";
+                case DeviceType.Unknown:
+                    return "****";
+                default:
+                    return "????";
+            }
+        }
 
         protected static DeviceType LoggerTypeToDeviceType(Int16 deviceType)
         {
