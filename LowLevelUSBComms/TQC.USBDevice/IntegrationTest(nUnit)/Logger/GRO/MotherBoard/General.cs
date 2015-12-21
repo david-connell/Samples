@@ -512,6 +512,29 @@ namespace IntegrationTestNUnit.Logger.GRO
         }
 
 
+        [TestCase(5, 23.5f)]
+        public void SetMaximumHeaterPercentage(short probeId, float maxTemp)
+        {
+            int numberOfSeconds = 2;
+            using (var logger = new GROMainBoard(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    logger.SetTempSettingByPercentage(probeId, maxTemp);                   
+                    Console.WriteLine("Set Probe {0} to {1:0.1} for {2} secs%", probeId, maxTemp, numberOfSeconds);
+                    Thread.Sleep(numberOfSeconds * 1000);
+                    logger.SetTempSettingByPercentage(probeId, 0.0f);                    
+                    Console.WriteLine("Returning Heater Temperature to 0%");
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to logger " + ProductId.ToString());
+                }
+            }
+        }
+
+
+
         [Test]
         public void ReadLift()
         {

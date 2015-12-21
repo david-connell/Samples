@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace TQC.USBDevice.GradientOven
+namespace TQC.USBDevice.BaseLoggerTypes
 {
-    
-    public class Percentage : IEqualityComparer<Percentage>
+    public class LoggerPercentage : IEqualityComparer<LoggerPercentage>
     {
-        public Percentage(byte percentage)
+        public LoggerPercentage(UInt16 loggerData) : this((loggerData / 10.0f))
+        {
+        }
+        public LoggerPercentage(float percentage)
         {
             if (percentage > 100)
             {
@@ -14,9 +18,9 @@ namespace TQC.USBDevice.GradientOven
             }
             Value = percentage;
         }
-        public byte Value { get; private set; }
+        public float Value { get; private set; }
 
-        public bool Equals(Percentage x, Percentage y)
+        public bool Equals(LoggerPercentage x, LoggerPercentage y)
         {
             return x.Value.Equals(y.Value);
         }
@@ -26,7 +30,7 @@ namespace TQC.USBDevice.GradientOven
         }
         public override bool Equals(object obj)
         {
-            Percentage other = obj as Percentage;
+            LoggerPercentage other = obj as LoggerPercentage;
             if (other == null)
             {
                 return false;
@@ -38,11 +42,17 @@ namespace TQC.USBDevice.GradientOven
             return string.Format("{0}%", Value);
         }
 
-        public int GetHashCode(Percentage obj)
+        public int GetHashCode(LoggerPercentage obj)
         {
             return obj.Value.GetHashCode();
         }
+
+        internal UInt16 ToData
+        {
+            get
+            {
+                return (UInt16)((Value * 10.0) + 0.5);
+            }
+        }
     }
-
-
 }

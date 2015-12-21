@@ -54,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseLoggerTypes\LoggerPercentage.cs" />
     <Compile Include="DeviceResponseUnexpectedException.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GlossMeter\GlossMeterLogger.cs" />

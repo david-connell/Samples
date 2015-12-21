@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TQC.USBDevice.BaseLoggerTypes;
 
 
 namespace TQC.USBDevice.GradientOven
@@ -529,6 +530,20 @@ namespace TQC.USBDevice.GradientOven
 
             request.AddRange(BitConverter.GetBytes((short)(200 + AbsoluteFanIdToLocalFanId(channelId))));
             request.AddRange(BitConverter.GetBytes(((UInt16)(temperatureSettingInDegreesC* 10.0f+0.5)) ));
+            Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(channelId));
+        }
+
+        public void SetTempSettingByPercentage(short channelId, float percentage)
+        {
+            if (channelId < 0 || channelId > 32)
+            {
+                throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
+            }
+            var value = new LoggerPercentage(percentage);                        
+            List<byte> request = new List<byte>();
+
+            request.AddRange(BitConverter.GetBytes((short)(300 + AbsoluteFanIdToLocalFanId(channelId))));
+            request.AddRange(BitConverter.GetBytes(value.ToData));
             Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(channelId));
         }
 
