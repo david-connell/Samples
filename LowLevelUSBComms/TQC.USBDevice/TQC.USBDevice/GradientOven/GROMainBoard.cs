@@ -10,6 +10,7 @@ namespace TQC.USBDevice.GradientOven
     {
         readonly Dictionary<byte, IGROThermoCoupleBoard> m_ChildDevices = new Dictionary<byte, IGROThermoCoupleBoard>();
         const int NumberOfFansPerBoard = 8;
+        const int NumberOfHeatersPerBoard = 8;
         const int NumberOfProbesPerBoard = 8;
 
         public GROMainBoard(IUsbInterfaceForm mainWinForm)
@@ -115,6 +116,23 @@ namespace TQC.USBDevice.GradientOven
                 return new byte [] { 1, 2, 3, 4 };
             }
         }
+
+        public int TotalNumberOfHeaters
+        {
+            get
+            {
+                return ThermocoupleBoardIDs.Count() * NumberOfHeatersPerBoard;
+            }
+        }
+
+        public int TotalNumberOfFans
+        {
+            get
+            {
+                return ThermocoupleBoardIDs.Count() * NumberOfFansPerBoard;
+            }
+        }
+
 
         public Percentage ExternalFanSpeed
         {
