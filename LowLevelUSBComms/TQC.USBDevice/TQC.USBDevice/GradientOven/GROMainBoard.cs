@@ -557,13 +557,36 @@ namespace TQC.USBDevice.GradientOven
             {
                 throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
             }
-            var value = new LoggerPercentage(percentage);                        
             List<byte> request = new List<byte>();
 
             request.AddRange(BitConverter.GetBytes((short)(300 + AbsoluteFanIdToLocalFanId(channelId))));
-            request.AddRange(BitConverter.GetBytes(value.ToData));
+            request.AddRange(BitConverter.GetBytes((byte) percentage));
             Request(Commands.GROSetCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(channelId));
         }
+
+        public float GetTempSettingByPercentage(short channelId)
+        {
+            if (channelId < 0 || channelId > 32)
+            {
+                throw new ArgumentOutOfRangeException("slotId", "Valid slots 0->32");
+            }
+            List<byte> request = new List<byte>();
+
+            request.AddRange(BitConverter.GetBytes((short)(300 + AbsoluteFanIdToLocalFanId(channelId))));
+            
+            var response = Request(Commands.GROReadCommand, request.ToArray(), AbsoluteFanIdToThermcoupleBoardID(channelId));
+
+            if (response == null)
+            {
+                throw new NoDataReceivedException(GetTempSettingsMethodDescription(channelId));
+            }
+            if (response.Length < sizeof(byte))
+            {
+                throw new TooLittleDataReceivedException(GetTempSettingsMethodDescription(channelId), response.Length, sizeof(UInt16));
+            }
+            return response[0];
+        }
+
 
         //Combines the boards
         public override Int32 NumberOfProbes
