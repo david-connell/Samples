@@ -79,7 +79,7 @@ namespace TQC.USBDevice
             return response;
         }
 
-        private byte[] GetResponse(byte deviceId, Commands command, int commandId, List<byte> request)
+        internal byte[] GetResponse(byte deviceId, Commands command, int commandId, List<byte> request)
         {
             List<byte> requestFull = new List<byte>();
             requestFull.AddRange(BitConverter.GetBytes((short)commandId));
@@ -324,7 +324,7 @@ namespace TQC.USBDevice
             return ReadDeviceInfoAsString(deviceId, 4);            
         }
 
-        private static string DecodeString(byte[] result)
+        internal static string DecodeString(byte[] result)
         {
             var textResult = Encoding.UTF8.GetString(result, 0, result.Length);
             int location = textResult.IndexOf('\0');
