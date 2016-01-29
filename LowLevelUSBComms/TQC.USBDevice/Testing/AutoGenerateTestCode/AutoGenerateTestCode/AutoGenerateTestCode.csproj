@@ -47,6 +47,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UsbCommands.cs" />
+    <Compile Include="UsbOffloadReadLoggedInformation.cs" />
+    <Compile Include="UsbReadLoggedInformation.cs" />
     <Compile Include="UsbTestWriter.cs" />
   </ItemGroup>
   <ItemGroup>

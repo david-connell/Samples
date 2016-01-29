@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using TQC.USBDevice;
-namespace TQC.USBDevice.CurveX3.UserSetup
+namespace TQC.USBDevice.TQCCurveX3Basic.Offloading
 {
     [TestFixture]
     public class ReadDeviceInformation 
@@ -22,7 +22,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 102, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x66, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("DeviceType");
@@ -30,7 +30,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 2)
                     {
-                            throw new TooLittleDataReceivedException("DeviceType", result.Length, 2);
+                        throw new TooLittleDataReceivedException("DeviceType", result.Length, 2);
                     }
                     UInt16 status = BitConverter.ToUInt16(result, 0);
                     Console.WriteLine("DeviceType={0}", status);
@@ -51,7 +51,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 0, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x0, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Device Serial Number");
@@ -59,7 +59,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Device Serial Number", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Device Serial Number", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Device Serial Number={0}", status);
@@ -80,7 +80,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 3, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x3, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Device Name");
@@ -104,7 +104,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 101, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x65, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Firmware features");
@@ -112,7 +112,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Firmware features", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Firmware features", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Firmware features={0}", status);
@@ -133,7 +133,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 1, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x1, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("SW Version");
@@ -141,7 +141,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("SW Version", result.Length, 4);
+                        throw new TooLittleDataReceivedException("SW Version", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("SW Version={0}", status);
@@ -162,7 +162,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 2, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x2, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("HW Version");
@@ -170,7 +170,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("HW Version", result.Length, 4);
+                        throw new TooLittleDataReceivedException("HW Version", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("HW Version={0}", status);
@@ -191,7 +191,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 11, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0xB, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Number of channels");
@@ -199,7 +199,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Number of channels", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Number of channels", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Number of channels={0}", status);
@@ -212,7 +212,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
             return;
         }
 
-        [Test]
+        [Test, ExpectedException(typeof(TQC.USBDevice.EnumerationNotSuportedException))]
         public void LengthOfBatchNames()
         {
             using (var logger = new TQCUsbLogger(null))
@@ -220,7 +220,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 19, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x13, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Length of Batch Names");
@@ -228,10 +228,11 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Length of Batch Names", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Length of Batch Names", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Length of Batch Names={0}", status);
+                    //Got back 7 as exception
                 }
                 else
                 {
@@ -249,7 +250,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 15, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0xF, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Max number of Paint Types");
@@ -257,39 +258,10 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Max number of Paint Types", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Max number of Paint Types", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Max number of Paint Types={0}", status);
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-
-        [Test]
-        public void MaxNumberOfBatches()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 7, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Max number of batches");
-                    }
-
-                    if (result.Length < 1)
-                    {
-                            throw new TooLittleDataReceivedException("Max number of batches", result.Length, 1);
-                    }
-                    byte status = result[0];
-                    Console.WriteLine("Max number of batches={0}", status);
                 }
                 else
                 {
@@ -307,7 +279,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 8, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x8, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Number of batches used");
@@ -315,7 +287,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Number of batches used", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Number of batches used", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Number of batches used={0}", status);
@@ -336,7 +308,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 6, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x6, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Physical Memory");
@@ -344,7 +316,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Physical Memory", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Physical Memory", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Physical Memory={0}", status);
@@ -365,7 +337,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 100, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x64, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("GetCommas Protocol");
@@ -373,7 +345,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 2)
                     {
-                            throw new TooLittleDataReceivedException("GetCommas Protocol", result.Length, 2);
+                        throw new TooLittleDataReceivedException("GetCommas Protocol", result.Length, 2);
                     }
                     UInt16 status = BitConverter.ToUInt16(result, 0);
                     Console.WriteLine("GetCommas Protocol={0}", status);
@@ -394,7 +366,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 4, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x4, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Manufacture Name");
@@ -418,7 +390,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 5, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x5, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Device Manufactured date");
@@ -426,7 +398,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Device Manufactured date", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Device Manufactured date", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Device Manufactured date={0}", status);
@@ -447,7 +419,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 12, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0xC, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Current state of logger");
@@ -455,7 +427,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Current state of logger", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Current state of logger", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Current state of logger={0}", status);
@@ -468,26 +440,27 @@ namespace TQC.USBDevice.CurveX3.UserSetup
             return;
         }
 
-        [Test]
-        public void SendingSetup()
+        [Test, ExpectedException(typeof(TQC.USBDevice.EnumerationNotSuportedException))]
+        public void OffloadAvailable()
         {
             using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)1, 18, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x11, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("Sending setup");
+                        throw new NoDataReceivedException("Offload Available");
                     }
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Sending setup", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Offload Available", result.Length, 1);
                     }
                     byte status = result[0];
-                    Console.WriteLine("Sending setup={0}", status);
+                    Console.WriteLine("Offload Available={0}", status);
+                    //Got back 7 as exception
                 }
                 else
                 {
@@ -515,7 +488,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 100, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x64, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Type of channel 1");
@@ -523,10 +496,11 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Type of channel 1", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Type of channel 1", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Type of channel 1={0}", status);
+                    Assert.That(result[0], Is.EqualTo(1));
                 }
                 else
                 {
@@ -544,13 +518,14 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 200, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0xC8, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Name of channel 1");
                     }
 
                     Console.WriteLine("Name of channel 1 = '{0}'", TQCUsbLogger.DecodeString(result));
+                    Assert.That(TQCUsbLogger.DecodeString(result), Is.EqualTo("Probe 1"));
                 }
                 else
                 {
@@ -568,7 +543,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 101, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x65, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Type of channel 2");
@@ -576,10 +551,11 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Type of channel 2", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Type of channel 2", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Type of channel 2={0}", status);
+                    Assert.That(result[0], Is.EqualTo(1));
                 }
                 else
                 {
@@ -597,13 +573,14 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 201, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0xC9, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Name of channel 2");
                     }
 
                     Console.WriteLine("Name of channel 2 = '{0}'", TQCUsbLogger.DecodeString(result));
+                    Assert.That(TQCUsbLogger.DecodeString(result), Is.EqualTo("Probe 2"));
                 }
                 else
                 {
@@ -621,7 +598,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 102, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x66, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Type of channel 3");
@@ -629,10 +606,11 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Type of channel 3", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Type of channel 3", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Type of channel 3={0}", status);
+                    Assert.That(result[0], Is.EqualTo(1));
                 }
                 else
                 {
@@ -650,13 +628,14 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 202, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0xCA, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Name of channel 3");
                     }
 
                     Console.WriteLine("Name of channel 3 = '{0}'", TQCUsbLogger.DecodeString(result));
+                    Assert.That(TQCUsbLogger.DecodeString(result), Is.EqualTo("Probe 3"));
                 }
                 else
                 {
@@ -674,7 +653,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 103, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x67, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Type of channel 4");
@@ -682,10 +661,11 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Type of channel 4", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Type of channel 4", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Type of channel 4={0}", status);
+                    Assert.That(result[0], Is.EqualTo(1));
                 }
                 else
                 {
@@ -703,13 +683,14 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 203, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0xCB, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Name of channel 4");
                     }
 
                     Console.WriteLine("Name of channel 4 = '{0}'", TQCUsbLogger.DecodeString(result));
+                    Assert.That(TQCUsbLogger.DecodeString(result), Is.EqualTo("Probe 4"));
                 }
                 else
                 {
@@ -727,13 +708,14 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 1, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x1, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Calibration company");
                     }
 
                     Console.WriteLine("Calibration company = '{0}'", TQCUsbLogger.DecodeString(result));
+                    Assert.That(TQCUsbLogger.DecodeString(result), Is.EqualTo("Windows7-PC"));
                 }
                 else
                 {
@@ -751,13 +733,14 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 2, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x2, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Calibration user name");
                     }
 
                     Console.WriteLine("Calibration user name = '{0}'", TQCUsbLogger.DecodeString(result));
+                    Assert.That(TQCUsbLogger.DecodeString(result), Is.EqualTo("Windows7"));
                 }
                 else
                 {
@@ -775,7 +758,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)2, 0, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x0, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Date of logger Calibration");
@@ -783,10 +766,348 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Date of logger Calibration", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Date of logger Calibration", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Date of logger Calibration={0}", status);
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+    }
+    [TestFixture]
+    public class ReadLoggedInformation 
+    {
+        private USBLogger.USBProductId ProductId;
+        public ReadLoggedInformation()
+        {
+            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
+            return;
+        }
+
+        [Test]
+        public void GetLoggedBatchIds()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    
+                    request.Add(0x0);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x3, 0x0, request);
+                    
+
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("GetLoggedBatchIds");
+                    }
+
+                    if (result.Length < 1)
+                    {
+                        throw new TooLittleDataReceivedException("GetLoggedBatchIds", result.Length, 1);
+                    }
+                    byte status = result[0];
+                    Console.WriteLine("GetLoggedBatchIds={0}", status);
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void GetSampleRate()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    
+                    request.Add(0x1);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x3, 0x1, request);
+                    
+
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Get Sample Rate");
+                    }
+
+                    if (result.Length < 4)
+                    {
+                        throw new TooLittleDataReceivedException("Get Sample Rate", result.Length, 4);
+                    }
+                    UInt32 status = BitConverter.ToUInt32(result, 0);
+                    Console.WriteLine("Get Sample Rate={0}", status);
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void NumberOfSamplesInBatch()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    
+                    request.Add(0x1);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x3, 0x3, request);
+                    
+
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Number of Samples in batch");
+                    }
+
+                    if (result.Length < 4)
+                    {
+                        throw new TooLittleDataReceivedException("Number of Samples in batch", result.Length, 4);
+                    }
+                    UInt32 status = BitConverter.ToUInt32(result, 0);
+                    Console.WriteLine("Number of Samples in batch={0}", status);
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void GetEnabledChannels()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    
+                    request.Add(0x1);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x3, 0x6, request);
+                    
+
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Get Enabled Channels");
+                    }
+
+                    if (result.Length < 4)
+                    {
+                        throw new TooLittleDataReceivedException("Get Enabled Channels", result.Length, 4);
+                    }
+                    UInt32 status = BitConverter.ToUInt32(result, 0);
+                    Console.WriteLine("Get Enabled Channels={0}", status);
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void GetStartTimeOfBatch()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    
+                    request.Add(0x1);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x3, 0x2, request);
+                    
+
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Get Start Time of batch");
+                    }
+
+                    if (result.Length < 4)
+                    {
+                        throw new TooLittleDataReceivedException("Get Start Time of batch", result.Length, 4);
+                    }
+                    UInt32 status = BitConverter.ToUInt32(result, 0);
+                    Console.WriteLine("Get Start Time of batch={0}", status);
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void BatchName()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    
+                    request.Add(0x1);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x3, 0x4, request);
+                    
+
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Batch Name");
+                    }
+
+                    Console.WriteLine("Batch Name = '{0}'", TQCUsbLogger.DecodeString(result));
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void NumberOfChannelsInBatch()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    
+                    request.Add(0x1);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x3, 0x5, request);
+                    
+
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Number of channels in batch");
+                    }
+
+                    if (result.Length < 1)
+                    {
+                        throw new TooLittleDataReceivedException("Number of channels in batch", result.Length, 1);
+                    }
+                    byte status = result[0];
+                    Console.WriteLine("Number of channels in batch={0}", status);
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void PaintType()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    
+                    request.Add(0x1);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x3, 0x8, request);
+                    
+
+                    if (result != null)
+                    {
+                        throw new Exception("Paint type returned back some data!");
+                    }
+
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+    }
+    [TestFixture]
+    public class OffloadLoggedInformation 
+    {
+        private USBLogger.USBProductId ProductId;
+        public OffloadLoggedInformation()
+        {
+            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
+            return;
+        }
+
+        [Test]
+        public void Offload()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+
+{
+                        List<byte> request = new List<byte>();
+                        request.Add(0x0);
+                        request.Add(0x0);
+                        var result = logger.GetResponse(0, (USBLogger.Commands)0x4, 0x1, request);
+                        if (result != null)
+                        {
+                            throw new TooLittleDataReceivedException("Offload", result.Length, 0);
+                        }
+                        //Got back OK
+                    }
+                    for (UInt16 counter = 1; counter < 1025; counter++)
+                    {
+                        List<byte> request = new List<byte>();
+                        request.AddRange(BitConverter.GetBytes(counter));
+                        try
+                        {
+                            var result = logger.GetResponse(0, (USBLogger.Commands)0x4, 0x1, request);
+                            Console.WriteLine("Block {0}", counter);
+                            if (result == null)
+                            {
+                                Console.WriteLine("Finished");
+                                break;
+                            }
+                        }
+                        catch (NoDataReceivedException)
+                        {
+                            Console.WriteLine("Finished by exception");
+                            break;
+                        }
+                    }
+                    //Got back OK
                 }
                 else
                 {
@@ -814,7 +1135,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)7, 1, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x1, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Sample Rate");
@@ -822,7 +1143,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Sample Rate", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Sample Rate", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Sample Rate={0}", status);
@@ -843,7 +1164,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)7, 0, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x0, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("RealTimeClock");
@@ -851,7 +1172,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("RealTimeClock", result.Length, 4);
+                        throw new TooLittleDataReceivedException("RealTimeClock", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("RealTimeClock={0}", status);
@@ -872,7 +1193,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)7, 5, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x5, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Temperature Units");
@@ -880,7 +1201,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Temperature Units", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Temperature Units", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Temperature Units={0}", status);
@@ -901,7 +1222,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)7, 9, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x9, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Number of Paint types");
@@ -909,7 +1230,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Number of Paint types", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Number of Paint types", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Number of Paint types={0}", status);
@@ -930,7 +1251,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)7, 6, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x6, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Current Paint type");
@@ -938,7 +1259,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Current Paint type", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Current Paint type", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Current Paint type={0}", status);
@@ -959,7 +1280,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)7, 1000, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x3E8, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Paint type 1");
@@ -967,7 +1288,7 @@ namespace TQC.USBDevice.CurveX3.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Paint type 1", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Paint type 1", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Paint type 1={0}", status);
@@ -989,184 +1310,13 @@ namespace TQC.USBDevice.CurveX3.UserSetup
                 {
                     List<byte> request = new List<byte>();
                     request.Add(1);
-                    var result = logger.GetResponse(0, (USBLogger.Commands)7, 8, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x8, request);
                     if (result == null)
                     {
                         throw new NoDataReceivedException("Batch Name");
                     }
 
                     Console.WriteLine("Batch Name = '{0}'", TQCUsbLogger.DecodeString(result));
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-    }
-    [TestFixture]
-    public class WriteDeviceSetupDetails 
-    {
-        private USBLogger.USBProductId ProductId;
-        public WriteDeviceSetupDetails()
-        {
-            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
-            return;
-        }
-
-        [Test]
-        public void TemperatureUnits()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)23, 5, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Temperature Units");
-                    }
-
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-
-        [Test]
-        public void RealTimeClock()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)23, 0, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("RealTimeClock");
-                    }
-
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-
-        [Test]
-        public void SampleRate()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)23, 1, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Sample Rate");
-                    }
-
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-
-        [Test]
-        public void BatchName()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)23, 8, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Batch Name");
-                    }
-
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-
-        [Test]
-        public void NumberOfPaintTypes()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)23, 9, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Number of Paint types");
-                    }
-
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-
-        [Test]
-        public void PaintType1()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)23, 1000, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Paint type 1");
-                    }
-
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-
-        [Test]
-        public void CurrentPaintType()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)23, 6, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Current Paint type");
-                    }
-
                 }
                 else
                 {

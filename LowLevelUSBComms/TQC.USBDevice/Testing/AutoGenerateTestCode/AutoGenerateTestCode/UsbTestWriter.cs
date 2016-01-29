@@ -45,8 +45,20 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                     WriteOutConstructor(textWriter, command);
 
                 }
+                string testAttributes = "";
+                if (command.ResponseStatus.HasValue && command.ResponseStatus.Value != 0)
+                {
+                    switch (command.ResponseStatus.Value)
+                    {
+                        case 7:
+                            testAttributes = ", ExpectedException(typeof(TQC.USBDevice.EnumerationNotSuportedException))"; break;
+                        default:
+                            testAttributes = ", ExpectedException(typeof(Exception))"; break;
+                    }
+                }
+
                 textWriter.WriteLine("");
-                textWriter.WriteLine("        [Test]");
+                textWriter.WriteLine("        [Test{0}]", testAttributes);
                 textWriter.WriteLine("        public void {0}()", command.TestName);
                 textWriter.WriteLine(
 @"        {{

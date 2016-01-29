@@ -11,9 +11,10 @@ namespace TQC.USBDevice.AutoGenerateTestCode
         public int CommandId { get; protected set; }
         public UsbEnumeration UsbEnumeration { get; protected set; }
 
-        internal string UnitTestCode(int commandId)
+
+        internal string UnitTestCode(int commandId, UsbCommandRequest usbCommandRequest)
         {
-            return UsbEnumeration.UnitTestCode(commandId);
+            return UsbEnumeration.UnitTestCode(commandId, usbCommandRequest);
         }
     }
     public class UsbEnumeration
@@ -24,6 +25,49 @@ namespace TQC.USBDevice.AutoGenerateTestCode
         {
             return value;
         }
+
+        protected string GeneralRequest(UsbCommandRequest usbCommandRequest)
+        {
+            StringBuilder extraBytesInRequest = new StringBuilder();
+
+            extraBytesInRequest.AppendLine();
+            foreach (var extraByte in usbCommandRequest.ExtraRequestInfo)
+            {
+                extraBytesInRequest.AppendLine(string.Format("                    request.Add(0x{0:X});", extraByte));
+            }
+            
+            string textStart = string.Format(
+@"                    List<byte> request = new List<byte>();
+                    {2}
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x{0:X}, 0x{1:X}, request);
+                    
+", CommandId, Enumeration, extraBytesInRequest);
+            return textStart;
+        }
+
+
+        protected string ReadPaintType()
+        {
+            string code = String.Format(@"
+                    if (result.Length < 4)
+                    {{
+                        throw new TooLittleDataReceivedException(""{0}"", result.Length, 4);
+                    }}
+                    UInt32 status = BitConverter.ToUInt32(result, 0);
+                    Console.WriteLine(""{0}={{0}}"", status);", ToString());
+            return code;
+        }
+        protected string ReadLimit()
+        {
+            string code = String.Format(@"
+                    if (result.Length < 4)
+                    {{
+                         throw new TooLittleDataReceivedException(""{0}"", result.Length, 4);
+                    }}
+                    UInt32 status = BitConverter.ToUInt32(result, 0);
+                    Console.WriteLine(""{0}={{0}}"", status);", ToString());
+            return code;
+        }
         protected string ReadDate()
         {
             return ReadUint32();
@@ -33,13 +77,13 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             string code = String.Format(@"
                     if (result.Length < (sizeof(float) * {1}) )
                     {{
-                            throw new TooLittleDataReceivedException(""{0}"", result.Length, (sizeof(float) * {1}) );
+                        throw new TooLittleDataReceivedException(""{0}"", result.Length, (sizeof(float) * {1}) );
                     }}
                     for (int i = 0; i < {1}; i++)
-                    {
+                    {{
                         float status = BitConverter.ToSingle(result, i*sizeof(float));
                         Console.WriteLine(""{0}{{0}}={{1}}"", i, status);
-                    }", ToString(), numberOfFloats);
+                    }}", ToString(), numberOfFloats);
             return code;
 
         }
@@ -49,7 +93,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             string code = String.Format(@"
                     if (result.Length < 4)
                     {{
-                            throw new TooLittleDataReceivedException(""{0}"", result.Length, 4);
+                        throw new TooLittleDataReceivedException(""{0}"", result.Length, 4);
                     }}
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine(""{0}={{0}}"", status);", ToString());
@@ -60,33 +104,43 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             string code = String.Format(@"
                     if (result.Length < 2)
                     {{
-                            throw new TooLittleDataReceivedException(""{0}"", result.Length, 2);
+                        throw new TooLittleDataReceivedException(""{0}"", result.Length, 2);
                     }}
                     UInt16 status = BitConverter.ToUInt16(result, 0);
                     Console.WriteLine(""{0}={{0}}"", status);", ToString());
             return code;
         }
-        protected string ReadUint8(bool isDepricated = false)
+        protected string ReadUint8(byte ? expectedValue = null, bool isDepricated = false)
         {
             string code = String.Format(@"
                     if (result.Length < 1)
                     {{
-                            throw new TooLittleDataReceivedException(""{0}"", result.Length, 1);
+                        throw new TooLittleDataReceivedException(""{0}"", result.Length, 1);
                     }}
                     byte status = result[0];
                     Console.WriteLine(""{0}={{0}}"", status);", ToString());
+            if (expectedValue.HasValue)
+            {
+                code += String.Format(@"
+                    Assert.That(result[0], Is.EqualTo({0}));", expectedValue.Value);
+            }
             return code;
         }
 
-        protected string ReadString()
+        protected string ReadString(string expectedValue = null)
         {
             string code = String.Format(@"
                     Console.WriteLine(""{2} = '{{0}}'"", TQCUsbLogger.DecodeString(result));", CommandId, Enumeration, ToString());
+            if (!String.IsNullOrWhiteSpace(expectedValue))
+            {
+                code += String.Format(@"
+                    Assert.That(TQCUsbLogger.DecodeString(result), Is.EqualTo(""{0}""));", expectedValue);
+            }
             return code;
         }
 
 
-        internal virtual string UnitTestCode(int commandId)
+        internal virtual string UnitTestCode(int commandId, UsbCommandRequest usbCommandRequest)
         {
             return "NO CODE WRITTEN";
         }
@@ -98,13 +152,18 @@ namespace TQC.USBDevice.AutoGenerateTestCode
         {
             Enumeration = id;
         }
-        internal override string UnitTestCode(int commandId)
+        internal override string UnitTestCode(int commandId, UsbCommandRequest usbCommandRequest)
         {
+            CommandId = commandId;
             if (commandId == 0x01)
             {
                 return UsbReadDeviceInfoTextCode(commandId);
             }
-            return base.UnitTestCode(commandId);
+            else if (commandId == 0x11)
+            {
+                return GeneralRequest(usbCommandRequest);
+            }
+            return base.UnitTestCode(commandId, usbCommandRequest);
         }
 
         private string UsbReadDeviceInfoTextCode(int commandId)
@@ -112,7 +171,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             CommandId = commandId;
             string textStart = string.Format(
 @"                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands){0}, {1}, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x{0:X}, 0x{1:X}, request);
                     if (result == null)
                     {{
                         throw new NoDataReceivedException(""{2}"");
@@ -134,12 +193,12 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                 case 10: t = ReadUint16(); break;
                 case 11: t = ReadUint8(); break;
                 case 12: t = ReadUint8(); break;
-                case 13: t = ReadUint8(true); break;
+                case 13: t = ReadUint8(null, true); break;
                 case 14: t = ReadUint32(true); break;
                 case 15: t = ReadUint8(); break;
                 case 16: t = "Available Components"; break;
-                case 17: t = ReadUint8(true); break;
-                case 18: t = ReadUint8(true); break;
+                case 17: t = ReadUint8(null, true); break;
+                case 18: t = ReadUint8(null, true); break;
                 case 19: t = ReadUint8(); break;
 
                 case 100: t = ReadUint16(); break;
@@ -227,21 +286,26 @@ namespace TQC.USBDevice.AutoGenerateTestCode
         {
             Enumeration = id;
         }
-        internal override string UnitTestCode(int commandId)
+        internal override string UnitTestCode(int commandId, UsbCommandRequest usbCommandRequest)
         {
+            CommandId = commandId;
             if (commandId == 0x02)
             {
-                return UsbReadDeviceInfoTextCode(commandId);
+                return UsbReadDeviceInfoTextCode(commandId, usbCommandRequest);
             }
-            return base.UnitTestCode(commandId);
+            else if (commandId == 0x12)
+            {
+                return GeneralRequest(usbCommandRequest);
+            }
+            return base.UnitTestCode(commandId, usbCommandRequest);
         }
 
-        private string UsbReadDeviceInfoTextCode(int commandId)
+        private string UsbReadDeviceInfoTextCode(int commandId, UsbCommandRequest usbCommandRequest)
         {
             CommandId = commandId;
             string textStart = string.Format(
 @"                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands){0}, {1}, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x{0:X}, 0x{1:X}, request);
                     if (result == null)
                     {{
                         throw new NoDataReceivedException(""{2}"");
@@ -251,8 +315,8 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             switch (Enumeration)
             {
                 case 0: t = ReadDate(); break;
-                case 1: t = ReadString(); break;
-                case 2: t = ReadString(); break;
+                case 1: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 2: t = ReadString(usbCommandRequest.ResponseAsString); break;
                 case 11: t = ReadFloat(3); break;
                 case 20: t = ReadFloat(2); break;
                 case 21: t = ReadFloat(2); break;
@@ -265,25 +329,25 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                 case 28: t = ReadFloat(2); break;
                 case 29: t = ReadFloat(2); break;
                 case 30: t = ReadFloat(2); break;
-                case 100: t = ReadUint8(); break;
-                case 101: t = ReadUint8(); break;
-                case 102: t = ReadUint8(); break;
-                case 103: t = ReadUint8(); break;
-                case 104: t = ReadUint8(); break;
-                case 105: t = ReadUint8(); break;
-                case 106: t = ReadUint8(); break;
-                case 107: t = ReadUint8(); break;
-                case 108: t = ReadUint8(); break;
+                case 100: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
+                case 101: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
+                case 102: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
+                case 103: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
+                case 104: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
+                case 105: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
+                case 106: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
+                case 107: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
+                case 108: t = ReadUint8(usbCommandRequest.ResponseAsByte); break;
 
-                case 200: t =ReadString(); break;
-                case 201: t =ReadString(); break;
-                case 202: t =ReadString(); break;
-                case 203: t =ReadString(); break;
-                case 204: t =ReadString(); break;
-                case 205: t =ReadString(); break;
-                case 206: t =ReadString(); break;
-                case 207: t =ReadString(); break;
-                case 208: t =ReadString(); break;
+                case 200: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 201: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 202: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 203: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 204: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 205: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 206: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 207: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 208: t = ReadString(usbCommandRequest.ResponseAsString); break;
 
                 case 300: t = _T("Calibration UINT 1"); break;
                 case 301: t = _T("Calibration UINT 2"); break;
@@ -368,7 +432,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             return "Read Calibration Details";
         }
     }
-    public class UsbWriteCalibrationDetails : UsbReadDeviceInfo
+    public class UsbWriteCalibrationDetails : UsbReadCalibrationDetails
     {
         public UsbWriteCalibrationDetails(int enumeration)
             : base(0x12, enumeration)
@@ -388,7 +452,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             Enumeration = id;
         }
 
-        internal override string UnitTestCode(int commandId)
+        internal override string UnitTestCode(int commandId, UsbCommandRequest usbCommandRequest)
         {
             if (commandId == 0x07)
             {
@@ -396,44 +460,22 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             }
             else if (commandId == 0x17)
             {
-                return UsbWriteDeviceInfoTextCode(commandId);
+                return UsbWriteDeviceInfoTextCode(commandId, usbCommandRequest);
             }
-            return base.UnitTestCode(commandId);
+            return base.UnitTestCode(commandId, usbCommandRequest);
         }
-        private string ReadPaintType()
-        {
-            string code = String.Format(@"
-                    if (result.Length < 4)
-                    {{
-                            throw new TooLittleDataReceivedException(""{0}"", result.Length, 4);
-                    }}
-                    UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine(""{0}={{0}}"", status);", ToString());
-            return code;
-        }
-        private string ReadLimit()
-        {
-            string code = String.Format(@"
-                    if (result.Length < 4)
-                    {{
-                            throw new TooLittleDataReceivedException(""{0}"", result.Length, 4);
-                    }}
-                    UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine(""{0}={{0}}"", status);", ToString());
-            return code;
-        }
+        
 
-        private string UsbWriteDeviceInfoTextCode(int commandId)
+        private string UsbWriteDeviceInfoTextCode(int commandId, UsbCommandRequest usbCommandRequest)
         {
+
             CommandId = commandId;
-            string textStart = string.Format(
-@"                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands){0}, {1}, request);
-                    if (result == null)
+            string textStart = GeneralRequest(usbCommandRequest)+String.Format(@"
+                    if (result != null)
                     {{
-                        throw new NoDataReceivedException(""{2}"");
+                        throw new TooLittleDataReceivedException(""{0}"", result.Length, 0);
                     }}
-", commandId, Enumeration, ToString());
+", ToString());
             return textStart;
         }
 
@@ -448,7 +490,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             }
             string textStart = string.Format(
 @"                    List<byte> request = new List<byte>();{3}
-                    var result = logger.GetResponse(0, (USBLogger.Commands){0}, {1}, request);
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x{0:X}, 0x{1:X}, request);
                     if (result == null)
                     {{
                         throw new NoDataReceivedException(""{2}"");
@@ -567,14 +609,154 @@ namespace TQC.USBDevice.AutoGenerateTestCode
         }
     }
 
+    public class UsbReadCurrentValues : UsbCommand
+    {
+        public class USBReadCurrentValuesDetail : UsbEnumeration
+        {
+            public USBReadCurrentValuesDetail(int id)
+            {
+                Enumeration = id;
+            }
+            internal override string UnitTestCode(int commandId, UsbCommandRequest usbCommandRequest)
+            {
+                if (commandId == 0x05)
+                {
+                    return UsbReadDeviceInfoTextCode(commandId, usbCommandRequest);
+                }
+                return base.UnitTestCode(commandId, usbCommandRequest);
+            }
 
+            private string UsbReadDeviceInfoTextCode(int commandId, UsbCommandRequest usbCommandRequest)
+            {
+                CommandId = commandId;
+                string textStart = string.Format(
+@"                    List<byte> request = new List<byte>();
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x{0:X}, 0x{1:X}, request);
+                    if (result == null)
+                    {{
+                        throw new NoDataReceivedException(""{2}"");
+                    }}
+", commandId, Enumeration, ToString());
+                
+                switch (Enumeration)
+                {
+                    case 0x0101:
+                    case 0x0105:
+                        textStart += String.Format(@"
+                    if (result.Length < 6)
+                    {{
+                        throw new NoDataReceivedException(""{2} need to have mode step up & time stamp"");
+                    }}
+                    Assert.That(result[0], Is.EqualTo({0}), ""Mode not correct"");
+                    Assert.That(result[1], Is.EqualTo({1}), ""SetID not correct"");
+", Enumeration & 0xFF, (Enumeration >> 8) & 0xFF, ToString()) ;
+                        int numberOfReadings = (usbCommandRequest.ResponseBuffer.Length - 6) / 2;
+                        for (int channelId = 0; channelId < numberOfReadings; channelId++)
+                        {
+                            textStart +=
+                            String.Format(
+@"                    Console.WriteLine(""Value {0} = {{0}}"",  BitConverter.ToInt16(result, {1}) /10.0);
+", channelId+1, channelId*2+6);
+                        }
+                    break;
+                    default:
+                        throw new Exception(string.Format("Unsupported Enum 0x{0:X}", Enumeration));
+                }
+                return textStart ;
+            }
+            public override string ToString()
+            {
+                String t = "??";
+                switch (Enumeration)
+                {
+                    case 0x0101: t = "Payload Mode Gloss"; break;
+                    case 0x0105: t = "Payload Mode Temperature"; break;
+                    case 0x0106: t = "Payload Mode Temperature And CJ"; break;
+                    case 0x0107: t = "Payload Mode Temperature GRO"; break;
+                    case 0x0110: t = "Payload Mode Internal"; break;
+                    case 0x0130: t = "Payload Mode UI"; break;
+                    case 0x0111: t = "Payload Mode UI"; break;
+
+                    default:
+                        throw new Exception(string.Format("Unsupported Enum 0x{0:X}", Enumeration));
+
+                }
+                return t;
+            }
+        }
+
+        public UsbReadCurrentValues(int command, int enumeration)
+        {
+            CommandId = command;
+            UsbEnumeration = new USBReadCurrentValuesDetail(enumeration);
+
+        }
+        public override string ToString()
+        {
+            return "Read Current Values";
+        }
+    }
+
+    public class UsbReadCurrentRawValues : UsbCommand
+    {
+        private int EnumerationID;
+
+        public UsbReadCurrentRawValues(int command, int enumeration)
+        {
+            CommandId = command;
+            //UsbEnumeration = new USBReadWriteDeviceSetupDetail(enumeration);
+
+        }
+
+        public override string ToString()
+        {
+            return "Read Current Raw Values";
+        }
+    }
 
     public class UsbCommandRequest : IEqualityComparer<UsbCommandRequest>
     {
         public int CommandId{ get;set;}
         public int EnumerationID { get;set;}
-        public string CommandIdToString{ get;set;}
-        public string EnumerationToString{ get;set;}
+
+        public byte[] ExtraRequestInfo { get; private set; }
+
+        public UInt16? ResponseStatus { get; private set; }
+        public byte[] ResponseBuffer { get; private set; }
+
+        internal static string DecodeString(byte[] result)
+        {
+            var textResult = Encoding.UTF8.GetString(result, 0, result.Length);
+            int location = textResult.IndexOf('\0');
+            if (location >= 0)
+            {
+                textResult = textResult.Substring(0, location);
+            }
+            return textResult.Replace('�', ' ').Trim();
+        }
+
+        public byte? ResponseAsByte
+        {
+            get
+            {
+                if (ResponseBuffer != null && ResponseBuffer.Length > 0)
+                {
+                    return ResponseBuffer[0];
+                }
+                return null;
+            }
+        }
+        public string ResponseAsString
+        {
+            get
+            {
+                if (ResponseBuffer != null && ResponseBuffer.Length > 0)
+                {
+                    return DecodeString(ResponseBuffer);
+                }
+                return null;
+            }
+        }
 
         public string TestName
         {
@@ -599,43 +781,91 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             {
                 switch (CommandId)
                 {
-                    case 0x1: return new UsbReadDeviceInfo(EnumerationID);
+                    case 0x01: return new UsbReadDeviceInfo(EnumerationID);
                     case 0x11: return new UsbWriteDeviceInfo(EnumerationID);
-                    case 0x2: return new UsbReadCalibrationDetails(EnumerationID);
-                    case 0x21: return new UsbWriteCalibrationDetails(EnumerationID);
+                    case 0x02: return new UsbReadCalibrationDetails(EnumerationID);
+                    case 0x12: return new UsbWriteCalibrationDetails(EnumerationID);
+
+                    case 0x03: return new UsbReadLoggedInformation(CommandId, EnumerationID);
+                    case 0x04: return new UsbOffloadReadLoggedInformation(CommandId, EnumerationID);
                     case 0x07: return new UsbReadDeviceSetDetails(EnumerationID);
                     case 0x17: return new UsbWriteDeviceSetDetails(EnumerationID);
+                    case 0x05: return new UsbReadCurrentValues(CommandId, EnumerationID);
+                    case 0x06: return new UsbReadCurrentRawValues(CommandId, EnumerationID);
 
+                    
                 }
-                return null;
+                throw new Exception(string.Format("Failed to implement Protocol Command 0x{0:X}", CommandId));
             }
         }
         public UsbCommandRequest(string text)
         {
-            var items = text.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
-            if (items.Length == 3)
+            //Console.WriteLine("buffer: '{0}'", text);
+            var items = text.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+            if (items.Length >= 1)
             {
-                int commandId;
-                if (int.TryParse(items[0].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out commandId))
-                    CommandId = commandId;
-                else
+                ParseRequestBuffer(items[0]);
+                if (items.Length >= 2)
                 {
-                    throw new Exception(string.Format("Hex is not the write format '{0}' <{1}>", items[0].Substring(2), text));
+                    ParseResponseBuffer(items[1]);
                 }
-                EnumerationID = int.Parse(items[1].Substring(2), System.Globalization.NumberStyles.HexNumber);
-                var texts = items[2].Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-                if (texts.Length == 2)
-                {
-                    CommandIdToString = texts[0];
-                    EnumerationToString = texts[1];
-                }
-            }
-            else
-            {
-                throw new Exception(string.Format("Unknown data format '{0}'", text));
             }
             
         }
+
+        private void ParseResponseBuffer(string responseBuffer)
+        {
+            if (responseBuffer.Length > 0)
+            {
+                if (responseBuffer[0] == 'W')
+                {
+                    UInt16 commandId;
+                    if (UInt16.TryParse(responseBuffer.Substring(3), System.Globalization.NumberStyles.HexNumber, null, out commandId))
+                    {
+                        ResponseStatus = commandId;
+                    }
+                }
+                else
+                {
+                    var requestItems = responseBuffer.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
+                    var responseBytes = new List<byte>();
+                    for (int id = 0; id < requestItems.Length; id++)
+                    {
+                        responseBytes.Add((byte)int.Parse(requestItems[id].Substring(2), System.Globalization.NumberStyles.HexNumber));
+                    }
+                    ResponseBuffer = responseBytes.ToArray();
+                }
+            }
+        }
+
+        private void ParseRequestBuffer(string requestBuffer)
+        {
+            //Console.WriteLine("Request buffer: '{0}'", requestBuffer);
+            var requestItems = requestBuffer.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
+            if (requestItems.Length >=  2)
+            {
+                int commandId;
+                if (int.TryParse(requestItems[0].Substring(2), System.Globalization.NumberStyles.HexNumber, null, out commandId))
+                    CommandId = commandId;
+                else
+                {
+                    throw new Exception(string.Format("Hex is not the write format '{0}' <{1}>", requestItems[0].Substring(2), requestBuffer));
+                }
+                EnumerationID = int.Parse(requestItems[1].Substring(2), System.Globalization.NumberStyles.HexNumber);
+                var requestBytes = new List<byte>();
+                for (int id = 2; id < requestItems.Length; id++)
+                {
+                    requestBytes.Add((byte)int.Parse(requestItems[id].Substring(2), System.Globalization.NumberStyles.HexNumber));
+                }
+                ExtraRequestInfo = requestBytes.ToArray();
+            }
+            else
+            {
+                throw new Exception(string.Format("Unknown request data format '{0}'", requestBuffer));
+            }
+        }
+
+
         public override int GetHashCode()
         {
  	        return CommandId.GetHashCode() ^ EnumerationID.GetHashCode();
@@ -651,7 +881,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
         }
         public override string ToString()
         {
- 	        return String.Format("{0}/{1}", CommandIdToString, EnumerationToString);
+ 	        return String.Format("{0}.{1}", ClassName, TestName);
         }
 
         public override bool Equals(object obj)
@@ -688,9 +918,25 @@ namespace TQC.USBDevice.AutoGenerateTestCode
         {
             get
             {
-                return UsbCommand.UnitTestCode(CommandId);
+                string buffer = UsbCommand.UnitTestCode(CommandId, this);
+                if (ResponseStatus.HasValue )
+                {
+                    if (ResponseStatus.Value == 0)
+                    {
+                        buffer += @"
+                    //Got back OK";
+                    }
+                    else
+                    {
+                        buffer += string.Format(@"
+                    //Got back {0} as exception", ResponseStatus.Value);
+                    }
+                }
+                return buffer;
             }
         }
+
+        
     }
 
     public class UsbCommands :IEnumerable<UsbCommandRequest>
@@ -719,12 +965,23 @@ namespace TQC.USBDevice.AutoGenerateTestCode
 
         private void ParseData()
         {
-            foreach (var line in m_TextLines)
+            foreach (var textLine in m_TextLines)
             {
-                var cmd = new UsbCommandRequest(line.Replace("\n", ""));
-                if (!m_Commands.Contains(cmd))
+                string line = textLine.Replace("\n", "");
+                if (line.Length > 0)
                 {
-                    m_Commands.Add(cmd);
+                    if (line[0] == '#')
+                    {
+                        Logger = UsbCommandRequest.ConvertTextToDotNetName(line.Substring(1));
+                    }
+                    else
+                    {
+                        var cmd = new UsbCommandRequest(line);
+                        if (!m_Commands.Contains(cmd))
+                        {
+                            m_Commands.Add(cmd);
+                        }
+                    }
                 }
             }
             m_Commands = m_Commands.OrderBy(x => x.CommandId).ToList();
