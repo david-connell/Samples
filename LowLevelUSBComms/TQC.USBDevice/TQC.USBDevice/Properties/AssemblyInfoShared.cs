@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("TQC")]
-[assembly: AssemblyCopyright("Copyright © TQC 2015")]
+[assembly: AssemblyCopyright("Copyright © TQC 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -12,5 +12,5 @@ using System.Runtime.InteropServices;
 //
 //Change build.bat
 //
-[assembly: AssemblyVersion("1.4.13.*")]
+[assembly: AssemblyVersion("1.4.14.*")]
 
