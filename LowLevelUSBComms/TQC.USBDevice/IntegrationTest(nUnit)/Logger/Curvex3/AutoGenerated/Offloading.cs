@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using NUnit.Framework;
 using System.Collections.Generic;
 using TQC.USBDevice;
@@ -330,7 +331,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.Offloading
         }
 
         [Test]
-        public void GetCommasProtocol()
+        public void GetCommunicationsProtocol()
         {
             using (var logger = new TQCUsbLogger(null))
             {
@@ -340,15 +341,15 @@ namespace TQC.USBDevice.TQCCurveX3Basic.Offloading
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x64, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("GetCommas Protocol");
+                        throw new NoDataReceivedException("Get Communications Protocol");
                     }
 
                     if (result.Length < 2)
                     {
-                        throw new TooLittleDataReceivedException("GetCommas Protocol", result.Length, 2);
+                        throw new TooLittleDataReceivedException("Get Communications Protocol", result.Length, 2);
                     }
                     UInt16 status = BitConverter.ToUInt16(result, 0);
-                    Console.WriteLine("GetCommas Protocol={0}", status);
+                    Console.WriteLine("Get Communications Protocol={0}", status);
                 }
                 else
                 {
@@ -393,15 +394,18 @@ namespace TQC.USBDevice.TQCCurveX3Basic.Offloading
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x5, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("Device Manufactured date");
+                        throw new NoDataReceivedException("Device Manufactured Date");
                     }
 
                     if (result.Length < 4)
                     {
-                        throw new TooLittleDataReceivedException("Device Manufactured date", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Device Manufactured Date", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("Device Manufactured date={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("Device Manufactured Date={0}", actualDate);
                 }
                 else
                 {
@@ -769,7 +773,10 @@ namespace TQC.USBDevice.TQCCurveX3Basic.Offloading
                         throw new TooLittleDataReceivedException("Date of logger Calibration", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("Date of logger Calibration={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("Date of logger Calibration={0}", actualDate);
                 }
                 else
                 {
@@ -954,7 +961,10 @@ namespace TQC.USBDevice.TQCCurveX3Basic.Offloading
                         throw new TooLittleDataReceivedException("Get Start Time of batch", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("Get Start Time of batch={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("Get Start Time of batch={0}", actualDate);
                 }
                 else
                 {
@@ -1175,7 +1185,10 @@ namespace TQC.USBDevice.TQCCurveX3Basic.Offloading
                         throw new TooLittleDataReceivedException("RealTimeClock", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("RealTimeClock={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("RealTimeClock={0}", actualDate);
                 }
                 else
                 {

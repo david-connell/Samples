@@ -31,7 +31,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 2)
                     {
-                            throw new TooLittleDataReceivedException("DeviceType", result.Length, 2);
+                        throw new TooLittleDataReceivedException("DeviceType", result.Length, 2);
                     }
                     UInt16 status = BitConverter.ToUInt16(result, 0);
                     Console.WriteLine("DeviceType={0}", status);
@@ -60,7 +60,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Device Serial Number", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Device Serial Number", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Device Serial Number={0}", status);
@@ -113,7 +113,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Firmware features", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Firmware features", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Firmware features={0}", status);
@@ -142,7 +142,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("SW Version", result.Length, 4);
+                        throw new TooLittleDataReceivedException("SW Version", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("SW Version={0}", status);
@@ -171,7 +171,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("HW Version", result.Length, 4);
+                        throw new TooLittleDataReceivedException("HW Version", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("HW Version={0}", status);
@@ -200,7 +200,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Number of channels", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Number of channels", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Number of channels={0}", status);
@@ -229,11 +229,11 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Length of Batch Names", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Length of Batch Names", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Length of Batch Names={0}", status);
-                        //Got back 7 as exception
+                    //Got back 7 as exception
                 }
                 else
                 {
@@ -259,7 +259,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Max number of Paint Types", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Max number of Paint Types", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Max number of Paint Types={0}", status);
@@ -288,7 +288,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Max number of batches", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Max number of batches", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Max number of batches={0}", status);
@@ -317,7 +317,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Number of batches used", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Number of batches used", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Number of batches used={0}", status);
@@ -346,7 +346,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Physical Memory", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Physical Memory", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Physical Memory={0}", status);
@@ -360,7 +360,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
         }
 
         [Test]
-        public void GetCommasProtocol()
+        public void GetCommunicationsProtocol()
         {
             using (var logger = new TQCUsbLogger(null))
             {
@@ -370,15 +370,15 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x64, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("GetCommas Protocol");
+                        throw new NoDataReceivedException("Get Communications Protocol");
                     }
 
                     if (result.Length < 2)
                     {
-                            throw new TooLittleDataReceivedException("GetCommas Protocol", result.Length, 2);
+                        throw new TooLittleDataReceivedException("Get Communications Protocol", result.Length, 2);
                     }
                     UInt16 status = BitConverter.ToUInt16(result, 0);
-                    Console.WriteLine("GetCommas Protocol={0}", status);
+                    Console.WriteLine("Get Communications Protocol={0}", status);
                 }
                 else
                 {
@@ -423,15 +423,18 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x5, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("Device Manufactured date");
+                        throw new NoDataReceivedException("Device Manufactured Date");
                     }
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Device Manufactured date", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Device Manufactured Date", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("Device Manufactured date={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("Device Manufactured Date={0}", actualDate);
                 }
                 else
                 {
@@ -457,7 +460,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Current state of logger", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Current state of logger", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Current state of logger={0}", status);
@@ -486,11 +489,11 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Sending setup", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Sending setup", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Sending setup={0}", status);
-                        //Got back 7 as exception
+                    //Got back 7 as exception
                 }
                 else
                 {
@@ -526,7 +529,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Type of channel 1", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Type of channel 1", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Type of channel 1={0}", status);
@@ -581,7 +584,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Type of channel 2", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Type of channel 2", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Type of channel 2={0}", status);
@@ -636,7 +639,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Type of channel 3", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Type of channel 3", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Type of channel 3={0}", status);
@@ -691,7 +694,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Type of channel 4", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Type of channel 4", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Type of channel 4={0}", status);
@@ -796,10 +799,13 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Date of logger Calibration", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Date of logger Calibration", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("Date of logger Calibration={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("Date of logger Calibration={0}", actualDate);
                 }
                 else
                 {
@@ -835,7 +841,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Sample Rate", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Sample Rate", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Sample Rate={0}", status);
@@ -864,10 +870,13 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("RealTimeClock", result.Length, 4);
+                        throw new TooLittleDataReceivedException("RealTimeClock", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("RealTimeClock={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("RealTimeClock={0}", actualDate);
                 }
                 else
                 {
@@ -893,7 +902,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Temperature Units", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Temperature Units", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Temperature Units={0}", status);
@@ -922,7 +931,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Number of Paint types", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Number of Paint types", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Number of Paint types={0}", status);
@@ -951,7 +960,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 1)
                     {
-                            throw new TooLittleDataReceivedException("Current Paint type", result.Length, 1);
+                        throw new TooLittleDataReceivedException("Current Paint type", result.Length, 1);
                     }
                     byte status = result[0];
                     Console.WriteLine("Current Paint type={0}", status);
@@ -980,7 +989,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
 
                     if (result.Length < 4)
                     {
-                            throw new TooLittleDataReceivedException("Paint type 1", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Paint type 1", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Paint type 1={0}", status);
@@ -1040,12 +1049,14 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
                     request.Add(0x0);
 
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x17, 0x5, request);
+                    
+
                     if (result != null)
                     {
                         throw new TooLittleDataReceivedException("Temperature Units", result.Length, 0);
                     }
 
-                        //Got back OK
+                    //Got back OK
                 }
                 else
                 {
@@ -1070,12 +1081,14 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
                     request.Add(0x56);
 
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x17, 0x0, request);
+                    
+
                     if (result != null)
                     {
                         throw new TooLittleDataReceivedException("RealTimeClock", result.Length, 0);
                     }
 
-                        //Got back OK
+                    //Got back OK
                 }
                 else
                 {
@@ -1100,12 +1113,14 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
                     request.Add(0x0);
 
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x17, 0x1, request);
+                    
+
                     if (result != null)
                     {
                         throw new TooLittleDataReceivedException("Sample Rate", result.Length, 0);
                     }
 
-                        //Got back OK
+                    //Got back OK
                 }
                 else
                 {
@@ -1127,12 +1142,14 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
                     request.Add(0x1);
 
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x17, 0x9, request);
+                    
+
                     if (result != null)
                     {
                         throw new TooLittleDataReceivedException("Number of Paint types", result.Length, 0);
                     }
 
-                        //Got back OK
+                    //Got back OK
                 }
                 else
                 {
@@ -1199,12 +1216,14 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
                     request.Add(0x0);
 
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x17, 0x3E8, request);
+                    
+
                     if (result != null)
                     {
                         throw new TooLittleDataReceivedException("Paint type 1", result.Length, 0);
                     }
 
-                        //Got back OK
+                    //Got back OK
                 }
                 else
                 {
@@ -1226,12 +1245,14 @@ namespace TQC.USBDevice.TQCCurveX3Basic.UserSetup
                     request.Add(0x0);
 
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x17, 0x6, request);
+                    
+
                     if (result != null)
                     {
                         throw new TooLittleDataReceivedException("Current Paint type", result.Length, 0);
                     }
 
-                        //Got back OK
+                    //Got back OK
                 }
                 else
                 {

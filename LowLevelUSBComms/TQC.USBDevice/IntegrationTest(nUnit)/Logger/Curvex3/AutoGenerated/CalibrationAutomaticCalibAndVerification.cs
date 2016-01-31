@@ -1,17 +1,40 @@
-﻿
-using System;
+﻿using System;
 using NUnit.Framework;
 using System.Collections.Generic;
 using TQC.USBDevice;
-namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
+namespace TQC.USBDevice.TQCCurveX3Basic.CalibrationAutomaticCalibAndVerification
 {
     [TestFixture]
-    public class ReadDeviceInformation 
+    public class ReadDeviceInformation
     {
         private USBLogger.USBProductId ProductId;
         public ReadDeviceInformation()
         {
             ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
+            return;
+        }
+
+        [Test]
+        public void DeviceName()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x3, request);
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Device Name");
+                    }
+
+                    Console.WriteLine("Device Name = '{0}'", TQCUsbLogger.DecodeString(result));
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
             return;
         }
 
@@ -64,30 +87,6 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     Console.WriteLine("Device Serial Number={0}", status);
-                }
-                else
-                {
-                    throw new Exception("Failed to open logger");
-                }
-            }
-            return;
-        }
-
-        [Test]
-        public void DeviceName()
-        {
-            using (var logger = new TQCUsbLogger(null))
-            {
-                if (logger.OpenWithMinumumRequests(ProductId))
-                {
-                    List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x3, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Device Name");
-                    }
-
-                    Console.WriteLine("Device Name = '{0}'", TQCUsbLogger.DecodeString(result));
                 }
                 else
                 {
@@ -433,7 +432,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     DateTime start = new DateTime(1970, 1, 1);
                     DateTime actualDate = start.AddSeconds(status);
-                    
+
                     Console.WriteLine("Device Manufactured Date={0}", actualDate);
                 }
                 else
@@ -445,7 +444,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
         }
     }
     [TestFixture]
-    public class ReadCalibrationDetails 
+    public class ReadCalibrationDetails
     {
         private USBLogger.USBProductId ProductId;
         public ReadCalibrationDetails()
@@ -745,8 +744,136 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
                     UInt32 status = BitConverter.ToUInt32(result, 0);
                     DateTime start = new DateTime(1970, 1, 1);
                     DateTime actualDate = start.AddSeconds(status);
-                    
+
                     Console.WriteLine("Date of logger Calibration={0}", actualDate);
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void CalibrationDetails1()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x14, request);
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Calibration Details 1");
+                    }
+
+                    if (result.Length < (sizeof(float) * 2))
+                    {
+                        throw new TooLittleDataReceivedException("Calibration Details 1", result.Length, (sizeof(float) * 2));
+                    }
+                    for (int i = 0; i < 2; i++)
+                    {
+                        float status = BitConverter.ToSingle(result, i * sizeof(float));
+                        Console.WriteLine("Calibration Details 1 #{0}={1}", i, status);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void CalibrationDetails2()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x15, request);
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Calibration Details 2");
+                    }
+
+                    if (result.Length < (sizeof(float) * 2))
+                    {
+                        throw new TooLittleDataReceivedException("Calibration Details 2", result.Length, (sizeof(float) * 2));
+                    }
+                    for (int i = 0; i < 2; i++)
+                    {
+                        float status = BitConverter.ToSingle(result, i * sizeof(float));
+                        Console.WriteLine("Calibration Details 2 #{0}={1}", i, status);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void CalibrationDetails3()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x16, request);
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Calibration Details 3");
+                    }
+
+                    if (result.Length < (sizeof(float) * 2))
+                    {
+                        throw new TooLittleDataReceivedException("Calibration Details 3", result.Length, (sizeof(float) * 2));
+                    }
+                    for (int i = 0; i < 2; i++)
+                    {
+                        float status = BitConverter.ToSingle(result, i * sizeof(float));
+                        Console.WriteLine("Calibration Details 3 #{0}={1}", i, status);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void CalibrationDetails4()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x17, request);
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Calibration Details 4");
+                    }
+
+                    if (result.Length < (sizeof(float) * 2))
+                    {
+                        throw new TooLittleDataReceivedException("Calibration Details 4", result.Length, (sizeof(float) * 2));
+                    }
+                    for (int i = 0; i < 2; i++)
+                    {
+                        float status = BitConverter.ToSingle(result, i * sizeof(float));
+                        Console.WriteLine("Calibration Details 4 #{0}={1}", i, status);
+                    }
                 }
                 else
                 {
@@ -757,7 +884,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
         }
     }
     [TestFixture]
-    public class ReadCurrentValues 
+    public class ReadCurrentValues
     {
         private USBLogger.USBProductId ProductId;
         public ReadCurrentValues()
@@ -786,10 +913,10 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
                     }
                     Assert.That(result[0], Is.EqualTo(5), "Mode not correct");
                     Assert.That(result[1], Is.EqualTo(1), "SetID not correct");
-                    Console.WriteLine("Value 1 = {0}",  BitConverter.ToInt16(result, 6) /10.0);
-                    Console.WriteLine("Value 2 = {0}",  BitConverter.ToInt16(result, 8) /10.0);
-                    Console.WriteLine("Value 3 = {0}",  BitConverter.ToInt16(result, 10) /10.0);
-                    Console.WriteLine("Value 4 = {0}",  BitConverter.ToInt16(result, 12) /10.0);
+                    Console.WriteLine("Value 1 = {0}", BitConverter.ToInt16(result, 6) / 10.0);
+                    Console.WriteLine("Value 2 = {0}", BitConverter.ToInt16(result, 8) / 10.0);
+                    Console.WriteLine("Value 3 = {0}", BitConverter.ToInt16(result, 10) / 10.0);
+                    Console.WriteLine("Value 4 = {0}", BitConverter.ToInt16(result, 12) / 10.0);
 
                 }
                 else
@@ -801,7 +928,53 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
         }
     }
     [TestFixture]
-    public class ReadDeviceSetupDetails 
+    public class ReadCurrentRawValues
+    {
+        private USBLogger.USBProductId ProductId;
+        public ReadCurrentRawValues()
+        {
+            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
+            return;
+        }
+
+        [Test]
+        public void PayloadMicrovolts()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x6, 0x102, request);
+                    if (result == null)
+                    {
+                        throw new NoDataReceivedException("Payload Microvolts");
+                    }
+
+                    if (result.Length < 6)
+                    {
+                        throw new NoDataReceivedException("Payload Microvolts need to have mode step up & time stamp");
+                    }
+                    Assert.That(result[0], Is.EqualTo(2), "Mode not correct");
+                    Assert.That(result[1], Is.EqualTo(1), "SetID not correct");
+                    Console.WriteLine("Voltage 1 = {0}", BitConverter.ToInt16(result, 2));
+                    Console.WriteLine("Voltage 2 = {0}", BitConverter.ToInt16(result, 4));
+                    Console.WriteLine("Voltage 3 = {0}", BitConverter.ToInt16(result, 6));
+                    Console.WriteLine("Voltage 4 = {0}", BitConverter.ToInt16(result, 8));
+                    Console.WriteLine("Voltage 5 = {0}", BitConverter.ToInt16(result, 10));
+                    Console.WriteLine("Voltage 6 = {0}", BitConverter.ToInt16(result, 12));
+
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+    }
+    [TestFixture]
+    public class ReadDeviceSetupDetails
     {
         private USBLogger.USBProductId ProductId;
         public ReadDeviceSetupDetails()
@@ -838,30 +1011,39 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
             }
             return;
         }
+    }
+    [TestFixture]
+    public class WriteCalibrationDetails
+    {
+        private USBLogger.USBProductId ProductId;
+        public WriteCalibrationDetails()
+        {
+            ProductId = USBLogger.USBProductId.USB_CURVEX_3a;
+            return;
+        }
 
         [Test]
-        public void RealTimeClock()
+        public void CalibrationDetails1()
         {
             using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x0, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("RealTimeClock");
-                    }
 
-                    if (result.Length < 4)
-                    {
-                        throw new TooLittleDataReceivedException("RealTimeClock", result.Length, 4);
-                    }
-                    UInt32 status = BitConverter.ToUInt32(result, 0);
-                    DateTime start = new DateTime(1970, 1, 1);
-                    DateTime actualDate = start.AddSeconds(status);
-                    
-                    Console.WriteLine("RealTimeClock={0}", actualDate);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x80);
+                    request.Add(0x3F);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x12, 0x14, request);
+
+
+                    //Got back OK
                 }
                 else
                 {
@@ -872,25 +1054,116 @@ namespace TQC.USBDevice.TQCCurveX3Basic.ConfigureAndTest
         }
 
         [Test]
-        public void TemperatureUnits()
+        public void CalibrationDetails2()
         {
             using (var logger = new TQCUsbLogger(null))
             {
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     List<byte> request = new List<byte>();
-                    var result = logger.GetResponse(0, (USBLogger.Commands)0x7, 0x5, request);
-                    if (result == null)
-                    {
-                        throw new NoDataReceivedException("Temperature Units");
-                    }
 
-                    if (result.Length < 1)
-                    {
-                        throw new TooLittleDataReceivedException("Temperature Units", result.Length, 1);
-                    }
-                    byte status = result[0];
-                    Console.WriteLine("Temperature Units={0}", status);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x80);
+                    request.Add(0x3F);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x12, 0x15, request);
+
+
+                    //Got back OK
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void CalibrationDetails3()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x80);
+                    request.Add(0x3F);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x12, 0x16, request);
+
+
+                    //Got back OK
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void CalibrationDetails4()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x80);
+                    request.Add(0x3F);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x0);
+                    request.Add(0x0);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x12, 0x17, request);
+
+
+                    //Got back OK
+                }
+                else
+                {
+                    throw new Exception("Failed to open logger");
+                }
+            }
+            return;
+        }
+
+        [Test]
+        public void DateOfLoggerCalibration()
+        {
+            using (var logger = new TQCUsbLogger(null))
+            {
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    List<byte> request = new List<byte>();
+
+                    request.Add(0x90);
+                    request.Add(0xE5);
+                    request.Add(0xAD);
+                    request.Add(0x56);
+
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x12, 0x0, request);
+
+
+                    //Got back OK
                 }
                 else
                 {

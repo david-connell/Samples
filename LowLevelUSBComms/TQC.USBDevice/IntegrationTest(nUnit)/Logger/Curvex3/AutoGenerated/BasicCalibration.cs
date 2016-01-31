@@ -360,7 +360,7 @@ namespace TQC.USBDevice.TQCCurveX3Basic.BasicCalibration
         }
 
         [Test]
-        public void GetCommasProtocol()
+        public void GetCommunicationsProtocol()
         {
             using (var logger = new TQCUsbLogger(null))
             {
@@ -370,15 +370,15 @@ namespace TQC.USBDevice.TQCCurveX3Basic.BasicCalibration
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x64, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("GetCommas Protocol");
+                        throw new NoDataReceivedException("Get Communications Protocol");
                     }
 
                     if (result.Length < 2)
                     {
-                        throw new TooLittleDataReceivedException("GetCommas Protocol", result.Length, 2);
+                        throw new TooLittleDataReceivedException("Get Communications Protocol", result.Length, 2);
                     }
                     UInt16 status = BitConverter.ToUInt16(result, 0);
-                    Console.WriteLine("GetCommas Protocol={0}", status);
+                    Console.WriteLine("Get Communications Protocol={0}", status);
                 }
                 else
                 {
@@ -423,15 +423,18 @@ namespace TQC.USBDevice.TQCCurveX3Basic.BasicCalibration
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x1, 0x5, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("Device Manufactured date");
+                        throw new NoDataReceivedException("Device Manufactured Date");
                     }
 
                     if (result.Length < 4)
                     {
-                        throw new TooLittleDataReceivedException("Device Manufactured date", result.Length, 4);
+                        throw new TooLittleDataReceivedException("Device Manufactured Date", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("Device Manufactured date={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("Device Manufactured Date={0}", actualDate);
                 }
                 else
                 {
@@ -740,7 +743,10 @@ namespace TQC.USBDevice.TQCCurveX3Basic.BasicCalibration
                         throw new TooLittleDataReceivedException("Date of logger Calibration", result.Length, 4);
                     }
                     UInt32 status = BitConverter.ToUInt32(result, 0);
-                    Console.WriteLine("Date of logger Calibration={0}", status);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine("Date of logger Calibration={0}", actualDate);
                 }
                 else
                 {
@@ -761,17 +767,17 @@ namespace TQC.USBDevice.TQCCurveX3Basic.BasicCalibration
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x14, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("Calibration Details1");
+                        throw new NoDataReceivedException("Calibration Details 1");
                     }
 
                     if (result.Length < (sizeof(float) * 2) )
                     {
-                        throw new TooLittleDataReceivedException("Calibration Details1", result.Length, (sizeof(float) * 2) );
+                        throw new TooLittleDataReceivedException("Calibration Details 1", result.Length, (sizeof(float) * 2) );
                     }
                     for (int i = 0; i < 2; i++)
                     {
                         float status = BitConverter.ToSingle(result, i*sizeof(float));
-                        Console.WriteLine("Calibration Details1{0}={1}", i, status);
+                        Console.WriteLine("Calibration Details 1 #{0}={1}", i, status);
                     }
                 }
                 else
@@ -793,17 +799,17 @@ namespace TQC.USBDevice.TQCCurveX3Basic.BasicCalibration
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x15, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("Calibration Details2");
+                        throw new NoDataReceivedException("Calibration Details 2");
                     }
 
                     if (result.Length < (sizeof(float) * 2) )
                     {
-                        throw new TooLittleDataReceivedException("Calibration Details2", result.Length, (sizeof(float) * 2) );
+                        throw new TooLittleDataReceivedException("Calibration Details 2", result.Length, (sizeof(float) * 2) );
                     }
                     for (int i = 0; i < 2; i++)
                     {
                         float status = BitConverter.ToSingle(result, i*sizeof(float));
-                        Console.WriteLine("Calibration Details2{0}={1}", i, status);
+                        Console.WriteLine("Calibration Details 2 #{0}={1}", i, status);
                     }
                 }
                 else
@@ -825,17 +831,17 @@ namespace TQC.USBDevice.TQCCurveX3Basic.BasicCalibration
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x16, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("Calibration Details3");
+                        throw new NoDataReceivedException("Calibration Details 3");
                     }
 
                     if (result.Length < (sizeof(float) * 2) )
                     {
-                        throw new TooLittleDataReceivedException("Calibration Details3", result.Length, (sizeof(float) * 2) );
+                        throw new TooLittleDataReceivedException("Calibration Details 3", result.Length, (sizeof(float) * 2) );
                     }
                     for (int i = 0; i < 2; i++)
                     {
                         float status = BitConverter.ToSingle(result, i*sizeof(float));
-                        Console.WriteLine("Calibration Details3{0}={1}", i, status);
+                        Console.WriteLine("Calibration Details 3 #{0}={1}", i, status);
                     }
                 }
                 else
@@ -857,17 +863,17 @@ namespace TQC.USBDevice.TQCCurveX3Basic.BasicCalibration
                     var result = logger.GetResponse(0, (USBLogger.Commands)0x2, 0x17, request);
                     if (result == null)
                     {
-                        throw new NoDataReceivedException("Calibration Details4");
+                        throw new NoDataReceivedException("Calibration Details 4");
                     }
 
                     if (result.Length < (sizeof(float) * 2) )
                     {
-                        throw new TooLittleDataReceivedException("Calibration Details4", result.Length, (sizeof(float) * 2) );
+                        throw new TooLittleDataReceivedException("Calibration Details 4", result.Length, (sizeof(float) * 2) );
                     }
                     for (int i = 0; i < 2; i++)
                     {
                         float status = BitConverter.ToSingle(result, i*sizeof(float));
-                        Console.WriteLine("Calibration Details4{0}={1}", i, status);
+                        Console.WriteLine("Calibration Details 4 #{0}={1}", i, status);
                     }
                 }
                 else

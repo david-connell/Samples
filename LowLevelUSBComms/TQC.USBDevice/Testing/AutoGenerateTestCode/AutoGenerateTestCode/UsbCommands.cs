@@ -70,7 +70,18 @@ namespace TQC.USBDevice.AutoGenerateTestCode
         }
         protected string ReadDate()
         {
-            return ReadUint32();
+
+            string code = String.Format(@"
+                    if (result.Length < 4)
+                    {{
+                        throw new TooLittleDataReceivedException(""{0}"", result.Length, 4);
+                    }}
+                    UInt32 status = BitConverter.ToUInt32(result, 0);
+                    DateTime start = new DateTime(1970, 1, 1);
+                    DateTime actualDate = start.AddSeconds(status);
+                    
+                    Console.WriteLine(""{0}={{0}}"", actualDate);", ToString());
+            return code;
         }
         protected string ReadFloat(int numberOfFloats, bool isDepricated = false)
         {
@@ -82,7 +93,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                     for (int i = 0; i < {1}; i++)
                     {{
                         float status = BitConverter.ToSingle(result, i*sizeof(float));
-                        Console.WriteLine(""{0}{{0}}={{1}}"", i, status);
+                        Console.WriteLine(""{0} #{{0}}={{1}}"", i, status);
                     }}", ToString(), numberOfFloats);
             return code;
 
@@ -221,7 +232,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                 case 2: t = "HW Version"; break;
                 case 3: t = "Device Name"; break;
                 case 4: t = "Manufacture Name"; break;
-                case 5: t = "Device Manufactured date"; break;
+                case 5: t = "Device Manufactured Date"; break;
                 case 6: t = "Physical Memory"; break;
                 case 7: t = "Max number of batches"; break;
                 case 8: t = "Number of batches used"; break;
@@ -237,7 +248,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                 case 18: t ="Sending setup"; break;
                 case 19: t ="Length of Batch Names"; break;
 
-                case 100: t = "GetCommas Protocol"; break;
+                case 100: t = "Get Communications Protocol"; break;
                 case 101: t = "Firmware features"; break;
                 case 102: t = "DeviceType"; break;
                 case 199: t = "Calib Cert for Glossmeter"; break;
@@ -370,17 +381,17 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                 case 1: t = _T("Calibration company"); break;
                 case 2: t = _T("Calibration user name"); break;
                 case 11: t = _T("Holder tile values"); break;
-                case 20: t = _T("Calibration Details1"); break;
-                case 21: t = _T("Calibration Details2"); break;
-                case 22: t = _T("Calibration Details3"); break;
-                case 23: t = _T("Calibration Details4"); break;
-                case 24: t = _T("Calibration Details5"); break;
-                case 25: t = _T("Calibration Details6"); break;
-                case 26: t = _T("Calibration Details7"); break;
-                case 27: t = _T("Calibration Details8"); break;
-                case 28: t = _T("Calibration Details9"); break;
-                case 29: t = _T("Calibration Details10"); break;
-                case 30: t = _T("Calibration Details11"); break;
+                case 20: t = _T("Calibration Details 1"); break;
+                case 21: t = _T("Calibration Details 2"); break;
+                case 22: t = _T("Calibration Details 3"); break;
+                case 23: t = _T("Calibration Details 4"); break;
+                case 24: t = _T("Calibration Details 5"); break;
+                case 25: t = _T("Calibration Details 6"); break;
+                case 26: t = _T("Calibration Details 7"); break;
+                case 27: t = _T("Calibration Details 8"); break;
+                case 28: t = _T("Calibration Details 9"); break;
+                case 29: t = _T("Calibration Details 10"); break;
+                case 30: t = _T("Calibration Details 11"); break;
                 case 100: t = _T("Type of channel 1"); break;
                 case 101: t = _T("Type of channel 2"); break;
                 case 102: t = _T("Type of channel 3"); break;
@@ -701,10 +712,82 @@ namespace TQC.USBDevice.AutoGenerateTestCode
     {
         private int EnumerationID;
 
+        public class USBReadCurrentRawValuesDetail : UsbEnumeration
+        {
+            public USBReadCurrentRawValuesDetail(int id)
+            {
+                Enumeration = id;
+            }
+            internal override string UnitTestCode(int commandId, UsbCommandRequest usbCommandRequest)
+            {
+                if (commandId == 0x06)
+                {
+                    return UsbReadDeviceInfoTextCode(commandId, usbCommandRequest);
+                }
+                return base.UnitTestCode(commandId, usbCommandRequest);
+            }
+
+            private string UsbReadDeviceInfoTextCode(int commandId, UsbCommandRequest usbCommandRequest)
+            {
+                CommandId = commandId;
+                string textStart = string.Format(
+@"                    List<byte> request = new List<byte>();
+                    var result = logger.GetResponse(0, (USBLogger.Commands)0x{0:X}, 0x{1:X}, request);
+                    if (result == null)
+                    {{
+                        throw new NoDataReceivedException(""{2}"");
+                    }}
+", commandId, Enumeration, ToString());
+
+                switch (Enumeration)
+                {
+                    case 0x0101: textStart = Int16RawData(usbCommandRequest, textStart, "ADC"); break;
+                    case 0x0102: textStart = Int16RawData(usbCommandRequest, textStart, "Voltage"); break;
+                    default:
+                        throw new Exception(string.Format("Unsupported Enum 0x{0:X}", Enumeration));
+                }
+                return textStart;
+            }
+
+            private string Int16RawData(UsbCommandRequest usbCommandRequest, string textStart, string text)
+            {
+                textStart += String.Format(@"
+                    if (result.Length < 6)
+                    {{
+                        throw new NoDataReceivedException(""{2} need to have mode step up & time stamp"");
+                    }}
+                    Assert.That(result[0], Is.EqualTo({0}), ""Mode not correct"");
+                    Assert.That(result[1], Is.EqualTo({1}), ""SetID not correct"");
+", Enumeration & 0xFF, (Enumeration >> 8) & 0xFF, ToString());
+                int numberOfReadings = (usbCommandRequest.ResponseBuffer.Length - 6) / 2;
+                for (int channelId = 0; channelId < numberOfReadings; channelId++)
+                {
+                    textStart +=
+                    String.Format(
+@"                    Console.WriteLine(""{0} {1} = {{0}}"",  BitConverter.ToInt16(result, {2}));
+", text, channelId + 1, channelId * 2 + 2);
+                }
+                return textStart;
+            }
+            public override string ToString()
+            {
+                String t = "??";
+                switch (Enumeration)
+                {
+                    case 0x0101: t = "Payload ADC"; break;
+                    case 0x0102: t = "Payload Microvolts"; break;
+                    case 0x0103: t = "Payload Temperature"; break;
+                    default:
+                        throw new Exception(string.Format("Unsupported Enum 0x{0:X}", Enumeration));
+
+                }
+                return t;
+            }
+        }
         public UsbReadCurrentRawValues(int command, int enumeration)
         {
             CommandId = command;
-            //UsbEnumeration = new USBReadWriteDeviceSetupDetail(enumeration);
+            UsbEnumeration = new USBReadCurrentRawValuesDetail(enumeration);
 
         }
 
