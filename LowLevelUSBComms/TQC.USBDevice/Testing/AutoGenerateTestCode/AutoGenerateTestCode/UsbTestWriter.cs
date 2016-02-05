@@ -43,7 +43,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                     }
                     WriteOutClassStart(textWriter, command);
 
-                    WriteOutConstructor(textWriter, command);
+                    WriteOutConstructor(textWriter, command, USBLogger.USBProductId.USB_CURVEX_3a);
 
                 }
                 string testAttributes = "";
@@ -59,8 +59,19 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                 }
 
                 textWriter.WriteLine("");
-                textWriter.WriteLine("        [Test{0}]", testAttributes);
-                textWriter.WriteLine("        public void {0}()", command.TestName);
+                if (command.UsbCommand.HasTestCaseData)
+                {
+                    foreach (var item in command.UsbCommand.TestCaseData)
+                    {
+                        textWriter.WriteLine("        {0}", item);
+                    }
+                }
+                else
+                {
+                    textWriter.WriteLine("        [Test{0}]", testAttributes);
+                }
+                textWriter.WriteLine("        public void {0}({1})", command.TestName, command.UsbCommand.MethodSignature);
+                
                 textWriter.WriteLine(
 @"        {{
             using (var logger = new TQCUsbLogger(null))
@@ -98,12 +109,12 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             textWriter.WriteLine("    {");
         }
 
-        private static void WriteOutConstructor(System.IO.TextWriter textWriter, UsbCommandRequest command)
+        private static void WriteOutConstructor(System.IO.TextWriter textWriter, UsbCommandRequest command, USBLogger.USBProductId product)
         {
             textWriter.WriteLine("        private USBLogger.USBProductId ProductId;");
             textWriter.WriteLine("        public {0}()", command.ClassName);
             textWriter.WriteLine("        {");
-            textWriter.WriteLine("            ProductId = USBLogger.USBProductId.{0};", USBLogger.USBProductId.USB_CURVEX_3a);
+            textWriter.WriteLine("            ProductId = USBLogger.USBProductId.{0};", product);
             textWriter.WriteLine("            return;");
             textWriter.WriteLine("        }");
         }

@@ -97,12 +97,13 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
             }
         }
 
-
         private void ReadCalibrationDetails(GROMainBoard logger, int probeId)
         {
             var value = logger.GetChildDevice(ThermocoupleBoard).CalibrationDetails(probeId);
-            Assert.That(value.C, Is.Not.EqualTo(0));
-            Assert.That(value.M, Is.Not.EqualTo(0));
+            Assert.That(Math.Abs(value.C), Is.LessThan(20), "Constant it too great");
+            Assert.That(value.M, Is.Not.EqualTo(0), "M should not be equal to 0");
+            Assert.That(Math.Abs(value.M), Is.GreaterThan(0.1), "M should greater than 0.1");
+            Assert.That(Math.Abs(value.M), Is.LessThan(10.0), "M should less than 10.0");
             Console.WriteLine("Probe {0} is {1}", probeId + 1, value);
         }
 

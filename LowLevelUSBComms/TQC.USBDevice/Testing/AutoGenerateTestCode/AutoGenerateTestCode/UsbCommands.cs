@@ -10,7 +10,27 @@ namespace TQC.USBDevice.AutoGenerateTestCode
     {
         public int CommandId { get; protected set; }
         public UsbEnumeration UsbEnumeration { get; protected set; }
-
+        public bool HasTestCaseData
+        {
+            get
+            {
+                return TestCaseData.Any();
+            }
+        }
+        virtual public string MethodSignature
+        {
+            get
+            {
+                return "";
+            }
+        }
+        virtual public IEnumerable<string> TestCaseData
+        {
+            get
+            {
+                yield break;
+            }
+        }
 
         internal string UnitTestCode(int commandId, UsbCommandRequest usbCommandRequest)
         {

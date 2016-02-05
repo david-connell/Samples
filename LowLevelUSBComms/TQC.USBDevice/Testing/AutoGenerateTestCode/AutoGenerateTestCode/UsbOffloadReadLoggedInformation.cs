@@ -8,8 +8,25 @@ namespace TQC.USBDevice.AutoGenerateTestCode
 
     public class UsbOffloadReadLoggedInformation : UsbCommand
     {
+
+        public override IEnumerable<string> TestCaseData
+        {
+            get
+            {
+                yield return "[TestCase((UInt16)0x01, TestName=\"Batch with ID = 01\")]";
+                yield return "[TestCase((UInt16)0xFF, TestName=\"Batch with ID = FF\")]";
+            }
+        }
+        public override string MethodSignature
+        {
+            get
+            {
+                return "UInt16 batchID";
+            }
+        }
         public class USBReadCurrentValuesDetail : UsbEnumeration
         {
+            
             public USBReadCurrentValuesDetail(int id)
             {
                 Enumeration = id;
@@ -38,18 +55,25 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                 switch (Enumeration)
                 {
                     case 0: break;
-                    case 1: textStart = 
+                    case 1: textStart =
 @"
-{
+                    {
                         List<byte> request = new List<byte>();
                         request.Add(0x0);
                         request.Add(0x0);
-                        var result = logger.GetResponse(0, (USBLogger.Commands)0x4, 0x1, request);
-                        if (result != null)
+                         try
                         {
-                            throw new TooLittleDataReceivedException(""Offload"", result.Length, 0);
+                            var result = logger.GetResponse(0, (USBLogger.Commands)0x4, batchID, request);
+                            if (result != null)
+                            {
+                                throw new TooLittleDataReceivedException(""Offload"", result.Length, 0);
+                            }
                         }
-                        //Got back OK
+                        catch (BatchNotAvailableException ex)
+                        {
+                            Console.WriteLine(""OK, No Batch found"");
+                            return;
+                        }
                     }
                     for (UInt16 counter = 1; counter < 1025; counter++)
                     {
@@ -57,7 +81,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                         request.AddRange(BitConverter.GetBytes(counter));
                         try
                         {
-                            var result = logger.GetResponse(0, (USBLogger.Commands)0x4, 0x1, request);
+                            var result = logger.GetResponse(0, (USBLogger.Commands)0x4, batchID, request);
                             Console.WriteLine(""Block {0}"", counter);
                             if (result == null)
                             {
