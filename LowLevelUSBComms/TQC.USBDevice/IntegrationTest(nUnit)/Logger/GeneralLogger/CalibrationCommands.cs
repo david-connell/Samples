@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IntegrationTestNUnit.CodeInfrastructure;
 using NUnit.Framework;
 using TQC.USBDevice;
 
@@ -48,6 +49,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                     var value = logger.CalibrationCompany;
                     Assert.That(value, Is.Not.Null);
                     Assert.That(value, Is.Not.EqualTo(""));
+                    Assert.That(value, SharedAsserts.IsEqualToCalibrationCompany);
                     Console.WriteLine(value);
                 }
                 else
@@ -84,8 +86,10 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 if (logger.OpenWithMinumumRequests(ProductId))
                 {
                     int maxProbes = logger.NumberOfProbes;
-                    for (int probeId = 0 ; probeId < maxProbes; probeId++)
+                    for (int probeId = 0; probeId < maxProbes; probeId++)
+                    {
                         ReadCalibrationDetails(logger, probeId);
+                    }
                 }
                 else
                 {

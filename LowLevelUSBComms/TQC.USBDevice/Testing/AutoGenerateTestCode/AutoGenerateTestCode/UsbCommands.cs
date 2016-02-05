@@ -138,11 +138,16 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             return code;
         }
 
-        protected string ReadString(string expectedValue = null)
+        protected string ReadString(string expectedValue = null, string equalTo = null)
         {
             string code = String.Format(@"
                     Console.WriteLine(""{2} = '{{0}}'"", TQCUsbLogger.DecodeString(result));", CommandId, Enumeration, ToString());
-            if (!String.IsNullOrWhiteSpace(expectedValue))
+            if (equalTo != null)
+            {
+                code += String.Format(@"
+                    Assert.That(TQCUsbLogger.DecodeString(result), {0});", equalTo);
+            }
+            else if (!String.IsNullOrWhiteSpace(expectedValue))
             {
                 code += String.Format(@"
                     Assert.That(TQCUsbLogger.DecodeString(result), Is.EqualTo(""{0}""));", expectedValue);
@@ -326,8 +331,8 @@ namespace TQC.USBDevice.AutoGenerateTestCode
             switch (Enumeration)
             {
                 case 0: t = ReadDate(); break;
-                case 1: t = ReadString(usbCommandRequest.ResponseAsString); break;
-                case 2: t = ReadString(usbCommandRequest.ResponseAsString); break;
+                case 1: t = ReadString(usbCommandRequest.ResponseAsString, "SharedAsserts.IsEqualToCalibrationCompany"); break;
+                case 2: t = ReadString(usbCommandRequest.ResponseAsString, "SharedAsserts.IsEqualToCalibrationUser"); break;
                 case 11: t = ReadFloat(3); break;
                 case 20: t = ReadFloat(2); break;
                 case 21: t = ReadFloat(2); break;
