@@ -12,5 +12,5 @@ using System.Runtime.InteropServices;
 //
 //Change build.bat
 //
-[assembly: AssemblyVersion("1.4.15.*")]
+[assembly: AssemblyVersion("1.4.16.*")]
 
