@@ -9,8 +9,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
-//
-//Change build.bat
-//
-[assembly: AssemblyVersion("1.4.19.*")]
+
+[assembly: AssemblyVersion("1.4.21.*")]
 
