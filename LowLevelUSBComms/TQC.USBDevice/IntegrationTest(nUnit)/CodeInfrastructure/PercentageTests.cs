@@ -17,6 +17,7 @@ namespace IntegrationTestNUnit.CodeInfrastructure
             Percentage val2 = new Percentage(1);
 
             Assert.That(val1, Is.EqualTo(val2));
+            Assert.That(val1 == val2, Is.True);
         }
     }
 }

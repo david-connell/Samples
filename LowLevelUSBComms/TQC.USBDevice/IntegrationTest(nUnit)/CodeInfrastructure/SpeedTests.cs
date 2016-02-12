@@ -17,6 +17,7 @@ namespace IntegrationTestNUnit.CodeInfrastructure
             Speed val2 = new Speed(1);
 
             Assert.That(val1, Is.EqualTo(val2));
+            Assert.That(val1 == val2, Is.True);
         }
     }
 }
