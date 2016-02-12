@@ -648,10 +648,7 @@ namespace TQC.USBDevice
         }
 
 
-        /// <summary>
-        /// This is not valid for GRO
-        /// </summary>
-        public IEnumerable<double> ProbeValues
+        public virtual IEnumerable<double> ProbeValues
         {
             get
             {

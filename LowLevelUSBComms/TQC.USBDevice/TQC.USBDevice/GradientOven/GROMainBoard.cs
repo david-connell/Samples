@@ -406,7 +406,7 @@ namespace TQC.USBDevice.GradientOven
 
                 request.AddRange(BitConverter.GetBytes((short)5));
                 request.Add(value.PositionInMilliMeters);
-                IssueGROSetCommand(request);                
+                IssueGROSetCommand(request);
             }
         }
 
@@ -506,6 +506,19 @@ namespace TQC.USBDevice.GradientOven
                 throw new TooLittleDataReceivedException("Read Internal Channels", response.Length, minBufLen);
             }
             return values;
+        }
+
+        public override IEnumerable<double> ProbeValues
+        {
+            get
+            {
+                List<double> probeValues = new List<double>();
+                foreach (var item in ThermocoupleBoardIDs)
+                {
+                    probeValues.AddRange(_ProbeValues(item));
+                }
+                return probeValues;
+            }
         }
 
         public float GetTempSetting(short slotId)
