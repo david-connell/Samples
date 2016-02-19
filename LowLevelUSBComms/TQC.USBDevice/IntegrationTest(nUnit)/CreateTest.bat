@@ -12,6 +12,8 @@ set version=%%a
 rd NunitTest/s /q
 md NunitTest
 xcopy *.dll NunitTest /R /Y
+xcopy *.config NunitTest /R /Y
+xcopy *.exe NunitTest /R /Y
 copy __*.bat NunitTest\*.bat 
 echo !version! >> Readme.txt
 copy Readme.txt NunitTest\Readme.txt
