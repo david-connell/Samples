@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using log4net;
 using TQC.IF.USBLogger;
+using TQC.USBDevice.Exceptions;
 using TQC.USBDevice.Utils;
 
 namespace TQC.USBDevice
@@ -101,6 +102,7 @@ namespace TQC.USBDevice
         }
 
         /// <summary>
+        /// 
         /// Get or sets the number of days that the debug output is stored for.
         /// The default is 2 days. 
         /// </summary>
@@ -664,11 +666,12 @@ namespace TQC.USBDevice
                     {
                         throw new NotImplementedException();
                     }
-
                 }
-
+                else
+                {
+                    throw new LoggerCannotBeConfiguredException("Unable to set Calibration Company");
+                }
             }
-
         }
 
         internal virtual String _CalibrationUserName(byte deviceId)
@@ -690,7 +693,6 @@ namespace TQC.USBDevice
                 {
                     return _CalibrationUserName(0);
                 }
-
             }
             set
             {
@@ -705,11 +707,12 @@ namespace TQC.USBDevice
                     {
                         throw new NotImplementedException();
                     }
-
                 }
-
+                else
+                {
+                    throw new LoggerCannotBeConfiguredException("Unable to set Calibration User");
+                }
             }
-
         }
 
         internal virtual DateTime _Calibration(byte deviceId)
@@ -729,9 +732,8 @@ namespace TQC.USBDevice
                 }
                 else
                 {
-                    return _Calibration(0);                    
+                    return _Calibration(0);
                 }
-
             }
             set
             {
@@ -746,7 +748,10 @@ namespace TQC.USBDevice
                     {
                         throw new NotImplementedException();
                     }
-
+                }
+                else
+                {
+                    throw new LoggerCannotBeConfiguredException("Unable to set Calibration Date");
                 }
             }
         }

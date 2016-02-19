@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TQC.USBDevice.Exceptions;
 
 namespace TQC.USBDevice
 {
@@ -119,9 +120,16 @@ namespace TQC.USBDevice
                 return _SerialNumber(0);
             }
             set
-            {     
-                if (CanLoggerBeConfigured)           
+            {
+                if (CanLoggerBeConfigured)
+                {
                     _SetSerialNumber(0, value);
+                }
+                else
+                {
+                    throw new LoggerCannotBeConfiguredException("Unable to set serial number");
+                }
+
             }
         }
 
@@ -179,12 +187,17 @@ namespace TQC.USBDevice
                 List<byte> request = new List<byte>();
                 string result = value;
                 if (value.Length > maxLength)
+                {
                     result = value.Substring(0, maxLength);
-                //request.AddRange(BitConverter.GetBytes((byte)value.Length));
+                }
                 request.AddRange(System.Text.ASCIIEncoding.Default.GetBytes(result));
                 for (int counter = result.Length; counter < maxLength; counter++)
                     request.Add(0);
                 GetResponse(deviceId, Commands.WriteDeviceInfo, enumerationId, request);
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException("Unable to write device information ");
             }
         }
 
@@ -192,9 +205,13 @@ namespace TQC.USBDevice
         {
             if (CanLoggerBeConfigured)
             {
-                List<byte> request = new List<byte>();                
+                List<byte> request = new List<byte>();
                 request.AddRange(BitConverter.GetBytes(value));
                 GetResponse(deviceId, Commands.WriteDeviceInfo, enumerationId, request);
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException("Unable to write byte device information");
             }
         }
 
@@ -202,13 +219,17 @@ namespace TQC.USBDevice
         {
             if (CanLoggerBeConfigured)
             {
-                List<byte> request = new List<byte>();                
+                List<byte> request = new List<byte>();
                 request.Add((byte)version.Revision);
                 request.Add((byte)version.Build);
                 request.Add((byte)version.Minor);
                 request.Add((byte)version.Major);
                 //request.AddRange(BitConverter.GetBytes(version));
                 GetResponse(deviceId, Commands.WriteDeviceInfo, enumerationId, request);
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException("Unable to write device version information");
             }
         }
 
@@ -222,7 +243,7 @@ namespace TQC.USBDevice
             }
             else
             {
-                throw new UnauthorizedAccessException("Cannot set serial number");
+                throw new LoggerCannotBeConfiguredException("Cannot set serial number");
             }
         }
 
@@ -453,14 +474,17 @@ namespace TQC.USBDevice
                     List<byte> request = new List<byte>();
                     request.AddRange(BitConverter.GetBytes((float)newValue.M));
                     request.AddRange(BitConverter.GetBytes((float)newValue.C));
-                                                            
+
                     var result = GetResponse(deviceId, Commands.WriteCalibrationDetails, 20 + probeId, request);
                     if (result != null)
                     {
                         throw new NoDataReceivedException("setCalibration");
                     }
                 }
-
+                else
+                {
+                    throw new LoggerCannotBeConfiguredException("Unable to set Calibration");
+                }
                 return; 
             }
             else

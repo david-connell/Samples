@@ -4,7 +4,6 @@ using System.Security.Permissions;
 
 namespace TQC.USBDevice
 {
-
     [Serializable]
     public class DeviceResponseException : Exception
     {
@@ -30,7 +29,7 @@ namespace TQC.USBDevice
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
-        }        
+        }
 
     }
 
