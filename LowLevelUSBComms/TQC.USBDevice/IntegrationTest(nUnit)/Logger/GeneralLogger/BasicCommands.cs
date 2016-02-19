@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,25 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             public BasicCommands(USBLogger.USBProductId product)
             {
                 ProductId = product;
+            }
+
+            [Test]
+            public void __TestAssemblyVersioning()
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                var name = assembly.GetName();
+
+                Console.WriteLine("Test Code = {0}", assembly.CodeBase);
+                Console.WriteLine("Test Version = {0}", name.Version);
+                var loggerAssembly = USBLogger.USBProductId.Glossmeter.GetType().Assembly;
+                Console.WriteLine("Logger Code = {0}", loggerAssembly.CodeBase);
+                Console.WriteLine("Logger Version = {0}", loggerAssembly.GetName().Version);
+
+                Assert.That(name.Version.Major, Is.EqualTo(loggerAssembly.GetName().Version.Major), "Major Mismatch versions");
+                Assert.That(name.Version.Minor, Is.EqualTo(loggerAssembly.GetName().Version.Minor), "Minor Mismatch versions");
+                Assert.That(name.Version.Build, Is.EqualTo(loggerAssembly.GetName().Version.Build), "Build Mismatch versions");
+
+                
             }
 
             [Test]
