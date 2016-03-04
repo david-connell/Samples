@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using log4net;
 using TQC.USBDevice.BaseLoggerTypes;
 
 
@@ -12,6 +13,7 @@ namespace TQC.USBDevice.GradientOven
         const int NumberOfFansPerBoard = 8;
         const int NumberOfHeatersPerBoard = 8;
         const int NumberOfProbesPerBoard = 8;
+        private static ILog m_Log = LogManager.GetLogger("TQC.USBDevice.GradientOven");
 
         public GROMainBoard(IUsbInterfaceForm mainWinForm)
             : base(mainWinForm)
@@ -36,7 +38,7 @@ namespace TQC.USBDevice.GradientOven
             else
             {
                 throw new GocChildException(string.Format("Child device {0} does not exist", id));   
-            }            
+            }
         }
 
 
@@ -161,7 +163,7 @@ namespace TQC.USBDevice.GradientOven
         public MainBoardStatus Status
         {
             get
-            {                
+            {
                 return (MainBoardStatus)_GetStatus(0).Status;
             }
 
@@ -172,6 +174,7 @@ namespace TQC.USBDevice.GradientOven
             get
             {
                 ButtonStatus button = ButtonStatus.NothingPressed;
+                m_Log.InfoFormat("Get Button Status");
                 var response = Request(Commands.ReadCurrentProbeVals, BitConverter.GetBytes((short)0x30));
 
                 if (response == null)
@@ -199,6 +202,7 @@ namespace TQC.USBDevice.GradientOven
                         button |= ButtonStatus.RedPressed;
                     }
                 }
+                m_Log.InfoFormat("Read Button Status {0}", button);
                 return button;
 
 
@@ -209,6 +213,7 @@ namespace TQC.USBDevice.GradientOven
         {
             get
             {
+                
                 var response = Request(Commands.GROReadCommand, BitConverter.GetBytes((short)8));
                 if (response == null)
                 {
@@ -218,7 +223,9 @@ namespace TQC.USBDevice.GradientOven
                 {
                     throw new TooLittleDataReceivedException("getInternalFanSpeed", response.Length, sizeof(byte));
                 }
-                return new Percentage(response[0]);
+                var result =  new Percentage(response[0]);
+                m_Log.InfoFormat("Get Internal Fan Speed {0}", result);
+                return result;
             }
             set
             {
@@ -226,6 +233,7 @@ namespace TQC.USBDevice.GradientOven
 
                 request.AddRange(BitConverter.GetBytes((short)8));
                 request.Add(value.Value);
+                m_Log.InfoFormat("Set Internal Fan Speed {0}", value);
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
@@ -249,13 +257,16 @@ namespace TQC.USBDevice.GradientOven
                 }
                 if (response == null)
                 {
+                    m_Log.InfoFormat("Get MaximumHeaterTemperature {0}", 250.0);
                     return 250.0;
                 }
                 if (response.Length < sizeof(UInt16))
                 {
                     throw new TooLittleDataReceivedException("MaximumHeaterTemperature", response.Length, sizeof(UInt16));
                 }
-                return BitConverter.ToUInt16(response, 0);                
+                var result =  BitConverter.ToUInt16(response, 0);
+                m_Log.InfoFormat("Get MaximumHeaterTemperature {0}", result);
+                return result;
             }
             set
             {
@@ -263,7 +274,7 @@ namespace TQC.USBDevice.GradientOven
 
                 request.AddRange(BitConverter.GetBytes((short)10));
                 request.AddRange(BitConverter.GetBytes((UInt16)value));
-
+                m_Log.InfoFormat("Set MaximumHeaterTemperature {0}", value);
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
@@ -280,7 +291,9 @@ namespace TQC.USBDevice.GradientOven
                 {
                     throw new TooLittleDataReceivedException("getCooling", response.Length, sizeof(byte));
                 }
-                return new Percentage(response[0]);
+                var result = new Percentage(response[0]);
+                m_Log.InfoFormat("Get Cooling {0}", result);
+                return result;
             }
             set
             {
@@ -288,6 +301,7 @@ namespace TQC.USBDevice.GradientOven
 
                 request.AddRange(BitConverter.GetBytes((short)1));
                 request.Add(value.Value);
+                m_Log.InfoFormat("Set Cooling {0}", value);
                 Request(Commands.GROSetCommand, request.ToArray());
             }
         }
@@ -307,12 +321,14 @@ namespace TQC.USBDevice.GradientOven
                 {
                     throw new TooLittleDataReceivedException("getPower", response.Length, sizeof(byte));
                 }
-                return (PowerState)response[0];
+                var result = (PowerState)response[0];
+                m_Log.InfoFormat("Get Power {0}", result);
+                return result;
             }
             set
             {
                 List<byte> request = new List<byte>();
-
+                m_Log.InfoFormat("Set Power {0}", value);
                 request.AddRange(BitConverter.GetBytes((short)2));
                 request.Add((byte)value );
                 Request(Commands.GROSetCommand, request.ToArray());
@@ -335,12 +351,14 @@ namespace TQC.USBDevice.GradientOven
                 {
                     throw new TooLittleDataReceivedException("getLift", response.Length, sizeof(byte));
                 }
-                return (LiftState)response[0];
+                var result = (LiftState)response[0];
+                m_Log.InfoFormat("Get Lift {0}", result);
+                return result;
             }
             set
             {
                 List<byte> request = new List<byte>();
-
+                m_Log.InfoFormat("Set Lift {0}", value);
                 request.AddRange(BitConverter.GetBytes((short)7));
                 request.Add((byte)value);
                 IssueGROSetCommand(request);                
@@ -363,12 +381,14 @@ namespace TQC.USBDevice.GradientOven
                 {
                     throw new TooLittleDataReceivedException("getClamp", response.Length, sizeof(byte));
                 }
-                return (ClampState) response[0];
+                var result= (ClampState) response[0];
+                m_Log.InfoFormat("Get Clamp {0}", result);
+                return result;
             }
             set
             {
                 List<byte> request = new List<byte>();
-
+                m_Log.InfoFormat("Set Clamp {0}", value);
                 request.AddRange(BitConverter.GetBytes((short)4));
                 request.Add((byte)value );
                 IssueGROSetCommand(request);
@@ -398,12 +418,14 @@ namespace TQC.USBDevice.GradientOven
                     throw new TooLittleDataReceivedException("getCarrierPosition", response.Length, sizeof(byte));
                 }
 
-                return new CarrierPosition(response[0]);
+                var result = new CarrierPosition(response[0]);
+                m_Log.InfoFormat("Get Carrier Position {0}", result);
+                return result;
             }
             set
             {
                 List<byte> request = new List<byte>();
-
+                m_Log.InfoFormat("Set Carrier Position {0}", value);
                 request.AddRange(BitConverter.GetBytes((short)5));
                 request.Add(value.PositionInMilliMeters);
                 IssueGROSetCommand(request);
@@ -428,12 +450,14 @@ namespace TQC.USBDevice.GradientOven
                 {
                     throw new TooLittleDataReceivedException("getCarrierSpeed", response.Length, sizeof(byte));
                 }
-                return new Speed(response[0]);
+                var result= new Speed(response[0]);
+                m_Log.InfoFormat("Get Carrier Speed {0}", result);
+                return result;
             }
             set
             {
                 List<byte> request = new List<byte>();
-
+                m_Log.InfoFormat("Set Carrier Speed {0}", value);
                 request.AddRange(BitConverter.GetBytes((short)6));
                 request.Add(value.SpeedMillimetersPerSecond);
                 IssueGROSetCommand(request);
@@ -459,7 +483,9 @@ namespace TQC.USBDevice.GradientOven
             {
                 throw new TooLittleDataReceivedException(GetFanSettingsMethodDescription(fanId), response.Length, sizeof(byte));
             }
-            return new Percentage(response[0]);
+            var result = new Percentage(response[0]);
+            m_Log.InfoFormat("Get Fan Setting {0} {1}", fanId, result);
+            return result;
         }
 
         private string GetFanSettingsMethodDescription(short fanId)
@@ -479,7 +505,7 @@ namespace TQC.USBDevice.GradientOven
                 throw new ArgumentOutOfRangeException("fanId", "Valid fans 0->32");
             }           
             List<byte> request = new List<byte>();
-
+            m_Log.InfoFormat("Set Fan Setting {0} {1}", fanId, fanSetting);
             request.AddRange(BitConverter.GetBytes((short)(100 + fanId) ) );
             request.Add(fanSetting.Value);
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using log4net;
 using TQC.USBDevice.Exceptions;
 
 namespace TQC.USBDevice
@@ -17,6 +18,7 @@ namespace TQC.USBDevice
     {
         Dictionary<byte, int> ProbesPerDevice = new Dictionary<byte, int>();
         Dictionary<byte, CachedData> m_CachedData = new Dictionary<byte, CachedData>();
+        private static ILog s_Log = LogManager.GetLogger("TQC.USBDevice.TQCUsbLogger");
 
         public TQCUsbLogger(IUsbInterfaceForm mainWinForm)
             : base(mainWinForm)
@@ -171,7 +173,9 @@ namespace TQC.USBDevice
                 throw new TooLittleDataReceivedException("getHarwareStatus", response.Length, sizeof(UInt32));
             }
             UInt32 status = BitConverter.ToUInt32(response, 0);
-            return new BoardStatus(status, response, 4);
+            var result =  new BoardStatus(status, response, 4);
+            s_Log.InfoFormat("GetStatus for {0} = {1}", deviceId, result);
+            return result;
         }
 
 

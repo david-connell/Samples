@@ -90,6 +90,7 @@ namespace UsbLibrary
 		/// <param name="strPath">Path to the device</param>
 		private void Initialise(string strPath)
 		{
+            s_Log.DebugFormat("Initialize {0}", strPath);
 			// Create the file from the device path
             m_hHandle = CreateFile(strPath, GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, IntPtr.Zero);
 
