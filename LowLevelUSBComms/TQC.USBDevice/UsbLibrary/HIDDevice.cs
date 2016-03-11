@@ -4,6 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using log4net;
+using System.Collections.Generic;
 
 namespace UsbLibrary
 {
@@ -31,7 +32,7 @@ namespace UsbLibrary
 	/// </summary>
     public abstract class HIDDevice : Win32Usb, IDisposable
     {
-		#region Privates variables
+
         static ILog s_Log = LogManager.GetLogger("UsbLibrary.HIDDevice");
 		/// <summary>Filestream we can use to read/write from</summary>
         private FileStream m_oFile;
@@ -41,9 +42,6 @@ namespace UsbLibrary
 		private int m_nOutputReportLength;
 		/// <summary>Handle to the device</summary>
 		private IntPtr m_hHandle;
-		#endregion
-
-        #region IDisposable Members
 		/// <summary>
 		/// Dispose method
 		/// </summary>
@@ -81,7 +79,6 @@ namespace UsbLibrary
                 s_Log.Info("Dispose", ex);                
             }
         }
-        #endregion
 
 		#region Privates/protected
 		/// <summary>
@@ -90,7 +87,19 @@ namespace UsbLibrary
 		/// <param name="strPath">Path to the device</param>
 		private void Initialise(string strPath)
 		{
-            s_Log.DebugFormat("Initialize {0}", strPath);
+            s_Log.InfoFormat("Initialize {0}", strPath);
+            if (m_oFile != null)
+            {
+                m_oFile.Close();
+                m_oFile = null;
+                m_hHandle = InvalidHandleValue;
+            }
+            if (m_hHandle != InvalidHandleValue)
+            {
+                CloseHandle(m_hHandle);
+                m_hHandle = InvalidHandleValue;
+            }
+
 			// Create the file from the device path
             m_hHandle = CreateFile(strPath, GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, IntPtr.Zero);
 
@@ -107,7 +116,6 @@ namespace UsbLibrary
                         m_nOutputReportLength = oCaps.OutputReportByteLength;	// ... and output report lengths
 
                         m_oFile = new FileStream(m_hHandle, FileAccess.Read | FileAccess.Write, true, m_nInputReportLength, true);
-                        //m_oFile = new FileStream(new SafeFileHandle(m_hHandle, false), FileAccess.Read | FileAccess.Write, m_nInputReportLength, true);
 
                         BeginAsyncRead();	// kick off the first asynchronous read                              
                     }
@@ -139,8 +147,10 @@ namespace UsbLibrary
         {
                 byte[] arrInputReport = new byte[m_nInputReportLength];
                 // put the buff we used to receive the stuff as the async state then we can get at it when the read completes
-
-                m_oFile.BeginRead(arrInputReport, 0, m_nInputReportLength, new AsyncCallback(ReadCompleted), arrInputReport);
+                if (m_oFile != null)
+                {
+                    m_oFile.BeginRead(arrInputReport, 0, m_nInputReportLength, new AsyncCallback(ReadCompleted), arrInputReport);
+                }
         }
 		/// <summary>
 		/// Callback for above. Care with this as it will be called on the background thread from the async read
@@ -158,16 +168,25 @@ namespace UsbLibrary
                 m_oFile.EndRead(iResult);	// call end read : this throws any exceptions that happened during the read
                 try
                 {
-					InputReport oInRep = CreateInputReport();	// Create the input report for the device
-					oInRep.SetData(arrBuff);	// and set the data portion - this processes the data received into a more easily understood format depending upon the report type
+                    InputReport oInRep = CreateInputReport();	// Create the input report for the device
+                    oInRep.SetData(arrBuff);	// and set the data portion - this processes the data received into a more easily understood format depending upon the report type
                     HandleDataReceived(oInRep);	// pass the new input report on to the higher level handler
                 }
                 finally
                 {
                     BeginAsyncRead();	// when all that is done, kick off another read for the next report
-                }                
+                }
             }
-            catch(IOException ex)	// if we got an IO exception, the device was removed
+            catch (IOException ex)	// if we got an IO exception, the device was removed
+            {
+                HandleDeviceRemoved();
+                if (OnDeviceRemoved != null)
+                {
+                    OnDeviceRemoved(this, new EventArgs());
+                }
+                Dispose();
+            }
+            catch (OperationCanceledException)
             {
                 HandleDeviceRemoved();
                 if (OnDeviceRemoved != null)

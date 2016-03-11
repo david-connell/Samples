@@ -96,6 +96,11 @@ namespace TQC.USBDevice
             }
         }
 
+        internal void CheckDevicePresent()
+        {
+            m_UsbCommunications.CheckDevicePresent();
+        }
+
         virtual protected void ClearCachedData()
         {
 
@@ -181,7 +186,7 @@ namespace TQC.USBDevice
         /// <returns>If the debug file is open (true => open)</returns>
         public bool DebugOpen(string fileNameRoot = null)
         {
-            m_Log.Info("DebugOpen");
+            m_Log.Debug("DebugOpen");
             IsDebugOutputOpen = false;
             if (!String.IsNullOrEmpty(fileNameRoot))
             {
@@ -197,7 +202,7 @@ namespace TQC.USBDevice
         /// <returns>if the debug file is open or closed (false => Closed)</returns>
         public bool DebugClose()
         {
-            m_Log.Info("DebugClose");
+            m_Log.Debug("DebugClose");
             IsDebugOutputOpen = false;
             return IsDebugOutputOpen;
         }
@@ -453,11 +458,11 @@ namespace TQC.USBDevice
             if (request != null && request.Length >= 2)
             {
                 var id = BitConverter.ToInt16(request, 0);
-                m_Log.Info(string.Format("Request {0}/{1} to {2}", command, id, conversationId));
+                m_Log.Debug(string.Format("Request {0}/{1} to {2}", command, id, conversationId));
             }
             else
             {
-                m_Log.Info(string.Format("Request {0} to {1}", command, conversationId));
+                m_Log.Debug(string.Format("Request {0} to {1}", command, conversationId));
             }
             do
             {
@@ -479,7 +484,7 @@ namespace TQC.USBDevice
                         }
                         else
                         {
-                            m_Log.Info("Known COM exception in Request", newException);
+                            m_Log.Debug("Known COM exception in Request", newException);
                             throw newException;
                         }
                     }

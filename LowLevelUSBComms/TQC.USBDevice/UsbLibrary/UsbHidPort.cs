@@ -21,7 +21,7 @@ namespace UsbLibrary
         private int                             vendor_id;
         private Guid                            device_class;
         private IntPtr                          usb_event_handle;
-        private SpecifiedDevice                 specified_device;
+        private SpecifiedDevice                 m_specified_device;
         private IntPtr                          handle;
         //events
         /// <summary>
@@ -80,7 +80,7 @@ namespace UsbLibrary
             //initializing in initial state
             product_id = 0;
             vendor_id = 0;
-            specified_device = null;
+            m_specified_device = null;
             device_class = Win32Usb.HIDGuid;
 
             InitializeComponent();
@@ -91,7 +91,7 @@ namespace UsbLibrary
             //initializing in initial state
             product_id = 0;
             vendor_id = 0;
-            specified_device = null;
+            m_specified_device = null;
             device_class = Win32Usb.HIDGuid;
 
             container.Add(this);
@@ -128,7 +128,7 @@ namespace UsbLibrary
         [Category("Embedded Details")]
         public SpecifiedDevice SpecifiedDevice
         {
-            get { return this.specified_device; }
+            get { return this.m_specified_device; }
         }
 
         /// <summary>
@@ -147,6 +147,7 @@ namespace UsbLibrary
         public void RegisterHandle(IntPtr Handle){
             usb_event_handle = Win32Usb.RegisterForUsbEvents(Handle, device_class);
             this.handle = Handle;
+            s_Log.WarnFormat("Registry Windows Handle");
             //Check if the device is already present.
             CheckDevicePresent();
         }
@@ -186,6 +187,7 @@ namespace UsbLibrary
                 switch (m.WParam.ToInt32())	// Check the W parameter to see if a device was inserted or removed
                 {
                     case Win32Usb.DEVICE_ARRIVAL:	// inserted
+                        s_Log.WarnFormat("ParseMessages  Arrival");
                         if (OnDeviceArrived != null)
                         {
                             OnDeviceArrived(this, new EventArgs());                            
@@ -193,6 +195,7 @@ namespace UsbLibrary
                         CheckDevicePresent();
                         break;
                     case Win32Usb.DEVICE_REMOVECOMPLETE:	// removed
+                        s_Log.WarnFormat("ParseMessages  Removed");
                         if (OnDeviceRemoved != null)
                         {
                             OnDeviceRemoved(this, new EventArgs());                            
@@ -213,18 +216,24 @@ namespace UsbLibrary
             {
                 //Mind if the specified device existed before.
                 bool history = false;
-                if(specified_device != null ){
+                if(m_specified_device != null )
+                {
                     history = true;
+                    s_Log.InfoFormat("Destroy existing device");
+                    m_specified_device.DataRecieved -= new DataRecievedEventHandler(OnDataRecieved);
+                    m_specified_device.DataSend += new DataSendEventHandler(OnDataSend);
+                    m_specified_device.Dispose();
+                    m_specified_device = null;
                 }
-
-                specified_device = SpecifiedDevice.FindSpecifiedDevice(this.vendor_id, this.product_id);	// look for the device on the USB bus
-                if (specified_device != null)	// did we find it?
+                s_Log.InfoFormat("CheckDevicePresent {0}", history);
+                m_specified_device = SpecifiedDevice.FindSpecifiedDevice(this.vendor_id, this.product_id);	// look for the device on the USB bus
+                if (m_specified_device != null)	// did we find it?
                 {
                     if (OnSpecifiedDeviceArrived != null)
                     {
                         this.OnSpecifiedDeviceArrived(this, new EventArgs());
-                        specified_device.DataRecieved += new DataRecievedEventHandler(OnDataRecieved);
-                        specified_device.DataSend += new DataSendEventHandler(OnDataSend);
+                        m_specified_device.DataRecieved += new DataRecievedEventHandler(OnDataRecieved);
+                        m_specified_device.DataSend += new DataSendEventHandler(OnDataSend);
                     }
                 }
                 else
