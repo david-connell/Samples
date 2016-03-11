@@ -82,7 +82,10 @@ namespace TQC.USBDevice
 
         public void OnWindowsMessage(ref System.Windows.Forms.Message m)
         {
-            m_UsbCommunications.OnWindowsMessage(ref m);
+            if (!m_bUseTQCCommunications)
+            {
+                m_UsbCommunications.OnWindowsMessage(ref m);
+            }
         }
 
 
@@ -96,9 +99,12 @@ namespace TQC.USBDevice
             }
         }
 
-        internal void CheckDevicePresent()
+        public void CheckDevicePresent()
         {
-            m_UsbCommunications.CheckDevicePresent();
+            if (!m_bUseTQCCommunications)
+            {
+                m_UsbCommunications.CheckDevicePresent();
+            }
         }
 
         virtual protected void ClearCachedData()

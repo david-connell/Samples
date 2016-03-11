@@ -213,11 +213,16 @@ namespace TQC.USBDevice
             Buffer.BlockCopy(inputData, offset, buffer, 0, buffer.Length);
             return Crc32.Calculate(buffer);
         }
-        bool m_IssueCheckDevice = false;
+        
         internal void CheckDevicePresent()
         {
-            m_IssueCheckDevice = true;            
+            lock (m_UsbHidPort1)
+            {
+                m_Log.WarnFormat("User code has requested checking for device!");
+                m_UsbHidPort1.CheckDevicePresent();
+            }
         }
+
         public byte[] IssueRequest(TQC.USBDevice.USBLogger.Commands command, byte[] request, byte conversationId)
         {
             byte[] dataRecieved;
@@ -229,11 +234,6 @@ namespace TQC.USBDevice
                     m_Event.Reset();
                     if (m_IsConnected)
                     {
-                        if (m_IssueCheckDevice)
-                        {
-                            m_IssueCheckDevice = false;
-                            m_UsbHidPort1.CheckDevicePresent();
-                        }
 
                         if (!m_UsbHidPort1.SpecifiedDevice.SendData(GenerateRequest(command, request, conversationId)))
                         {
@@ -244,7 +244,6 @@ namespace TQC.USBDevice
                         {
                             if (!m_Event.WaitOne(GetTimeOutForCommand(command)))
                             {
-                                m_UsbHidPort1.CheckDevicePresent();
                                 throw new ResponsePacketErrorTimeoutException();
                             }
                         }
