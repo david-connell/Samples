@@ -1078,7 +1078,11 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                 string line = textLine.Replace("\n", "");
                 if (line.Length > 0)
                 {
-                    if (line[0] == '#')
+                    if (line[0] == ';')
+                    {
+                        //comment
+                    }
+                    else if (line[0] == '#')
                     {
                         Logger = UsbCommandRequest.ConvertTextToDotNetName(line.Substring(1));
                     }
