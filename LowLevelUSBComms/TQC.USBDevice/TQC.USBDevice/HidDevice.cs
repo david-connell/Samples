@@ -195,6 +195,12 @@ namespace TQC.USBDevice
 
         /// <summary>Windows message sent when a device is inserted or removed</summary>
 
+        /// <summary>CreateFile : file share for write</summary>
+        protected const uint FILE_SHARE_WRITE = 0x2;
+        /// <summary>CreateFile : file share for read</summary>
+        protected const uint FILE_SHARE_READ = 0x1;
+
+
         public const int WM_DEVICECHANGE = 0x0219;
 
         /// <summary>WParam for above : A device was inserted</summary>
@@ -859,7 +865,7 @@ namespace TQC.USBDevice
             // Create the file from the device path
 
             //m_hHandle = CreateFile(path, GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, IntPtr.Zero);
-            m_hHandle = CreateFile(path, 0, 3, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
+            m_hHandle = CreateFile(path, 0, FILE_SHARE_WRITE | FILE_SHARE_READ, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
 
             Path = path;
 
@@ -875,7 +881,7 @@ namespace TQC.USBDevice
                 InitializeCapabilities();
 
                 CloseHandle(m_hHandle);
-                m_hHandle = IntPtr.Zero;
+                m_hHandle = InvalidHandleValue;
 
                 //m_File = new FileStream(
 
@@ -894,7 +900,7 @@ namespace TQC.USBDevice
             else    // File open failed? Chuck an exception
             {
 
-                m_hHandle = IntPtr.Zero;
+                m_hHandle = InvalidHandleValue;
 
                 // throw HidDeviceException.GenerateWithWinError("Failed to create device file");
 
@@ -982,10 +988,12 @@ namespace TQC.USBDevice
         {
             Glossmeter = 0x1b4cFF00,
             USB_PRODUCT2 = 0x15CD0011,
-            USB_CURVEX_3 = 0x2047FFFE,
-            USB_CURVEX_3a = 0x20470827,
+            USB_CURVEX_3 = 0x2047FFFE,//orignal
+            USB_CURVEX_3a = 0x20470827,//current
             GRADIENT_OVEN = 0x04037B60,
             USB_THERMOCOUPLE_SIMULATOR = 0x20470828,
+            USB_THERMOCOUPLE_SIMULATORa = 0x204709FC,
+
 
         }
 
@@ -1202,10 +1210,11 @@ namespace TQC.USBDevice
 
             }
 
-            if (m_hHandle != IntPtr.Zero)   // Dispose and finalize, get rid of unmanaged resources
+            if (m_hHandle != InvalidHandleValue)   // Dispose and finalize, get rid of unmanaged resources
             {
 
                 CloseHandle(m_hHandle);
+                m_hHandle = InvalidHandleValue;
 
             }
 

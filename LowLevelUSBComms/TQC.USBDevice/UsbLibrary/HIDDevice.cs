@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using log4net;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace UsbLibrary
 {
@@ -41,7 +42,7 @@ namespace UsbLibrary
 		/// <summary>Length if output report : device gives us this</summary>
 		private int m_nOutputReportLength;
 		/// <summary>Handle to the device</summary>
-		private IntPtr m_hHandle;
+		private IntPtr m_hHandle = InvalidHandleValue;
 		/// <summary>
 		/// Dispose method
 		/// </summary>
@@ -101,7 +102,8 @@ namespace UsbLibrary
             }
 
 			// Create the file from the device path
-            m_hHandle = CreateFile(strPath, GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, IntPtr.Zero);
+            //m_hHandle = CreateFile(strPath, GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, IntPtr.Zero);
+            m_hHandle = CreateFile(strPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, IntPtr.Zero);
 
             if ( m_hHandle != InvalidHandleValue && m_hHandle != null)	// if the open worked...
 			{
@@ -209,7 +211,26 @@ namespace UsbLibrary
                 {
                     return false;
                 }
+                //bool hasCompleted = false;
+                //m_oFile.BeginWrite(oOutRep.Buffer, 0, oOutRep.BufferLength, ar =>
+                //    {
+                //        FileStream _fs = (FileStream)ar.AsyncState;
+                //        _fs.EndWrite(ar);
+                //        hasCompleted = true;
+                //    }, m_oFile);
+
+                //DateTime timeToWait = DateTime.Now.AddMilliseconds(1000);
+                //while (DateTime.Now < timeToWait && !hasCompleted)
+                //{
+                //    Thread.Sleep(1);
+                //}
+                //if (!hasCompleted)
+                //{
+                //    throw new IOException("Failed to complete < 100ms");
+                //}
+                
                 m_oFile.Write(oOutRep.Buffer, 0, oOutRep.BufferLength);
+                //Console.WriteLine("Yes");
                 sentData = true;
             }
             catch (IOException ex)
