@@ -15,6 +15,7 @@ namespace TQC.USBDevice
         public string FullName { get; set; }
         public string FriendlyName { get; set; }
         private bool m_IsOk;
+        public int PidVid { get; set; }
 
         public SerialOrUsbPort(string deviceName, string fullName, string niceName, int usbPort)
         {
@@ -23,6 +24,15 @@ namespace TQC.USBDevice
             DeviceName = deviceName;
             FullName = fullName;
             FriendlyName = niceName;
+            PidVid = usbPort;
+        }
+        public override string ToString()
+        {
+            return string.Format("{0} 0x{1:x8}", FriendlyName, PidVid );
+        }
+        public string ToFullString()
+        {
+            return string.Format("{0} {1}", FriendlyName, FullName);
         }
     }
 
@@ -55,7 +65,9 @@ namespace TQC.USBDevice
                 new USBDevice(HidDevice.USBProductId.Glossmeter, "GlossMeter"),
                 new USBDevice(HidDevice.USBProductId.USB_PRODUCT2, "GlossMeter2"),
                 new USBDevice(HidDevice.USBProductId.USB_CURVEX_3, "CurveX 3 (Old)"),
-                new USBDevice(HidDevice.USBProductId.USB_CURVEX_3a, "CurveX 3"),                
+                new USBDevice(HidDevice.USBProductId.USB_CURVEX_3a, "CurveX 3"),
+                new USBDevice(HidDevice.USBProductId.GRADIENT_OVEN, "GRADIENT_OVEN"),
+                new USBDevice(HidDevice.USBProductId.USB_THERMOCOUPLE_SIMULATOR, "USB_THERMOCOUPLE_SIMULATOR"),
             };
 
             var devices = new List<SerialOrUsbPort>();
@@ -72,7 +84,6 @@ namespace TQC.USBDevice
                         dev.Path,
                         dev.Product,
                         (int)item.VID_PID));
-
                         dev.Dispose();
 
                     }
