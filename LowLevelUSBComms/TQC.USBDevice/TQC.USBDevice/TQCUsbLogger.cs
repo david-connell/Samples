@@ -715,6 +715,7 @@ namespace TQC.USBDevice
             var cachedData = GetData(deviceId);
             int totalNumberOfProbes = cachedData.NumberOfProbes;
             int maxNumberOfSets = 1; // (int)(totalNumberOfProbes / 8 + 0.999);
+            bool isGro = false;
             for (int setId = 1; setId <= maxNumberOfSets; setId++)
             {
                 byte mode = 0x05;
@@ -724,6 +725,9 @@ namespace TQC.USBDevice
                     case DeviceType.DuoGlossmeter:
                     case DeviceType.SoloGlossmeter:
                         mode = 0x01;
+                        break;
+                    case USBDevice.DeviceType.GRO:
+                        isGro = true;
                         break;
                     case USBDevice.DeviceType.ThermocoupleSimulator:
                         throw new NotSupportedException("Thermocouple simultator cannot read temperatures");
@@ -735,11 +739,21 @@ namespace TQC.USBDevice
                 {
                     const int lengthOfData = 2;
                     const int startOffset = 6;
+                    double valueAsDouble;
+                    double valueCached = 0;
 
                     for (int i = 0; i < (result.Length - startOffset) / lengthOfData; i++)
                     {
                         Int16 value = BitConverter.ToInt16(result, startOffset + i * lengthOfData);
-                        data.Add((double)value / 10.0);
+                        valueAsDouble = (double)value / 10.0;
+                        //This is a horrible hack!
+                        //Must Remove
+                        if (isGro && valueAsDouble > 349.0)
+                        {
+                            valueAsDouble = valueCached;
+                        }
+                        data.Add(valueAsDouble);
+                        valueCached = valueAsDouble;
                     }
                 }
             }
