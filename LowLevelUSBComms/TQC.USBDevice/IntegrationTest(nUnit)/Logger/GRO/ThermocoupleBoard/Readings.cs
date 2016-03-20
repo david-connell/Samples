@@ -9,6 +9,9 @@ using TQC.USBDevice;
 namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
 {
     [TestFixture((byte)1)]
+    [TestFixture((byte)2)]
+    [TestFixture((byte)3)]
+    [TestFixture((byte)4)]
     class Readings
     {
 
