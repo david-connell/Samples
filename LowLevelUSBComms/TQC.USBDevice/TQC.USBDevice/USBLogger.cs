@@ -58,10 +58,13 @@ namespace TQC.USBDevice
         {
             Configuration config = new Configuration();
             m_Handle = InvalidHandle;
-            m_Logger = new USBGeneric();
+            
             m_UsbCommunications = new USBCommunication(mainWinForm, this);
             m_bUseTQCCommunications = config.UseNativeCommunication;
-
+            if (m_bUseTQCCommunications)
+            {
+                m_Logger = new USBGeneric();
+            }
             m_Log.Info(m_bUseTQCCommunications ?
                 "Using COM wrapper to speak to device" :
                 "Using .NET wrapper to speak to device");
