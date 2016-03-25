@@ -6,6 +6,9 @@ using Microsoft.Win32.SafeHandles;
 using log4net;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows.Forms;
+using System.Security.Permissions;
+using System.Runtime.ConstrainedExecution;
 
 namespace UsbLibrary
 {
@@ -17,9 +20,15 @@ namespace UsbLibrary
     {
         public HIDDeviceException(string strMessage) : base(strMessage) { }
 
+        public HIDDeviceException(string strMessage, Exception ex) : base(strMessage, ex) { }
+
         public static HIDDeviceException GenerateWithWinError(string strMessage)
         {
             return new HIDDeviceException(string.Format("Msg:{0} WinEr:{1:X8}", strMessage, Marshal.GetLastWin32Error()));
+        }
+        public static HIDDeviceException GenerateWithWinError(string strMessage, Exception ex)
+        {
+            return new HIDDeviceException(string.Format("Msg:{0} WinEr:{1:X8}", strMessage, Marshal.GetLastWin32Error()), ex);
         }
 
         public static HIDDeviceException GenerateError(string strMessage)
@@ -28,6 +37,8 @@ namespace UsbLibrary
         }
     }
 	#endregion
+  
+
 	/// <summary>
 	/// Abstract HID device : Derive your new device controller class from this
 	/// </summary>
@@ -42,7 +53,8 @@ namespace UsbLibrary
 		/// <summary>Length if output report : device gives us this</summary>
 		private int m_nOutputReportLength;
 		/// <summary>Handle to the device</summary>
-		private IntPtr m_hHandle = InvalidHandleValue;
+        private SafeFileHandle m_hHandle;
+
 		/// <summary>
 		/// Dispose method
 		/// </summary>
@@ -65,19 +77,19 @@ namespace UsbLibrary
                     {
                         m_oFile.Close();
                         m_oFile = null;
-                        m_hHandle = InvalidHandleValue;
+                        m_hHandle = null ;
                     }
                 }
-                if (m_hHandle != InvalidHandleValue)	// Dispose and finalize, get rid of unmanaged resources
+                if (m_hHandle != null && !m_hHandle.IsInvalid)
                 {
-                    CloseHandle(m_hHandle);
-                    m_hHandle = InvalidHandleValue;
+                    m_hHandle.Close();
                 }
+                m_hHandle = null;
 
             }
             catch (Exception ex)
             {
-                s_Log.Info("Dispose", ex);                
+                s_Log.Info("Dispose", ex);
             }
         }
 
@@ -93,22 +105,23 @@ namespace UsbLibrary
             {
                 m_oFile.Close();
                 m_oFile = null;
-                m_hHandle = InvalidHandleValue;
+                m_hHandle = null;
             }
-            if (m_hHandle != InvalidHandleValue)
+            if (m_hHandle != null && !m_hHandle.IsInvalid)
             {
-                CloseHandle(m_hHandle);
-                m_hHandle = InvalidHandleValue;
+                m_hHandle.Close();
+                m_hHandle = null;
             }
+            
+            s_Log.WarnFormat("Open {0}", strPath);
 
-			// Create the file from the device path
             //m_hHandle = CreateFile(strPath, GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, IntPtr.Zero);
             m_hHandle = CreateFile(strPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, IntPtr.Zero);
 
-            if ( m_hHandle != InvalidHandleValue && m_hHandle != null)	// if the open worked...
+            if (!m_hHandle.IsInvalid)	// if the open worked...
 			{
 				IntPtr lpData;
-				if (HidD_GetPreparsedData(m_hHandle, out lpData))	// get windows to read the device data into an internal buffer
+                if (HidD_GetPreparsedData(m_hHandle.DangerousGetHandle(), out lpData))	// get windows to read the device data into an internal buffer
 				{
                     try
                     {
@@ -117,13 +130,14 @@ namespace UsbLibrary
                         m_nInputReportLength = oCaps.InputReportByteLength;	// get the input...
                         m_nOutputReportLength = oCaps.OutputReportByteLength;	// ... and output report lengths
 
-                        m_oFile = new FileStream(m_hHandle, FileAccess.Read | FileAccess.Write, true, m_nInputReportLength, true);
+                        m_oFile = new FileStream(m_hHandle, FileAccess.Read | FileAccess.Write, m_nInputReportLength, true);
+                        //m_oFile = new FileStream(m_hHandle.DangerousGetHandle(), FileAccess.Read | FileAccess.Write, true, m_nInputReportLength, true);
 
                         BeginAsyncRead();	// kick off the first asynchronous read                              
                     }
                     catch (Exception ex)
                     {
-                        throw HIDDeviceException.GenerateWithWinError("Failed to get the detailed data from the hid.");
+                        throw HIDDeviceException.GenerateWithWinError("Failed to get the detailed data from the hid.", ex);
                     }
 					finally
 					{
@@ -137,7 +151,6 @@ namespace UsbLibrary
 			}
 			else	// File open failed? Chuck an exception
 			{
-                m_hHandle = InvalidHandleValue;
 				throw HIDDeviceException.GenerateWithWinError("Failed to create device file");
 			}
 		}
@@ -179,7 +192,7 @@ namespace UsbLibrary
                     BeginAsyncRead();	// when all that is done, kick off another read for the next report
                 }
             }
-            catch (IOException ex)	// if we got an IO exception, the device was removed
+            catch (IOException )	// if we got an IO exception, the device was removed
             {
                 HandleDeviceRemoved();
                 if (OnDeviceRemoved != null)
@@ -211,36 +224,31 @@ namespace UsbLibrary
                 {
                     return false;
                 }
-                //bool hasCompleted = false;
-                //m_oFile.BeginWrite(oOutRep.Buffer, 0, oOutRep.BufferLength, ar =>
-                //    {
-                //        FileStream _fs = (FileStream)ar.AsyncState;
-                //        _fs.EndWrite(ar);
-                //        hasCompleted = true;
-                //    }, m_oFile);
-
-                //DateTime timeToWait = DateTime.Now.AddMilliseconds(1000);
-                //while (DateTime.Now < timeToWait && !hasCompleted)
-                //{
-                //    Thread.Sleep(1);
-                //}
-                //if (!hasCompleted)
-                //{
-                //    throw new IOException("Failed to complete < 100ms");
-                //}
+                ManualResetEvent manualEvent = new ManualResetEvent(false);
                 
-                m_oFile.Write(oOutRep.Buffer, 0, oOutRep.BufferLength);
-                //Console.WriteLine("Yes");
+                m_oFile.BeginWrite(oOutRep.Buffer, 0, oOutRep.BufferLength, ar =>
+                    {
+                        FileStream _fs = (FileStream)ar.AsyncState;
+                        _fs.Flush();
+                        _fs.EndWrite(ar);
+                        manualEvent.Set();
+                    }, m_oFile);
+
+                if (!manualEvent.WaitOne(1000, false))
+                {
+                    throw new IOException("Failed to complete < 1000ms");
+                }
+                //m_oFile.Write(oOutRep.Buffer, 0, oOutRep.BufferLength);
                 sentData = true;
             }
             catch (IOException ex)
             {
                 s_Log.Info("Write IOException", ex);
-                throw new HIDDeviceException("Probably the device was removed, or an invalid report ID was used...");
+                throw new HIDDeviceException("Probably the device was removed, or an invalid report ID was used");
             }
 			catch(Exception exx)
 			{
-                s_Log.Info("Write general exception", exx);                
+                s_Log.Info("Write general exception", exx);
 			}
             return sentData;
         }

@@ -216,15 +216,7 @@ namespace UsbLibrary
             {
                 //Mind if the specified device existed before.
                 bool history = false;
-                if(m_specified_device != null )
-                {
-                    history = true;
-                    s_Log.InfoFormat("Destroy existing device");
-                    m_specified_device.DataRecieved -= new DataRecievedEventHandler(OnDataRecieved);
-                    m_specified_device.DataSend += new DataSendEventHandler(OnDataSend);
-                    m_specified_device.Dispose();
-                    m_specified_device = null;
-                }
+                history = Close();
                 s_Log.InfoFormat("CheckDevicePresent {0}", history);
                 m_specified_device = SpecifiedDevice.FindSpecifiedDevice(this.vendor_id, this.product_id);	// look for the device on the USB bus
                 if (m_specified_device != null)	// did we find it?
@@ -250,6 +242,21 @@ namespace UsbLibrary
             }
         }
 
+        public bool Close()
+        {
+            bool history = false;
+            if (m_specified_device != null)
+            {
+                history = true;
+                s_Log.InfoFormat("Destroy existing device");
+                m_specified_device.DataRecieved -= new DataRecievedEventHandler(OnDataRecieved);
+                m_specified_device.DataSend -= new DataSendEventHandler(OnDataSend);
+                m_specified_device.Dispose();
+                m_specified_device = null;
+            }
+            return history;
+        }
+
         private void DataRecieved(object sender, DataRecievedEventArgs args)
         {
             if(this.OnDataRecieved != null){
@@ -264,6 +271,7 @@ namespace UsbLibrary
                 this.OnDataSend(sender, args);
             }
         }
-    
+
+
     }
 }

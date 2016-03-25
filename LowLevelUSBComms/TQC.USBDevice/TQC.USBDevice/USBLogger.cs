@@ -34,6 +34,7 @@ namespace TQC.USBDevice
     {
         const int InvalidHandle = -1;
         int m_Handle;
+        bool m_HasBeenDisposed = false;
         
         private ILog m_Log = LogManager.GetLogger("TQC.USBDevice.USBLogger");
 
@@ -636,8 +637,16 @@ namespace TQC.USBDevice
             Dispose(true);
         }
 
+        public bool HasBeenDisposed
+        {
+            get
+            {
+                return m_HasBeenDisposed;
+            }
+        }
         private void Dispose(bool inDispose)
         {
+            m_HasBeenDisposed = true;
             if (inDispose)
             {
                 Close();

@@ -1,6 +1,9 @@
 using System;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Security.Permissions;
+using Microsoft.Win32.SafeHandles;
+using System.Runtime.ConstrainedExecution;
 
 namespace UsbLibrary
 {
@@ -9,6 +12,34 @@ namespace UsbLibrary
 	/// </summary>
     public class Win32Usb
     {
+        //[SecurityPermission(SecurityAction.InheritanceDemand, UnmanagedCode = true)]
+        //[SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
+        //protected class MySafeFileHandle : SafeFileHandle
+        //{
+        //    // Create a SafeHandle, informing the base class
+        //    // that this SafeHandle instance "owns" the handle,
+        //    // and therefore SafeHandle should call
+        //    // our ReleaseHandle method when the SafeHandle
+        //    // is no longer in use.
+        //    private MySafeFileHandle()
+        //        : base(true)
+        //    {
+        //    }
+        //    [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+        //    override protected bool ReleaseHandle()
+        //    {
+
+        //        // Here, we must obey all rules for constrained execution regions.
+        //        return HIDDevice.CloseHandle(handle) != 0;
+        //        // If ReleaseHandle failed, it can be reported via the
+        //        // "releaseHandleFailed" managed debugging assistant (MDA).  This
+        //        // MDA is disabled by default, but can be enabled in a debugger
+        //        // or during testing to diagnose handle corruption problems.
+        //        // We do not throw an exception because most code could not recover
+        //        // from the problem.
+        //    }
+        //}
+
         #region Structures
         /// <summary>
         /// An overlapped structure used for overlapped IO operations. The structure is
@@ -235,7 +266,8 @@ namespace UsbLibrary
 		/// <param name="nAttributes">Any extra attributes? e.g. open overlapped</param>
 		/// <param name="lpTemplate">Not used</param>
 		/// <returns></returns>
-		[DllImport("kernel32.dll", SetLastError = true)] protected static extern IntPtr CreateFile([MarshalAs(UnmanagedType.LPStr)] string strName, uint nAccess, uint nShareMode, IntPtr lpSecurity, uint nCreationFlags, uint nAttributes, IntPtr lpTemplate);
+		[DllImport("kernel32.dll", SetLastError = true)] protected static extern
+            SafeFileHandle CreateFile([MarshalAs(UnmanagedType.LPStr)] string strName, uint nAccess, uint nShareMode, IntPtr lpSecurity, uint nCreationFlags, uint nAttributes, IntPtr lpTemplate);
 		/// <summary>
 		/// Closes a window handle. File handles, event handles, mutex handles... etc
 		/// </summary>

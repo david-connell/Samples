@@ -225,7 +225,7 @@ namespace TQC.USBDevice
 
         public byte[] IssueRequest(TQC.USBDevice.USBLogger.Commands command, byte[] request, byte conversationId)
         {
-            byte[] dataRecieved;
+            byte[] dataRecieved = null;
             lock (m_UsbHidPort1)
             {
                 if (m_UsbHidPort1.SpecifiedDevice != null)
@@ -238,7 +238,8 @@ namespace TQC.USBDevice
                         if (!m_UsbHidPort1.SpecifiedDevice.SendData(GenerateRequest(command, request, conversationId)))
                         {
                             m_UsbHidPort1.CheckDevicePresent();
-                            
+                            m_Data = null;
+                            throw new ResponsePacketErrorTimeoutException();
                         }
                         else
                         {
@@ -383,8 +384,8 @@ namespace TQC.USBDevice
                 time2Wait = new TimeSpan(0, 0, 0, 2, 0);
             }
             else if (m_UsbLogger.IsGRO)
-            {                
-                time2Wait = new TimeSpan(0, 0, 0, 0, m_Configuration.GROTimeoutInMilliseconds);
+            {
+                time2Wait = new TimeSpan(0, 0, 0, 0, 2*m_Configuration.GROTimeoutInMilliseconds);
             }
             return time2Wait;
         }
@@ -393,12 +394,9 @@ namespace TQC.USBDevice
         {
             if (m_UsbHidPort1 != null)
             {
-                if (m_UsbHidPort1.SpecifiedDevice != null)
-                {
-                    m_UsbHidPort1.SpecifiedDevice.Dispose();
-                }
-                m_UsbHidPort1 = null;
+                m_UsbHidPort1.Close();
             }
+            
         }
 
         public bool Open(TQC.USBDevice.USBLogger.USBProductId id, bool minimumCommunications, string portName = "")
@@ -428,6 +426,7 @@ namespace TQC.USBDevice
                 if (m_UsbHidPort1 != null)
                 {
                     m_UsbHidPort1.UnregisterHandle();
+                    m_UsbHidPort1 = null;
                 }
                 GC.SuppressFinalize(this);
             }
