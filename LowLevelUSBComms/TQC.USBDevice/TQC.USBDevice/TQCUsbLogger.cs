@@ -572,7 +572,7 @@ namespace TQC.USBDevice
             }
         }
 
-        internal virtual DateTime _Calibration(byte deviceId)
+        internal override DateTime _Calibration(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 0);
             return ResultToDateTime("Calibration Date", result, 0);
