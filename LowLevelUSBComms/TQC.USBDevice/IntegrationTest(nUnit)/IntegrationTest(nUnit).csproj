@@ -70,7 +70,9 @@
     <Compile Include="CodeInfrastructure\CarrierPositionTests.cs" />
     <Compile Include="CodeInfrastructure\PercentageTests.cs" />
     <Compile Include="CodeInfrastructure\SpeedTests.cs" />
-    <Compile Include="Logger\GeneralLogger\BasicCommands.cs" />
+    <Compile Include="Logger\GeneralLogger\BasicCommands.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Logger\GlossMeter\Basic.cs" />
     <Compile Include="Logger\GRO\MotherBoard\Basic.cs" />
     <Compile Include="Logger\GRO\MotherBoard\General.cs" />

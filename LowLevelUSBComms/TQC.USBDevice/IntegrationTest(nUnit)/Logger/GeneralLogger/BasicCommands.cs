@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using NUnit.Framework;
 using TQC.USBDevice;
 using TQC.USBDevice.GlossMeter;
@@ -13,14 +14,57 @@ using TQC.USBDevice.GradientOven;
 
 namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
+        public class MyForm : Form, IUsbInterfaceForm
+        {
+            public USBLogger m_Logger = null;
+            protected override void WndProc(ref Message m)
+            {
+                if (m_Logger != null && !m_Logger.HasBeenDisposed)
+                {
+                    m_Logger.OnWindowsMessage(ref m);
+                }
+                base.WndProc(ref m);
+            }
+        }
+
         public abstract class BasicCommands
         {            
             protected USBLogger.USBProductId ProductId ;
+            MyForm m_MyForm;
 
             public BasicCommands(USBLogger.USBProductId product)
             {
                 ProductId = product;
             }
+            [TestFixtureSetUp]
+            public void Setup()
+            {
+                m_MyForm = null;
+
+                // The dispatcher thread
+                var t = new Thread(() =>
+                {
+                    m_MyForm = new MyForm();
+
+                    // Initiates the dispatcher thread shutdown when the window closes
+                    //m_MyForm.Closed += (s, e) => m_MyForm.InvokeShutdown();
+                    
+                    m_MyForm.ShowDialog();
+
+                    // Makes the thread support message pumping
+                    //System.Windows.Threading.Dispatcher.Run();
+                });
+
+                // Configure the thread
+                t.SetApartmentState(ApartmentState.STA);
+                t.Start();
+            }
+            [TestFixtureTearDown]
+            public void TearDown()
+            {
+                m_MyForm.Close();
+            }
+
 
             [Test]
             public void __TestAssemblyVersioning()
@@ -44,7 +88,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [Test]
             public void TestVersioning()
             {
-                using (var logger = new USBLogger(null))
+                using (var logger = new USBLogger(m_MyForm))
                 {
                     var version = logger.COMObjectVersion;
                     Assert.That(version, Is.GreaterThan(new Version(1, 0)));
@@ -54,9 +98,10 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
 
             protected virtual TQCUsbLogger OpenLogger(bool miniumum = true)
             {
-                var logger = new TQCUsbLogger(null);
+                var logger = new TQCUsbLogger(m_MyForm);
                 if (logger.Open(ProductId, miniumum))
                 {
+                    m_MyForm.m_Logger = logger;
                     return logger;
                 }
                 throw new Exception("Failed to connect to logger " + ProductId.ToString());

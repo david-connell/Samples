@@ -13,6 +13,7 @@ namespace IntegrationTestNUnit
         [SetUp]
         public void RunBeforeAnyTests()
         {
+            Console.WriteLine("Config Log4Net");
             log4net.Config.XmlConfigurator.Configure();
         }
 
