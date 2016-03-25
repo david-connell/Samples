@@ -229,8 +229,15 @@ namespace UsbLibrary
                 m_oFile.BeginWrite(oOutRep.Buffer, 0, oOutRep.BufferLength, ar =>
                     {
                         FileStream _fs = (FileStream)ar.AsyncState;
-                        _fs.Flush();
-                        _fs.EndWrite(ar);
+                        try
+                        {
+                            _fs.Flush();
+                            _fs.EndWrite(ar);
+                        }
+                        catch (Exception ex)
+                        {
+                            s_Log.Error("Write failure", ex);
+                        }
                         manualEvent.Set();
                     }, m_oFile);
 
