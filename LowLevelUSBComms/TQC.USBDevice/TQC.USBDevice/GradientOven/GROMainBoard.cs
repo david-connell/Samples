@@ -16,7 +16,7 @@ namespace TQC.USBDevice.GradientOven
         private static ILog m_Log = LogManager.GetLogger("TQC.USBDevice.GradientOven");
 
         public GROMainBoard(IUsbInterfaceForm mainWinForm)
-            : base(mainWinForm)
+            : base(mainWinForm, null)
         {
         }
 

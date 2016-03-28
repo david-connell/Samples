@@ -15,6 +15,7 @@ namespace UsbLibrary
     [ToolboxBitmap(typeof(UsbHidPort), "UsbHidBmp.bmp")]
     public partial class UsbHidPort : Component
     {
+
         static ILog s_Log = LogManager.GetLogger("UsbLibrary.UsbHidPort");
         //private memebers
         private int                             product_id;
@@ -23,6 +24,8 @@ namespace UsbLibrary
         private IntPtr                          usb_event_handle;
         private SpecifiedDevice                 m_specified_device;
         private IntPtr                          handle;
+
+        public Type TypeOfDeviceToFind {get;set;}
         //events
         /// <summary>
         /// This event will be triggered when the device you specified is pluged into your usb port on
@@ -75,26 +78,26 @@ namespace UsbLibrary
         [DisplayName("OnDataSend")]
         public event EventHandler               OnDataSend;
 
-        public UsbHidPort()
+        public UsbHidPort() : this(null, null)
         {
-            //initializing in initial state
-            product_id = 0;
-            vendor_id = 0;
-            m_specified_device = null;
-            device_class = Win32Usb.HIDGuid;
-
-            InitializeComponent();
         }
         
-        public UsbHidPort(IContainer container)
+        public UsbHidPort(IContainer container, Type type)
         {
             //initializing in initial state
             product_id = 0;
             vendor_id = 0;
             m_specified_device = null;
             device_class = Win32Usb.HIDGuid;
-
-            container.Add(this);
+            TypeOfDeviceToFind = type;
+            if (type == null)
+            {
+                TypeOfDeviceToFind = typeof(SpecifiedDevice);
+            }
+            if (container != null)
+            {
+                container.Add(this);
+            }
             InitializeComponent();
         }
 
@@ -214,11 +217,9 @@ namespace UsbLibrary
         {
             try
             {
-                //Mind if the specified device existed before.
-                bool history = false;
-                history = Close();
+                bool history =  Close();
                 s_Log.InfoFormat("CheckDevicePresent {0}", history);
-                m_specified_device = SpecifiedDevice.FindSpecifiedDevice(this.vendor_id, this.product_id);	// look for the device on the USB bus
+                m_specified_device = FindDevice();
                 if (m_specified_device != null)	// did we find it?
                 {
                     if (OnSpecifiedDeviceArrived != null)
@@ -240,6 +241,11 @@ namespace UsbLibrary
             {
                 s_Log.Info("CheckDevicePresent", ex);
             }
+        }
+
+        private SpecifiedDevice FindDevice()
+        {
+            return SpecifiedDevice.FindSpecifiedDevice(vendor_id, product_id, TypeOfDeviceToFind);	// look for the device on the USB bus
         }
 
         public bool Close()

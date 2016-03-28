@@ -18,7 +18,7 @@ namespace TQC.USBDevice.GlossMeter
         public bool IsInCraddle { get { return (SpecialStatus & 0x01) == 0x01; } }
 
         public GlossMeterLogger(IUsbInterfaceForm mainWinForm)
-            : base(mainWinForm)
+            : base(mainWinForm, null)
         {
         }
 

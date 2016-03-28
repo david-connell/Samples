@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Text;
 using log4net;
+using System.Threading;
 
 namespace UsbLibrary
 {
@@ -40,9 +41,9 @@ namespace UsbLibrary
             return new SpecifiedInputReport(this);
         }
 
-        public static SpecifiedDevice FindSpecifiedDevice(int vendor_id, int product_id)
+        public static SpecifiedDevice FindSpecifiedDevice(int vendor_id, int product_id, Type typeOfDevice)
         {
-            return (SpecifiedDevice)FindDevice(vendor_id, product_id, typeof(SpecifiedDevice));
+            return (SpecifiedDevice)FindDevice(vendor_id, product_id, typeOfDevice);
         }
 
         protected override void HandleDataReceived(InputReport oInRep)

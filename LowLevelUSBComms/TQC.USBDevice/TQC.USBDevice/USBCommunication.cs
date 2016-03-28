@@ -26,11 +26,11 @@ namespace TQC.USBDevice
         bool m_IsConnected;
         Configuration m_Configuration = new Configuration();
 
-        public USBCommunication(IUsbInterfaceForm mainWindowForm, USBLogger logger)
+        public USBCommunication(IUsbInterfaceForm mainWindowForm, USBLogger logger, Type typeOfDeviceToInject)
         {
             m_IsConnected = true;
             m_UsbLogger = logger;
-            m_UsbHidPort1 = new UsbLibrary.UsbHidPort();
+            m_UsbHidPort1 = new UsbLibrary.UsbHidPort(null, typeOfDeviceToInject);
             m_UsbHidPort1.OnSpecifiedDeviceArrived += m_UsbHidPort1_OnSpecifiedDeviceArrived;
             m_UsbHidPort1.OnDataRecieved += m_UsbHidPort1_OnDataRecieved;
             m_UsbHidPort1.OnSpecifiedDeviceRemoved += m_UsbHidPort1_OnDeviceRemoved;

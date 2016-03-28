@@ -20,8 +20,11 @@ namespace TQC.USBDevice
         Dictionary<byte, CachedData> m_CachedData = new Dictionary<byte, CachedData>();
         private static ILog s_Log = LogManager.GetLogger("TQC.USBDevice.TQCUsbLogger");
 
-        public TQCUsbLogger(IUsbInterfaceForm mainWinForm)
-            : base(mainWinForm)
+        public TQCUsbLogger(IUsbInterfaceForm mainWinForm): this(mainWinForm, null)
+        {
+        }
+        public TQCUsbLogger(IUsbInterfaceForm mainWinForm, Type typeOfHidDeviceToInject)
+            : base(mainWinForm, typeOfHidDeviceToInject)
         {
         }
         private string CommandDescription(Commands command, int commandId)

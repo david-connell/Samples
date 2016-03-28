@@ -98,6 +98,10 @@
       <Project>{bb4fafdc-9176-4050-99ae-89597fb62f27}</Project>
       <Name>TQC.USBDevice</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UsbLibrary\UsbLibrary.csproj">
+      <Project>{71e42a6d-c432-4c03-bf4f-abfd2a3173e0}</Project>
+      <Name>UsbLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt">

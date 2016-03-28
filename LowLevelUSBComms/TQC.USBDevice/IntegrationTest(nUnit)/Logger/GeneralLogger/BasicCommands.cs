@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using log4net;
 using NUnit.Framework;
 using TQC.USBDevice;
 using TQC.USBDevice.GlossMeter;
@@ -405,14 +406,76 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                         
                 }
             }
+            static Exception s_ExceptionCaused;
+            static ManualResetEvent s_ManualEvent;
+            public class TestSpecifiedDevice : UsbLibrary.SpecifiedDevice
+            {
+                static ILog s_Log = LogManager.GetLogger("UsbLibrary.TestSpecifiedDevice");
+                public TestSpecifiedDevice()
+                    : base()
+                {
+                    s_ExceptionCaused = null;
+                }
 
+                protected override void WriteCompleted(IAsyncResult ar)
+                {
+                    WriteCompleteTask task = (WriteCompleteTask)ar.AsyncState;
+                    Thread.Sleep(5000);
+                    try
+                    {
+                        if (task.FileStream != null)
+                        {
+                            task.FileStream.Flush();
+                            task.FileStream.EndWrite(ar);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        s_ExceptionCaused = ex;
+                    }
+                    task.Event.Set();
+                    s_ManualEvent.Set();
+                }
+            }
+
+            protected virtual TQCUsbLogger OpenTestLogger(Type typeOfDevice)
+            {
+                var logger = new TQCUsbLogger(m_MyForm, typeOfDevice);
+                if (logger.Open(ProductId, false))
+                {
+                    m_MyForm.m_Logger = logger;
+                    return logger;
+                }
+                throw new Exception("Failed to connect to logger " + ProductId.ToString());
+            }
+
+
+            [Test]
+            public void TimeOutOnWriteOutCommand()
+            {
+                s_ManualEvent = new ManualResetEvent(false);
+                using (var logger = OpenTestLogger(typeof(TestSpecifiedDevice)))
+                {
+                    DeviceType value = DeviceType.Unknown;
+                    Assert.Throws<TQC.USBDevice.ResponsePacketErrorTimeoutException>(() => value = logger.DeviceType);
+                    logger.Close();
+                    if (!s_ManualEvent.WaitOne(6000, false))
+                    {
+                        Assert.Fail("Failed to wait long enough for exception to be generated");
+                    }
+                    
+                    Assert.That(s_ExceptionCaused, Is.Not.Null, "No exception generated");
+                    Assert.That(s_ExceptionCaused.GetType(), Is.EqualTo(typeof(System.ObjectDisposedException)));
+                }
+
+            }
 
             [Test]
             public void ReadDeviceType()
             {
                 using (var logger = OpenLogger())
                 {
-                    var value = logger.DeviceType;
+                    DeviceType value = logger.DeviceType;
                     switch (ProductId)
                     {
                         case USBLogger.USBProductId.Glossmeter:
@@ -433,7 +496,6 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                         default:
                             throw new Exception(string.Format("Unknown logger type {0} value {1}", ProductId, value));
                     }
-                        
                     Console.WriteLine(value);
                 }
             }
