@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,23 +16,17 @@ using TQC.USBDevice.GradientOven;
 
 namespace IntegrationTestNUnit.Logger.GeneralLogger
 {
-        public class MyForm : Form, IUsbInterfaceForm
-        {
-            public USBLogger m_Logger = null;
-            protected override void WndProc(ref Message m)
-            {
-                if (m_Logger != null && !m_Logger.HasBeenDisposed)
-                {
-                    m_Logger.OnWindowsMessage(ref m);
-                }
-                base.WndProc(ref m);
-            }
-        }
 
+    public enum SpeedTestType
+    {
+        Status,
+        DeviceType,
+        SerialNumber,
+        Name,
+    }
         public abstract class BasicCommands
         {            
             protected USBLogger.USBProductId ProductId ;
-            MyForm m_MyForm;
 
             public BasicCommands(USBLogger.USBProductId product)
             {
@@ -40,30 +35,10 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [TestFixtureSetUp]
             public void Setup()
             {
-                m_MyForm = null;
-
-                // The dispatcher thread
-                var t = new Thread(() =>
-                {
-                    m_MyForm = new MyForm();
-
-                    // Initiates the dispatcher thread shutdown when the window closes
-                    //m_MyForm.Closed += (s, e) => m_MyForm.InvokeShutdown();
-                    
-                    m_MyForm.ShowDialog();
-
-                    // Makes the thread support message pumping
-                    //System.Windows.Threading.Dispatcher.Run();
-                });
-
-                // Configure the thread
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();
             }
             [TestFixtureTearDown]
             public void TearDown()
             {
-                m_MyForm.Close();
             }
 
 
@@ -86,10 +61,85 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                 
             }
 
+
+            [TestCase(5, SpeedTestType.DeviceType, true, 0,0)]
+            [TestCase(5, SpeedTestType.DeviceType, false, 0, 0)]
+            //[TestCase(10, SpeedTestType.DeviceType)]
+            [TestCase(200, SpeedTestType.DeviceType, false, 0, 0)]
+            [TestCase(2000, SpeedTestType.DeviceType, false, 0, 0)]
+            [TestCase(200, SpeedTestType.DeviceType, false, 10, 0)]
+            [TestCase(200, SpeedTestType.DeviceType, false, 5, 5)]
+            [TestCase(200, SpeedTestType.DeviceType, false, 2, 2)]
+            //[TestCase(100, SpeedTestType.Status)]
+            //[TestCase(100, SpeedTestType.Name)]
+            //[TestCase(200, SpeedTestType.Name)]
+            public void GeneralSpeed(int numberOfSeconds, SpeedTestType typeOfTest, bool useNative, int pre, int post)
+            {
+                Configuration config = new Configuration();
+                config.UseNativeCommunication = useNative;
+                config.PreSleepMilliseconds= pre; 
+                config.PostSleepMilliseconds = post;
+                using (var logger = OpenLogger())
+                {
+                    
+                    {
+                        int totalNumberOfMilliseconds = numberOfSeconds * 1000;
+                        var stopWatch = new Stopwatch();
+                        int count = 0;
+                        int exception = 0;
+                        stopWatch.Start();
+                        while (stopWatch.ElapsedMilliseconds < totalNumberOfMilliseconds)
+                        {
+                            try
+                            {
+                                switch (typeOfTest)
+                                {
+                                    case SpeedTestType.DeviceType:
+                                        {
+                                            var type = logger.DeviceType;
+                                        }
+                                        break;
+                                    case SpeedTestType.Name:
+                                        {
+                                            var type = logger.DeviceName;
+                                        }
+                                        break;
+                                    case SpeedTestType.SerialNumber:
+                                        {
+                                            var type = logger.SerialNumber;
+                                        }
+                                        break;
+                                    case SpeedTestType.Status:
+                                        {
+                                            byte buttonStatus;
+                                            int status;
+                                            logger.UserInterfaceStatus(out buttonStatus, out status);
+                                        }
+                                        break;
+                                }
+                                count++;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                exception++;
+                            }
+
+                        }
+                        stopWatch.Stop();
+
+                        Console.WriteLine("Calls Rate = {0} / sec", count / stopWatch.Elapsed.TotalSeconds);
+                        Console.WriteLine("Exception count = {0}", exception);
+                        logger.Close();
+                    }
+                }
+            }
+
+
             [Test]
             public void TestVersioning()
             {
-                using (var logger = new USBLogger(m_MyForm))
+                using (var logger = new USBLogger(null))
                 {
                     var version = logger.COMObjectVersion;
                     Assert.That(version, Is.GreaterThan(new Version(1, 0)));
@@ -99,10 +149,9 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
 
             protected virtual TQCUsbLogger OpenLogger(bool miniumum = true)
             {
-                var logger = new TQCUsbLogger(m_MyForm);
+                var logger = new TQCUsbLogger(null);
                 if (logger.Open(ProductId, miniumum))
                 {
-                    m_MyForm.m_Logger = logger;
                     return logger;
                 }
                 throw new Exception("Failed to connect to logger " + ProductId.ToString());
@@ -440,10 +489,9 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
 
             protected virtual TQCUsbLogger OpenTestLogger(Type typeOfDevice)
             {
-                var logger = new TQCUsbLogger(m_MyForm, typeOfDevice);
+                var logger = new TQCUsbLogger(null, typeOfDevice);
                 if (logger.Open(ProductId, false))
                 {
-                    m_MyForm.m_Logger = logger;
                     return logger;
                 }
                 throw new Exception("Failed to connect to logger " + ProductId.ToString());
