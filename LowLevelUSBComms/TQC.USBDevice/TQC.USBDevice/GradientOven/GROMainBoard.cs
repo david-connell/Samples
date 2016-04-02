@@ -174,7 +174,7 @@ namespace TQC.USBDevice.GradientOven
             get
             {
                 ButtonStatus button = ButtonStatus.NothingPressed;
-                m_Log.InfoFormat("Get Button Status");
+                //m_Log.InfoFormat("Get Button Status");
                 var response = Request(Commands.ReadCurrentProbeVals, BitConverter.GetBytes((short)0x30));
 
                 if (response == null)

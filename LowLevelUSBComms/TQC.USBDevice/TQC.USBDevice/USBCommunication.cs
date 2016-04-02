@@ -14,6 +14,7 @@ namespace TQC.USBDevice
         IntPtr Handle { get; }        
     }
 
+    
     internal class USBCommunication : IDisposable
     {
         private UsbLibrary.UsbHidPort m_UsbHidPort1;
@@ -24,7 +25,7 @@ namespace TQC.USBDevice
         const byte BounceCommand = 0xFF;
         IUsbInterfaceForm m_MainWindowForm;
         bool m_IsConnected;
-        Configuration m_Configuration = new Configuration();
+        CacheConfiguration m_Configuration = new CacheConfiguration();
 
         public USBCommunication(IUsbInterfaceForm mainWindowForm, USBLogger logger, Type typeOfDeviceToInject)
         {
@@ -234,12 +235,11 @@ namespace TQC.USBDevice
                     m_Event.Reset();
                     if (m_IsConnected)
                     {
-
                         if (!m_UsbHidPort1.SpecifiedDevice.SendData(GenerateRequest(command, request, conversationId)))
                         {
                             m_UsbHidPort1.CheckDevicePresent();
                             m_Data = null;
-                            throw new ResponsePacketErrorTimeoutException();
+                            throw new RequestPacketErrorTimeoutException();
                         }
                         else
                         {

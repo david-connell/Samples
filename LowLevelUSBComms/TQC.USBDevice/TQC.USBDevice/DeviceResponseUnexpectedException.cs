@@ -232,6 +232,19 @@ namespace TQC.USBDevice
     }
 
     [Serializable]
+    public class RequestPacketErrorTimeoutException : ResponsePacketErrorTimeoutException 
+    {
+        public RequestPacketErrorTimeoutException()
+            : base()
+        {
+        }
+        protected RequestPacketErrorTimeoutException(
+          SerializationInfo info,
+          StreamingContext context)
+            : base(info, context) { }
+    }
+
+    [Serializable]
     public class UsbDisconnectedException : DeviceResponseUnexpectedException
     {
         public UsbDisconnectedException() : base(USBLogger.USBCommandResponseCode.ResponseUsbDeviceRemoved) { }

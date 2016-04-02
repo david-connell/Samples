@@ -52,6 +52,8 @@ namespace TQC.USBDevice
         private USBGeneric m_Logger;
         private USBCommunication m_UsbCommunications;
         bool m_bUseTQCCommunications;
+        int m_PreSleep;
+        int m_PostSleep;
 
         const string c_COMObjectFileName = "USBGenericLogger.dll";
 
@@ -66,6 +68,9 @@ namespace TQC.USBDevice
             
             m_UsbCommunications = new USBCommunication(mainWinForm, this, typeOfDeviceToInject);
             m_bUseTQCCommunications = config.UseNativeCommunication;
+            m_PreSleep = config.PreSleepMilliseconds;
+            m_PostSleep = config.PostSleepMilliseconds;
+            
             if (m_bUseTQCCommunications)
             {
                 m_Logger = new USBGeneric();
@@ -74,6 +79,8 @@ namespace TQC.USBDevice
                 "Using COM wrapper to speak to device" :
                 "Using .NET wrapper to speak to device");
 
+            m_Log.InfoFormat("Pre sleep {0}", m_PreSleep);
+            m_Log.InfoFormat("Post sleep {0}", m_PostSleep);
             var compatibleVersion = new Version(6, 0, 49, 0);
             if (COMObjectVersion < compatibleVersion)
             {
@@ -469,14 +476,63 @@ namespace TQC.USBDevice
         {
             bool retry;
             int attempts = MAX_RETRY_ATTEMPTS;
-            if (request != null && request.Length >= 2)
+            if (m_Log.IsDebugEnabled)
             {
-                var id = BitConverter.ToInt16(request, 0);
-                m_Log.Debug(string.Format("Request {0}/{1} to {2}", command, id, conversationId));
-            }
-            else
-            {
-                m_Log.Debug(string.Format("Request {0} to {1}", command, conversationId));
+                if (request != null && request.Length >= 2)
+                {
+                    var id = BitConverter.ToInt16(request, 0);
+                    string decoded = "";
+                    switch (command)
+                    {
+                        case Commands.ReadCurrentProbeVals:
+                            switch (id)
+                            {
+                                case 0x30: decoded = "Buttons"; break;
+                                case 100: decoded = "CJ"; break;
+                                case 101: decoded = "Board temp"; break;
+                                case 0x0106: decoded = "CJSet1"; break;
+                                case 0x0105: decoded = "Values"; break;
+                                case 0x0101: decoded = "GLO-Values"; break;
+                            }
+                            break;
+                        case Commands.GROReadCommand:
+                        case Commands.GROSetCommand:
+                            switch (id)
+                            {
+                                case 0: decoded = "ExhaustFan"; break;
+                                case 1: decoded = "Cooling"; break;
+                                case 2: decoded = "Power"; break;
+                                case 4: decoded = "Clamp"; break;
+                                case 5: decoded = "CarrierPosition"; break;
+                                case 6: decoded = "CarrierSpeed"; break;
+                                case 7: decoded = "Lift"; break;
+                                case 8: decoded = "InternalFan"; break;
+                                case 9: decoded = "Status"; break;
+                                case 10: decoded = "MaxTempSetting"; break;
+
+                                default:
+                                    if (id >= 100 && id <= 132)
+                                    {
+                                        decoded = String.Format("Fan {0}", id - 100);
+                                    }
+                                    if (id >= 200 && id <= 232)
+                                    {
+                                        decoded = String.Format("Temp {0}", id - 200);
+                                    }
+                                    if (id >= 300 && id <= 332)
+                                    {
+                                        decoded = String.Format("Temp % {0}", id - 300);
+                                    }
+                                    break;
+                            }
+                            break;
+                    }
+                    m_Log.Debug(string.Format("Request {0}/{1}({2}) to {3}", command, id, decoded, conversationId));
+                }
+                else
+                {
+                    m_Log.Debug(string.Format("Request {0} to {1}", command, conversationId));
+                }
             }
             do
             {
@@ -522,14 +578,28 @@ namespace TQC.USBDevice
 
         private byte[] IssueRequest(Commands command, byte[] request, byte conversationId)
         {
-            if (m_bUseTQCCommunications)
+            byte[] result = null;
+            lock (this)
             {
-                return m_Logger.GenericCommandByHandle(m_Handle, conversationId, (byte)command, request) as byte[];
+                if (m_PreSleep > 0)
+                {
+                    Thread.Sleep(m_PreSleep);
+                }
+                if (m_bUseTQCCommunications)
+                {
+                    result = m_Logger.GenericCommandByHandle(m_Handle, conversationId, (byte)command, request) as byte[];
+                }
+                else
+                {
+                    result = m_UsbCommunications.IssueRequest(command, request, conversationId);
+                }
+                if (m_PostSleep > 0)
+                {
+                    Thread.Sleep(m_PostSleep);
+                }
             }
-            else
-            {
-                return m_UsbCommunications.IssueRequest(command, request, conversationId);
-            }
+            return result;
+            
         }
 
 
