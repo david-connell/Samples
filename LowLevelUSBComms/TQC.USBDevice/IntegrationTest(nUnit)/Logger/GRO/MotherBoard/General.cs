@@ -252,7 +252,7 @@ namespace IntegrationTestNUnit.Logger.GRO
 
                     logger.InternalFanSpeed = val;
                     Thread.Sleep(100);
-                    Assert.That(logger.ExternalFanSpeed, Is.EqualTo(val));
+                    Assert.That(logger.InternalFanSpeed, Is.EqualTo(val));
                 }
                 else
                 {
@@ -371,7 +371,8 @@ namespace IntegrationTestNUnit.Logger.GRO
                     val = val == ClampState.Open ? ClampState.Closed : ClampState.Open;
                     Console.WriteLine("Setting Clamp = {0}", val);
                     logger.Clamp = val;
-                    Thread.Sleep(5000);
+
+                    Thread.Sleep(7000);
                     Assert.That(logger.Clamp, Is.EqualTo(val));
                 }
                 else
