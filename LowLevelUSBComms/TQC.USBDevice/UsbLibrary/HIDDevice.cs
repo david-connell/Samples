@@ -9,6 +9,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Security.Permissions;
 using System.Runtime.ConstrainedExecution;
+using System.Diagnostics;
 
 namespace UsbLibrary
 {
@@ -112,12 +113,7 @@ namespace UsbLibrary
             {
                 if (bDisposing)	// if we are disposing, need to close the managed resources
                 {
-                    if (m_oFile != null)
-                    {
-                        m_oFile.Close();
-                        m_oFile = null;
-                        m_hHandle = null;
-                    }
+                    DisposeFile();
                 }
                 if (m_hHandle != null && !m_hHandle.IsInvalid)
                 {
@@ -132,6 +128,50 @@ namespace UsbLibrary
             }
         }
 
+        private void DisposeFile()
+        {
+            var tempHandle = m_hHandle;
+            var tempFile = m_oFile;
+            m_hHandle = null;
+            m_oFile = null;
+
+            if (tempFile != null)
+            {
+                try
+                {
+                    tempFile.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    s_Log.Error("Temp file dispose", ex);
+                }
+            }
+            if (tempHandle != null && !tempHandle.IsInvalid)
+            {
+                if (!tempHandle.IsClosed)
+                {
+                    try
+                    {
+                        s_Log.Info("Handle Close");
+                        tempHandle.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        s_Log.Error("Close handle", ex);
+                    }
+                }
+                try
+                {
+                    s_Log.Info("Handle Dispose");
+                    tempHandle.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    s_Log.Error("Dispose handle", ex);
+                }
+            }
+        }
+
         /// <summary>
         /// Initialises the device
         /// </summary>
@@ -139,17 +179,7 @@ namespace UsbLibrary
         private void Initialise(string strPath)
         {
             s_Log.InfoFormat("Initialize {0}", strPath);
-            if (m_oFile != null)
-            {
-                m_oFile.Close();
-                m_oFile = null;
-                m_hHandle = null;
-            }
-            if (m_hHandle != null && !m_hHandle.IsInvalid)
-            {
-                m_hHandle.Close();
-                m_hHandle = null;
-            }
+            DisposeFile();
 
             s_Log.WarnFormat("Open {0}", strPath);
 
@@ -195,14 +225,25 @@ namespace UsbLibrary
         /// Kicks off an asynchronous read which completes when data is read or when the device
         /// is disconnected. Uses a callback.
         /// </summary>
-        private void BeginAsyncRead()
+        private bool BeginAsyncRead()
         {
+            bool error = true;
             byte[] arrInputReport = new byte[m_nInputReportLength];
             // put the buff we used to receive the stuff as the async state then we can get at it when the read completes
             if (m_oFile != null)
             {
-                m_oFile.BeginRead(arrInputReport, 0, m_nInputReportLength, new AsyncCallback(ReadCompleted), arrInputReport);
+                try
+                {
+                    m_oFile.BeginRead(arrInputReport, 0, m_nInputReportLength, new AsyncCallback(ReadCompleted), arrInputReport);
+                    error = false;
+                }
+                catch (ObjectDisposedException)
+                {
+                    //We have got a problem here!
+                }
+
             }
+            return error;
         }
         /// <summary>
         /// Callback for above. Care with this as it will be called on the background thread from the async read
@@ -234,6 +275,10 @@ namespace UsbLibrary
                 ReadCompleteHandedException();
             }
             catch (OperationCanceledException)
+            {
+                ReadCompleteHandedException();
+            }
+            catch (System.ObjectDisposedException)
             {
                 ReadCompleteHandedException();
             }
@@ -284,7 +329,7 @@ namespace UsbLibrary
             bool sentData = false;
             try
             {
-                const int numberOfMilliSecondsToWait = 1000;
+                const int numberOfMilliSecondsToWait = 100;
                 if (m_oFile == null)
                 {
                     return false;
