@@ -169,6 +169,8 @@ namespace TQC.USBDevice.GradientOven
 
         }
 
+       
+
         public ButtonStatus Button
         {
             get

@@ -32,7 +32,18 @@ namespace TQC.USBDevice
         }
 
     }
-
+    [Serializable]
+    public class InitializingException : Exception
+    {
+        public UInt32 ErrorCode { get; private set; }
+        public InitializingException(UInt32 errorCode) { ErrorCode = errorCode; }
+        public InitializingException(UInt32 errorCode, string message) : base(message) { ErrorCode = errorCode; }
+        public InitializingException(UInt32 errorCode, string message, Exception inner) : base(message, inner) { ErrorCode = errorCode; }
+        protected InitializingException(
+          SerializationInfo info,
+          StreamingContext context)
+            : base(info, context) { }
+    }
     [Serializable]
     public class NoDataReceivedException : DeviceResponseException
     {

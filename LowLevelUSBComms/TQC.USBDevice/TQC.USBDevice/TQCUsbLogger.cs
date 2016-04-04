@@ -164,6 +164,7 @@ namespace TQC.USBDevice
                 }
             }
         }
+
         internal BoardStatus _GetStatus(byte deviceId)
         {
             var response = GetResponse(deviceId, Commands.GROReadCommand, 0x09);
@@ -265,7 +266,43 @@ namespace TQC.USBDevice
             return new Version(result[3], result[2], result[1], result[0]);
         }
 
-        
+        public bool Initialize()
+        {
+            int percentage = 0;
+            var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x03));
+
+            if (response != null)
+            {
+                throw new NoDataReceivedException("Initialize");
+            }
+            return IsInitializing(out percentage);
+        }
+
+        public bool IsInitializing(out int percentage)
+        {
+            var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x4));
+
+            if (response == null)
+            {
+                throw new NoDataReceivedException("IsInitializing");
+            }
+            if (response.Length < sizeof(UInt32) + sizeof(byte))
+            {
+                throw new TooLittleDataReceivedException("IsInitializing", response.Length, sizeof(UInt32) + sizeof(byte));
+            }
+            bool isInitializing = false;
+            UInt32 errorCode = BitConverter.ToUInt32(response, 0);
+
+            switch (errorCode)
+            {
+                case 0: isInitializing = false; break;
+                case 1: isInitializing = true; break;
+                default:
+                    throw new InitializingException(errorCode);
+            }
+            percentage = response[5];
+            return isInitializing;
+        }
 
         public Version HardwareVersion
         {
