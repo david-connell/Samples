@@ -191,15 +191,15 @@ namespace TQC.USBDevice.GradientOven
 
                 //if (buttonStatus != 0)
                 {
-                    if ((buttonStatus & (0x10)) == 0x10)
+                    if ((buttonStatus & (0x08)) == 0x08)
                     {
                         button |= ButtonStatus.YellowPressed;
                     }
-                    if ((buttonStatus & (0x20)) == 0x20)
+                    if ((buttonStatus & (0x10)) == 0x10)
                     {
                         button |= ButtonStatus.GreenPressed;
                     }
-                    if ((buttonStatus & (0x40)) == 0x40)
+                    if ((buttonStatus & (0x20)) == 0x20)
                     {
                         button |= ButtonStatus.RedPressed;
                     }
