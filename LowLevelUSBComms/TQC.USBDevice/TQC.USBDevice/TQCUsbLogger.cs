@@ -270,8 +270,7 @@ namespace TQC.USBDevice
         {
             int percentage = 0;
             var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x03));
-
-            if (response != null)
+            if (response != null && response.Length > 0)
             {
                 throw new NoDataReceivedException("Initialize");
             }
@@ -281,15 +280,17 @@ namespace TQC.USBDevice
         public bool IsInitializing(out int percentage)
         {
             var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x4));
-
+            
             if (response == null)
             {
                 throw new NoDataReceivedException("IsInitializing");
             }
-            if (response.Length < sizeof(UInt32) + sizeof(byte))
+            
+            if (response.Length < (sizeof(UInt32) + sizeof(byte)))
             {
                 throw new TooLittleDataReceivedException("IsInitializing", response.Length, sizeof(UInt32) + sizeof(byte));
             }
+            
             bool isInitializing = false;
             UInt32 errorCode = BitConverter.ToUInt32(response, 0);
 
@@ -300,7 +301,9 @@ namespace TQC.USBDevice
                 default:
                     throw new InitializingException(errorCode);
             }
-            percentage = response[5];
+            percentage = response[sizeof(UInt32)];
+            //Console.WriteLine("Percentage = {0} {1}", percentage, response[4]);
+
             return isInitializing;
         }
 
