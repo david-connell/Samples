@@ -43,6 +43,23 @@ namespace IntegrationTestNUnit.Logger.GRO
                 }
             }
         }
+        [Test]
+        public void Initialize()
+        {
+            using (var logger = new GROMainBoard(null))
+            {
+                
+                if (logger.OpenWithMinumumRequests(ProductId))
+                {
+                    Assert.That(logger.Initialize(), Is.EqualTo(true));
+                    int percent;
+                    while (logger.IsInitializing(out percent))
+                    {
+                        Console.WriteLine("Percentage = ({0})", percent);
+                    }
+                }
+            }
+        }
 
         [TestCase(ButtonStatus.OKPressed, "Press the OK Button")]
         [TestCase(ButtonStatus.CancelPressed, "Press the Cancel Button")]
