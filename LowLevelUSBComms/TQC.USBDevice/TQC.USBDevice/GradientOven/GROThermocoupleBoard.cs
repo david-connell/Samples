@@ -157,5 +157,14 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
+        public bool Initialize()
+        {
+            return ParentDevice._Initialize(ChildDeviceID);
+        }
+
+        public bool IsInitializing(out int percentage)
+        {
+            return ParentDevice._IsInitializing(ChildDeviceID, out percentage);
+        }
     }
 }

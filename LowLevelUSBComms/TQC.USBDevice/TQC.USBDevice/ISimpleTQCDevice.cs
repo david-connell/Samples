@@ -17,6 +17,8 @@ namespace TQC.USBDevice
 
         IEnumerable<double> ColdJunctions { get; }
         IEnumerable<double> ProbeValues { get; }
+        bool Initialize();
+        bool IsInitializing(out int percentage);
 
     }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using log4net;
 using TQC.USBDevice.Exceptions;
@@ -268,18 +267,28 @@ namespace TQC.USBDevice
 
         public bool Initialize()
         {
+            return _Initialize(0);
+        }
+
+        internal bool _Initialize(byte deviceId)
+        {
             int percentage = 0;
-            var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x03));
+            var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x03), deviceId);
             if (response != null && response.Length > 0)
             {
                 throw new NoDataReceivedException("Initialize");
             }
-            return IsInitializing(out percentage);
+            return _IsInitializing(deviceId, out percentage);
         }
 
         public bool IsInitializing(out int percentage)
         {
-            var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x4));
+            return _IsInitializing(0, out percentage);
+        }
+
+        internal  bool _IsInitializing(byte deviceId, out int percentage)
+        {
+            var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x4), deviceId);
             
             if (response == null)
             {

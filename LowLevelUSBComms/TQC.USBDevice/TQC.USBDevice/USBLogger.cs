@@ -7,7 +7,6 @@ using System.Threading;
 using log4net;
 using TQC.IF.USBLogger;
 using TQC.USBDevice.Exceptions;
-using TQC.USBDevice.Utils;
 
 namespace TQC.USBDevice
 {
@@ -44,7 +43,7 @@ namespace TQC.USBDevice
             USB_PRODUCT2 = 0x15CD0011,
             USB_CURVEX_3 = 0x2047FFFE,
             USB_CURVEX_3a = 0x20470827,
-            GRADIENT_OVEN = 0x04037B60,
+            GRADIENT_OVEN = 0x204709FD,
             USB_THERMOCOUPLE_SIMULATOR = 0x20470828,
 
         }
