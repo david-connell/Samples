@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using TQC.USBDevice;
 using TQC.USBDevice.GradientOven;
@@ -137,6 +133,20 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
             }
         }
 
+
+        [Test]
+        public void Initialize()
+        {
+            using (ThermocoupleBoard thermocoupleBoard = new ThermocoupleBoard(ProductId, ThermocoupleBoard))
+            {
+                Console.WriteLine("Status = '{0}'", thermocoupleBoard.Board.Initialize());
+                int percentage;
+                while (thermocoupleBoard.Board.IsInitializing(out percentage))
+                {
+                    Console.WriteLine("Percentage = {0}", percentage);
+                }
+            }
+        }
 
     }
 }

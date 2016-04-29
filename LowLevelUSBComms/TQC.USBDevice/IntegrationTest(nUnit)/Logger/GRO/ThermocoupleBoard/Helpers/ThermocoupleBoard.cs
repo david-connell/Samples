@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TQC.USBDevice;
 using TQC.USBDevice.GradientOven;
 
@@ -11,7 +7,7 @@ namespace IntegrationTestNUnit.Logger.GRO.ThermocoupleBoard
     class ThermocoupleBoard : IDisposable
     {
         GROMainBoard m_Logger = new GROMainBoard(null);
-        byte m_ThermocoupleBoard;
+        readonly byte m_ThermocoupleBoard;
         public ThermocoupleBoard(USBLogger.USBProductId productId, byte thermocoupleBoard)
         {
             m_Logger.OpenWithMinumumRequests(productId);
