@@ -43,7 +43,7 @@ namespace TQC.USBDevice.AutoGenerateTestCode
                     }
                     WriteOutClassStart(textWriter, command);
 
-                    WriteOutConstructor(textWriter, command, USBLogger.USBProductId.USB_CURVEX_3a);
+                    WriteOutConstructor(textWriter, command, USBLogger.USBProductId.USB_CURVEX_3_STANDARD);
 
                 }
                 string testAttributes = "";

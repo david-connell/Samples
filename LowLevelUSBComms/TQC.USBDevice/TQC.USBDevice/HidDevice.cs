@@ -965,6 +965,7 @@ namespace TQC.USBDevice
 
                     case USBProductId.USB_CURVEX_3:
                     case USBProductId.USB_CURVEX_3a:
+                    case USBProductId.USB_CURVEX_3_STANDARD:
                         m_Product = "*CurveX 3";
                         break;
 
@@ -990,6 +991,7 @@ namespace TQC.USBDevice
             USB_PRODUCT2 = 0x15CD0011,
             USB_CURVEX_3 = 0x2047FFFE,//orignal
             USB_CURVEX_3a = 0x20470827,//current
+            USB_CURVEX_3_STANDARD = 0x1FC98128,
             GRADIENT_OVEN = 0x04037B60,
             USB_THERMOCOUPLE_SIMULATOR = 0x20470828,
             USB_THERMOCOUPLE_SIMULATORa = 0x204709FC,

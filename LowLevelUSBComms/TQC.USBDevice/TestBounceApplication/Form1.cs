@@ -35,6 +35,7 @@ namespace TestBounceApplication
             comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.GRADIENT_OVEN));
             comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_CURVEX_3));
             comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_CURVEX_3a));
+            comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_CURVEX_3_STANDARD));
             comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_PRODUCT2));
             comboBox1.Items.Add(new UserSelection(USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR));
             comboBox1.SelectedIndex = 1;
@@ -75,6 +76,7 @@ namespace TestBounceApplication
                     case USBLogger.USBProductId.Glossmeter: return "Glossmeter";
                     case USBLogger.USBProductId.USB_CURVEX_3a: return "CurveX 3 (VID=0x2047, PID=0x0827)";
                     case USBLogger.USBProductId.USB_CURVEX_3: return "CurveX 3 (VID=0x2047, PID=0xFFFE)";                    
+                    case USBLogger.USBProductId.USB_CURVEX_3_STANDARD: return "CurveX 3 Standard";
                     case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR: return "Thermocouple Simulator";                  
                 }
                 return string.Format("VID/PID{0:X}", (int)ProductId);

@@ -66,6 +66,7 @@ namespace TQC.USBDevice
                 new USBDevice(HidDevice.USBProductId.USB_PRODUCT2, "GlossMeter2"),
                 new USBDevice(HidDevice.USBProductId.USB_CURVEX_3, "CurveX 3 (Old)"),
                 new USBDevice(HidDevice.USBProductId.USB_CURVEX_3a, "CurveX 3"),
+                new USBDevice(HidDevice.USBProductId.USB_CURVEX_3_STANDARD, "CurveX 3 Standard"),
                 new USBDevice(HidDevice.USBProductId.GRADIENT_OVEN, "GRADIENT_OVEN"),
                 new USBDevice(HidDevice.USBProductId.USB_THERMOCOUPLE_SIMULATOR, "USB_THERMOCOUPLE_SIMULATOR"),
             };

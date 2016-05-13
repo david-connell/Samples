@@ -13,7 +13,7 @@ namespace IntegrationTestNUnit.Logger.Curvex3
     class Basic : BasicCommands
     {
         public Basic()
-            : base(USBLogger.USBProductId.USB_CURVEX_3a)
+            : base(USBLogger.USBProductId.USB_CURVEX_3_STANDARD)
         {
         }
         
@@ -24,7 +24,7 @@ namespace IntegrationTestNUnit.Logger.Curvex3
     class Calibration : CalibrationCommands
     {
         public Calibration()
-            : base(USBLogger.USBProductId.USB_CURVEX_3a)
+            : base(USBLogger.USBProductId.USB_CURVEX_3_STANDARD)
         {
         }
 
@@ -57,7 +57,7 @@ namespace IntegrationTestNUnit.Logger.Curvex3
     class ReadValues : ReadValuesCommands
     {
         public ReadValues()
-            : base(USBLogger.USBProductId.USB_CURVEX_3a)
+            : base(USBLogger.USBProductId.USB_CURVEX_3_STANDARD)
         {
         }
        

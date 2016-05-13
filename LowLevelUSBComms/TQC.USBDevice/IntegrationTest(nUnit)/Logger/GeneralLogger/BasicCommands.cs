@@ -451,6 +451,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                     default:
                     case USBLogger.USBProductId.USB_CURVEX_3:
                     case USBLogger.USBProductId.USB_CURVEX_3a:
+                    case USBLogger.USBProductId.USB_CURVEX_3_STANDARD:
                         return new TQCUsbLogger(null);
                         
                 }
@@ -538,6 +539,9 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                         case USBLogger.USBProductId.USB_CURVEX_3a:
                             Assert.That(value, Is.EqualTo(DeviceType.CurveX3_Basic));
                             break;
+                        case USBLogger.USBProductId.USB_CURVEX_3_STANDARD:
+                            Assert.That(value, Is.EqualTo(DeviceType.CurveX3_Mid));
+                            break;
                         case USBLogger.USBProductId.USB_THERMOCOUPLE_SIMULATOR:
                             Assert.That(value, Is.EqualTo(DeviceType.ThermocoupleSimulator));
                             break;
@@ -582,6 +586,9 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                         case USBLogger.USBProductId.GRADIENT_OVEN:
                             Assert.That(logger.NumberOfProbes, Is.EqualTo(0));
                             break;
+                        case USBLogger.USBProductId.USB_CURVEX_3_STANDARD:
+                            Assert.That(logger.NumberOfProbes, Is.EqualTo(6));
+                            break;
                         case USBLogger.USBProductId.USB_CURVEX_3a:
                             Assert.That(logger.NumberOfProbes, Is.EqualTo(4));
                             break;
@@ -606,6 +613,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
                         case USBLogger.USBProductId.GRADIENT_OVEN:
                             Assert.That(logger.NumberOfBatches, Is.EqualTo(0));
                             break;
+                        case USBLogger.USBProductId.USB_CURVEX_3_STANDARD:
                         case USBLogger.USBProductId.USB_CURVEX_3a:
                             Assert.That(logger.NumberOfBatches, Is.EqualTo(10));
                             break;

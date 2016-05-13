@@ -43,6 +43,7 @@ namespace TQC.USBDevice
             USB_PRODUCT2 = 0x15CD0011,
             USB_CURVEX_3 = 0x2047FFFE,
             USB_CURVEX_3a = 0x20470827,
+            USB_CURVEX_3_STANDARD = 0x1FC98128,
             GRADIENT_OVEN = 0x204709FD,
             USB_THERMOCOUPLE_SIMULATOR = 0x20470828,
 
@@ -893,7 +894,7 @@ namespace TQC.USBDevice
         {
             get
             {
-                return (m_ProductId == USBProductId.USB_CURVEX_3) || (m_ProductId == USBProductId.USB_CURVEX_3a); 
+                return (m_ProductId == USBProductId.USB_CURVEX_3) || (m_ProductId == USBProductId.USB_CURVEX_3a) || (m_ProductId == USBProductId.USB_CURVEX_3_STANDARD); 
             }
         }
 
