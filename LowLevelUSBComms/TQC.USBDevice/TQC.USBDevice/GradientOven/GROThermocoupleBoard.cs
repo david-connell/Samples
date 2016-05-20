@@ -98,6 +98,11 @@ namespace TQC.USBDevice.GradientOven
             }
         }
 
+        public void SetCalibrationReport(int probeId, CalibrationReport details)
+        {
+            ParentDevice.SetCalibrationReport(probeId, details);
+        }
+
         public DateTime Calibration
         {
             get
@@ -122,6 +127,11 @@ namespace TQC.USBDevice.GradientOven
         public void SetCalibrationDetails(int probeId, LinearCalibrationDetails details)
         {
             ParentDevice._SetCalibration(ChildDeviceID, probeId, details);
+        }
+
+        public CalibrationReport CalibrationReport(int probeId)
+        {
+            return ParentDevice.CalibrationReport(probeId);
         }
 
         public String CalibrationCompany

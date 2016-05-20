@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace TQC.USBDevice
 {
@@ -10,12 +8,12 @@ namespace TQC.USBDevice
 
         public bool IsSerialPort { get; set; }
         private int m_nComPortId;
-        public string DeviceName { get; set; }
+        public string DeviceName { get; private set; }
         private string m_ComPortName;
         public string FullName { get; set; }
-        public string FriendlyName { get; set; }
+        public string FriendlyName { get; private set; }
         private bool m_IsOk;
-        public int PidVid { get; set; }
+        public int PidVid { get; private set; }
 
         public SerialOrUsbPort(string deviceName, string fullName, string niceName, int usbPort)
         {

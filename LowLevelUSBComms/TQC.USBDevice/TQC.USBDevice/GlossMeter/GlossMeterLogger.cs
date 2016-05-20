@@ -5,6 +5,7 @@ using System.Threading;
 
 namespace TQC.USBDevice.GlossMeter
 {
+
     public class GlossMeterLogger : TQCUsbLogger
     {
 
@@ -34,7 +35,7 @@ namespace TQC.USBDevice.GlossMeter
             Request(Commands.LoggerSpecificCommand, request.ToArray());
         }
 
-        public string CalibrationCertificate
+        public override string CalibrationCertificate
         {
             get
             {

@@ -58,6 +58,7 @@
     <Compile Include="DeviceResponseUnexpectedException.cs" />
     <Compile Include="Exceptions\LoggerCannotBeConfiguredException.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Curvex3\Curvex3Standard.cs" />
     <Compile Include="GlossMeter\GlossMeterLogger.cs" />
     <Compile Include="GradientOven\ButtonStatus.cs" />
     <Compile Include="GradientOven\CarrierPosition.cs" />

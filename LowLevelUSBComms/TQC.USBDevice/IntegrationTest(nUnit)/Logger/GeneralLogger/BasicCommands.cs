@@ -62,7 +62,7 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             }
 
 
-            [TestCase(5, SpeedTestType.DeviceType, true, 0,0)]
+            [TestCase(5, SpeedTestType.DeviceType, true, 0, 0), Explicit]
             [TestCase(5, SpeedTestType.DeviceType, false, 0, 0)]
             //[TestCase(10, SpeedTestType.DeviceType)]
             [TestCase(200, SpeedTestType.DeviceType, false, 0, 0)]
@@ -70,9 +70,6 @@ namespace IntegrationTestNUnit.Logger.GeneralLogger
             [TestCase(200, SpeedTestType.DeviceType, false, 10, 0)]
             [TestCase(200, SpeedTestType.DeviceType, false, 5, 5)]
             [TestCase(200, SpeedTestType.DeviceType, false, 2, 2)]
-            //[TestCase(100, SpeedTestType.Status)]
-            //[TestCase(100, SpeedTestType.Name)]
-            //[TestCase(200, SpeedTestType.Name)]
             public void GeneralSpeed(int numberOfSeconds, SpeedTestType typeOfTest, bool useNative, int pre, int post)
             {
                 Configuration config = new Configuration();

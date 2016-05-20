@@ -15,14 +15,11 @@ namespace TQC.USBDevice
     //Extend here with request responses that are not covered by the standard COM calls.
     public class TQCUsbLogger : USBLogger, ISimpleTQCDevice
     {
-        Dictionary<byte, int> ProbesPerDevice = new Dictionary<byte, int>();
+        Dictionary<byte, int> m_ProbesPerDevice = new Dictionary<byte, int>();
         Dictionary<byte, CachedData> m_CachedData = new Dictionary<byte, CachedData>();
-        private static ILog s_Log = LogManager.GetLogger("TQC.USBDevice.TQCUsbLogger");
+        private static readonly ILog s_Log = LogManager.GetLogger("TQC.USBDevice.TQCUsbLogger");
 
-        public TQCUsbLogger(IUsbInterfaceForm mainWinForm): this(mainWinForm, null)
-        {
-        }
-        public TQCUsbLogger(IUsbInterfaceForm mainWinForm, Type typeOfHidDeviceToInject)
+        public TQCUsbLogger(IUsbInterfaceForm mainWinForm, Type typeOfHidDeviceToInject = null)
             : base(mainWinForm, typeOfHidDeviceToInject)
         {
         }
@@ -113,7 +110,7 @@ namespace TQC.USBDevice
 
         protected override void ClearCachedData()
         {
-            ProbesPerDevice = new Dictionary<byte, int>();
+            m_ProbesPerDevice = new Dictionary<byte, int>();
             m_CachedData = new Dictionary<byte, CachedData>();
         }
 
@@ -182,7 +179,7 @@ namespace TQC.USBDevice
         }
 
 
-        override internal Int32 _SerialNumber(byte deviceId)
+        internal override Int32 _SerialNumber(byte deviceId)
         {
             return GetInt32(deviceId, Commands.ReadDeviceInfo, 0);
         }
@@ -197,7 +194,7 @@ namespace TQC.USBDevice
                 {
                     result = value.Substring(0, maxLength);
                 }
-                request.AddRange(System.Text.ASCIIEncoding.Default.GetBytes(result));
+                request.AddRange(Encoding.Default.GetBytes(result));
                 for (int counter = result.Length; counter < maxLength; counter++)
                     request.Add(0);
                 GetResponse(deviceId, Commands.WriteDeviceInfo, enumerationId, request);
@@ -222,6 +219,21 @@ namespace TQC.USBDevice
             }
         }
 
+        internal void WriteDeviceInfo(byte deviceId, int enumerationId, Int16 value)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                List<byte> request = new List<byte>();
+                request.AddRange(BitConverter.GetBytes(value));
+                GetResponse(deviceId, Commands.WriteDeviceInfo, enumerationId, request);
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException("Unable to write byte device information");
+            }
+        }
+
+
         internal void WriteDeviceInfo(byte deviceId, int enumerationId, Version version)
         {
             if (CanLoggerBeConfigured)
@@ -240,6 +252,19 @@ namespace TQC.USBDevice
             }
         }
 
+        internal void _SetDeviceType(byte deviceId, DeviceType type)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                WriteDeviceInfo(deviceId, 102, DeviceTypeLoggerType(type));
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException("Cannot set device type");
+            }
+
+        }
+
         internal void _SetSerialNumber(byte deviceId, Int32 serialNumber)
         {
             if (CanLoggerBeConfigured)
@@ -255,7 +280,7 @@ namespace TQC.USBDevice
         }
 
 
-        override internal Version _SoftwareVersion(byte deviceId)
+        internal override Version _SoftwareVersion(byte deviceId)
         {
             var result = GetResponse(deviceId, Commands.ReadDeviceInfo, 1);
             if (result.Length < 4)
@@ -272,7 +297,7 @@ namespace TQC.USBDevice
 
         internal bool _Initialize(byte deviceId)
         {
-            int percentage = 0;
+            int percentage;
             var response = Request(Commands.LoggerResetCommand, BitConverter.GetBytes((short)0x03), deviceId);
             if (response != null && response.Length > 0)
             {
@@ -300,7 +325,7 @@ namespace TQC.USBDevice
                 throw new TooLittleDataReceivedException("IsInitializing", response.Length, sizeof(UInt32) + sizeof(byte));
             }
             
-            bool isInitializing = false;
+            bool isInitializing;
             UInt32 errorCode = BitConverter.ToUInt32(response, 0);
 
             switch (errorCode)
@@ -424,6 +449,17 @@ namespace TQC.USBDevice
             }
         }
 
+        public virtual string CalibrationCertificate
+        {
+            get
+            {
+                return ReadDeviceInfoAsString(0, 200);
+            }
+            set
+            {
+                WriteDeviceInfo(0, 200, value, 40);
+            }
+        }
 
         internal DateTime _ManufactureDate(byte deviceId)
         {
@@ -440,9 +476,15 @@ namespace TQC.USBDevice
 
             var unixTimeStamp = BitConverter.ToInt32(result, offset);
 
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
+        }
+
+        private Int32 DateTimeToResult(DateTime dateTime)
+        {
+            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            return (Int32)(dateTime.ToUniversalTime() - dtDateTime).TotalSeconds;
         }
 
         public DateTime ManufactureDate
@@ -453,11 +495,7 @@ namespace TQC.USBDevice
             }
             set
             {
-                Int32 numberOfSecs;
-                DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-                var span = value - dtDateTime;
-                numberOfSecs = (Int32) span.TotalSeconds;
-                WriteDeviceInfo(0, 5, numberOfSecs);
+                WriteDeviceInfo(0, 5, DateTimeToResult(value));
             }
         }
 
@@ -492,11 +530,11 @@ namespace TQC.USBDevice
 
         internal Int32 _NumberOfProbes(byte deviceId)
         {
-            if (!ProbesPerDevice.ContainsKey(deviceId))
+            if (!m_ProbesPerDevice.ContainsKey(deviceId))
             {
-                ProbesPerDevice[deviceId] = GetInt8(deviceId, Commands.ReadDeviceInfo, 11);
+                m_ProbesPerDevice[deviceId] = GetInt8(deviceId, Commands.ReadDeviceInfo, 11);
             }
-            return ProbesPerDevice[deviceId];
+            return m_ProbesPerDevice[deviceId];
         }
 
         internal LinearCalibrationDetails _Calibration(byte deviceId, int probeId)
@@ -521,6 +559,85 @@ namespace TQC.USBDevice
             }
         }
 
+        private void _SetCalibration(string errorText, byte deviceId, int commandId, List<byte>data)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                var result = GetResponse(deviceId, Commands.WriteCalibrationDetails, commandId, data);
+                if (result != null && result.Length > 0)
+                {
+                    throw new NoDataReceivedException("setCalibration");
+                }
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException(string.Format("Unable to set Calibration for {0}", errorText));
+
+            }
+        }
+
+        private void _SetCalibration(string errorText, byte deviceId, int commandId, Int32 data)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                List<byte> request = new List<byte>();
+                request.AddRange(BitConverter.GetBytes(data));
+                var result = GetResponse(deviceId, Commands.WriteCalibrationDetails, commandId, request);
+                if (result != null && result.Length > 0)
+                {
+                    throw new NoDataReceivedException("setCalibration");
+                }
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException(string.Format("Unable to set Calibration for {0}", errorText));
+                
+            }
+        }
+        private void _SetCalibration(string errorText, byte deviceId, int commandId, UInt16 data)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                List<byte> request = new List<byte>();
+                request.AddRange(BitConverter.GetBytes(data));
+                var result = GetResponse(deviceId, Commands.WriteCalibrationDetails, commandId, request);
+                if (result != null && result.Length > 0)
+                {
+                    throw new NoDataReceivedException("setCalibration");
+                }
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException(string.Format("Unable to set Calibration for {0}", errorText));
+
+            }
+        }
+        private void _SetCalibration(string errorText, byte deviceId, int commandId, string data, int maxLength)
+        {
+            if (CanLoggerBeConfigured)
+            {
+                List<byte> request = new List<byte>();
+                string result = data;
+                if (data.Length > maxLength)
+                {
+                    result = data.Substring(0, maxLength);
+                }
+                request.AddRange(Encoding.Default.GetBytes(result));
+                for (int counter = result.Length; counter < maxLength; counter++)
+                    request.Add(0); 
+                var responseData = GetResponse(deviceId, Commands.WriteCalibrationDetails, commandId, request);
+                if (responseData != null && responseData.Length > 0)
+                {
+                    throw new NoDataReceivedException("setCalibration");
+                }
+            }
+            else
+            {
+                throw new LoggerCannotBeConfiguredException(string.Format("Unable to set Calibration for {0}", errorText));
+
+            }
+        }
+
         internal void _SetCalibration(byte deviceId, int probeId, LinearCalibrationDetails newValue)
         {
             if (probeId >= 0 && probeId < _NumberOfProbes(deviceId))
@@ -532,7 +649,7 @@ namespace TQC.USBDevice
                     request.AddRange(BitConverter.GetBytes((float)newValue.C));
 
                     var result = GetResponse(deviceId, Commands.WriteCalibrationDetails, 20 + probeId, request);
-                    if (result != null)
+                    if (result != null && result.Length > 0)
                     {
                         throw new NoDataReceivedException("setCalibration");
                     }
@@ -541,7 +658,6 @@ namespace TQC.USBDevice
                 {
                     throw new LoggerCannotBeConfiguredException("Unable to set Calibration");
                 }
-                return; 
             }
             else
             {
@@ -553,6 +669,69 @@ namespace TQC.USBDevice
         {
             _SetCalibration(0, probeId, details);
         }
+
+
+        private DateTime _CalibrationReportDateTime(byte deviceId, int probeId)
+        {
+            var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 400 + probeId);
+            if (result == null)
+            {
+                throw new NoDataReceivedException("_CalibrationReportDateTime");
+            }
+            if (result.Length < sizeof(Int32))
+            {
+                throw new TooLittleDataReceivedException("_CalibrationReportDateTime", result.Length, sizeof(Int32));
+            }
+            return ResultToDateTime("_CalibrationReportDateTime", result, 0);
+        }
+
+        private Int32[] _CalibrationReportData(byte deviceId, int probeId, bool isNominal)
+        {
+            var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, isNominal ? 431 + probeId : 464 + probeId);
+            if (result == null)
+            {
+                throw new NoDataReceivedException("_CalibrationReportData");
+            }
+            if (result.Length < sizeof(byte))
+            {
+                throw new TooLittleDataReceivedException("_CalibrationReportData", result.Length, sizeof(byte));
+            }
+            byte numberOfItems = result[0];
+            if (result.Length < (sizeof(byte) + sizeof(Int32)*numberOfItems))
+            {
+                throw new TooLittleDataReceivedException("_CalibrationReportData", result.Length, (sizeof(byte) + sizeof(Int32) * numberOfItems));
+            }
+            var returnValue = new Int32[numberOfItems];
+            for (int index = 0; index < numberOfItems; index++)
+            {
+                returnValue[index] = BitConverter.ToInt32(result, 1 + index*sizeof(Int32));
+            }
+            return returnValue;
+        }
+
+        public CalibrationReport CalibrationReport(int probeId)
+        {
+            var result = new CalibrationReport(_CalibrationReportDateTime(0, probeId));
+            var nominal = _CalibrationReportData(0, probeId, true);
+            var actual = _CalibrationReportData(0, probeId, false);
+            if (nominal.Length != actual.Length)
+            {
+                throw new IndexOutOfRangeException(String.Format("Nominal length {0} != Actual Length {1}", nominal.Length, actual.Length));
+            }
+            for (int id = 0; id < nominal.Length; id++)
+            {
+                result.Points.Add(new CalibrationReport.CalibrationReportPoint(nominal[id], actual[id]));
+            }
+            return result;
+        }
+
+        public void SetCalibrationReport(int probeId, CalibrationReport details)
+        {
+            _SetCalibration("ProbeDateTime", 0, 400+probeId, DateTimeToResult(details.DateTime));
+            _SetCalibration("ProbeNominal", 0, 432 + probeId, details.NormalRequest);
+            _SetCalibration("ProbeActual", 0, 464 + probeId, details.ActualRequest);
+        }
+
 
         public virtual LinearCalibrationDetails CalibrationDetails(int probeId)
         {
@@ -576,7 +755,7 @@ namespace TQC.USBDevice
 
         public virtual string ProbeName(int probeId)
         {
-            return _ProbeName(0, probeId);            
+            return _ProbeName(0, probeId);
         }
 
         internal ProbeType _ProbeType(byte deviceId, int probeId)
@@ -611,6 +790,7 @@ namespace TQC.USBDevice
             {
                 return _DeviceType(0);
             }
+            set { _SetDeviceType(0, value); }
         }
 
         /// <summary>
@@ -621,6 +801,10 @@ namespace TQC.USBDevice
             get
             {
                 return _Calibration(0);
+            }
+            set
+            {
+                _SetCalibration("Calibration Date", 0, 0, DateTimeToResult(value));
             }
         }
 
@@ -639,6 +823,10 @@ namespace TQC.USBDevice
             {
                 return _CalibrationCompany(0);
             }
+            set
+            {
+                _SetCalibration("Calibration Company", 0, 1, value, 28);
+            }
         }
 
         internal override String _CalibrationCompany(byte deviceId)
@@ -655,13 +843,58 @@ namespace TQC.USBDevice
             {
                 return _CalibrationUserName(0);
             }
+            set
+            {
+                _SetCalibration("Calibration Username", 0, 2, value,28);
+            }
+        }
+
+
+        public String CalibrationEquipmentName
+        {
+            get
+            {
+                return _GetCalibrationDetailAsString(0, 12);
+            }
+            set
+            {
+                _SetCalibration("CalibrationEquipmentName", 0, 12, value, 28);
+            }
+        }
+
+        public String CalibrationEquipmentSerialNumber
+        {
+            get
+            {
+                return _GetCalibrationDetailAsString(0, 13);
+            }
+            set
+            {
+                _SetCalibration("CalibrationEquipmentSerialNumber", 0, 13, value, 28);
+            }
+        }
+
+        public String CalibrationEquipmentTracability
+        {
+            get
+            {
+                return _GetCalibrationDetailAsString(0, 14);
+            }
+            set
+            {
+                _SetCalibration("CalibrationEquipmentTracability", 0, 14, value, 28);
+            }
+        }
+
+        private string _GetCalibrationDetailAsString(byte deviceId, int commandId)
+        {
+            var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, commandId);
+            return result == null ? "" : DecodeString(result);
         }
 
         internal override String _CalibrationUserName(byte deviceId)
         {
-            var result = GetResponse(deviceId, Commands.ReadCalibrationDetails, 2);
-
-            return result == null ? "": DecodeString(result);
+            return _GetCalibrationDetailAsString(deviceId, 2);
         }
 
         internal override DeviceType _DeviceType(byte deviceId)
@@ -724,7 +957,6 @@ namespace TQC.USBDevice
                 buttonStatus = response[2];
                 status = BitConverter.ToInt32(response, 3);
             }
-            return;
         }
 
 
@@ -778,10 +1010,10 @@ namespace TQC.USBDevice
                     case DeviceType.SoloGlossmeter:
                         mode = 0x01;
                         break;
-                    case USBDevice.DeviceType.GRO:
+                    case DeviceType.GRO:
                         isGro = true;
                         break;
-                    case USBDevice.DeviceType.ThermocoupleSimulator:
+                    case DeviceType.ThermocoupleSimulator:
                         throw new NotSupportedException("Thermocouple simultator cannot read temperatures");
                         //break;
 
@@ -791,13 +1023,12 @@ namespace TQC.USBDevice
                 {
                     const int lengthOfData = 2;
                     const int startOffset = 6;
-                    double valueAsDouble;
                     double valueCached = 0;
 
                     for (int i = 0; i < (result.Length - startOffset) / lengthOfData; i++)
                     {
                         Int16 value = BitConverter.ToInt16(result, startOffset + i * lengthOfData);
-                        valueAsDouble = (double)value / 10.0;
+                        var valueAsDouble = (double)value / 10.0;
                         //This is a horrible hack!
                         //Must Remove
                         if (isGro && valueAsDouble > 349.0)
@@ -867,7 +1098,7 @@ namespace TQC.USBDevice
             }
             catch
             {
-                
+                // ignored
             }
             return false;
         }

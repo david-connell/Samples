@@ -707,6 +707,29 @@ namespace TQC.USBDevice
             return DeviceType.Unknown;
         }
 
+        protected static int DeviceTypeLoggerType(DeviceType deviceType)
+        {
+            switch (deviceType)
+            {
+                case DeviceType.SoloGlossmeter:
+                    return 1;
+                case DeviceType.DuoGlossmeter:
+                    return 2;
+                case DeviceType.PolyGlossmeter:
+                    return 3;
+                case DeviceType.CurveX3_Basic:
+                    return 4;
+                case DeviceType.CurveX3_Mid:
+                    return 5;
+                case DeviceType.CurveX3_High:
+                    return 6;
+                case DeviceType.GRO:
+                    return 7;
+                case DeviceType.ThermocoupleSimulator: return 9;
+            }
+            return -1;
+        }
+
         public void Dispose()
         {
             Dispose(true);
