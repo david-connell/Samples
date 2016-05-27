@@ -4,14 +4,14 @@ using NUnit.Framework;
 using TQC.USBDevice;
 using TQC.USBDevice.Curvex3;
 
-namespace IntegrationTestNUnit.Logger.Curvex3.Basic
+namespace IntegrationTestNUnit.Logger.Curvex3.Standard
 {
     [TestFixture]
-    class Basic : BasicCommands
+    class Standard : BasicCommands
     {
-        public const USBLogger.USBProductId USBCurvex3 = USBLogger.USBProductId.USB_CURVEX_3a;
+        public const USBLogger.USBProductId USBCurvex3 = USBLogger.USBProductId.USB_CURVEX_3_STANDARD;
 
-        public Basic()
+        public Standard()
             : base(USBCurvex3)
         {
         }
@@ -23,7 +23,7 @@ namespace IntegrationTestNUnit.Logger.Curvex3.Basic
     class Calibration : CalibrationCommands
     {
         public Calibration()
-            : base(Basic.USBCurvex3)
+            : base(Standard.USBCurvex3)
         {
         }
 
@@ -37,7 +37,7 @@ namespace IntegrationTestNUnit.Logger.Curvex3.Basic
                     int maxProbes = logger.NumberOfProbes;
                     if (maxProbes > 0)
                     {
-                        LinearCalibrationDetails details = new LinearCalibrationDetails(1,0);
+                        LinearCalibrationDetails details = new LinearCalibrationDetails(1, 0);
                         logger.SetCalibrationDetails(0, details);
                         Assert.That(logger.CalibrationDetails(0), Is.EqualTo(details));
                     }
@@ -355,10 +355,9 @@ namespace IntegrationTestNUnit.Logger.Curvex3.Basic
     class ReadValues : ReadValuesCommands
     {
         public ReadValues()
-            : base(Basic.USBCurvex3)
+            : base(Standard.USBCurvex3)
         {
         }
-       
+
     }
-    
 }
